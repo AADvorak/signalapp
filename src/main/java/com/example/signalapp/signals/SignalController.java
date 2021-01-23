@@ -21,53 +21,46 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SignalController {
     
-    private final SignalTitleRepository titleRepository;
+    private final SignalRepository signalRepository;
+    private final SignalDataRepository signalDataRepository;
     
-    private final SignalDataRepository dataRepository;
-    
-    private final SignalDataService signalDataService;
-
-    SignalController(SignalTitleRepository titleRepository, SignalDataRepository dataRepository, SignalDataService signalDataService) {
-        this.titleRepository = titleRepository;
-        this.dataRepository = dataRepository;
-        this.signalDataService = signalDataService;
+    SignalController(SignalRepository signalRepository, SignalDataRepository signalDataRepository) {
+        this.signalRepository = signalRepository;
+        this.signalDataRepository = signalDataRepository;
     }
 
     @GetMapping("/signals")
-    List<SignalTitle> signals() {
-        return titleRepository.findAllByOrderByCreateTimeDesc();
+    List<SignalIdNameDescription> signals() {
+        return signalRepository.findAllIdNameDescription();
     }
     
     @PostMapping("/signals")
-    SignalTitle newSignal(@RequestBody Signal newSignal) {
-        SignalTitle newSignalTitle = titleRepository.save(newSignal.getTitle());
-        signalDataService.insert(newSignal.getData(), newSignalTitle.getId());
-        return newSignalTitle;
+    Id newSignal(@RequestBody Signal newSignal) {
+        newSignal.setSignalToData();
+        return new Id(signalRepository.save(newSignal).getId());
     }
     
     @PutMapping("/signals/{id}")
-    SignalTitle replaceSignal(@RequestBody Signal newSignal, @PathVariable Integer id) {
-        SignalTitle newSignalTitle = titleRepository.findById(id).map(title -> {
-            title.setName(newSignal.getTitle().getName());
-            title.setDescription(newSignal.getTitle().getDescription());
-            return titleRepository.save(title);
+    void replaceSignal(@RequestBody Signal newSignal, @PathVariable Integer id) {
+        signalRepository.findById(id).map(signal -> {
+            signal.setName(newSignal.getName());
+            signal.setDescription(newSignal.getDescription());
+            signal.setData(newSignal.getData());
+            return signalRepository.save(signal);
         }).orElseGet(() -> {
-            newSignal.getTitle().setId(id);
-            return titleRepository.save(newSignal.getTitle());
+            newSignal.setId(id);
+            return signalRepository.save(newSignal);
         });
-        signalDataService.replace(newSignal.getData(), id);
-        return newSignalTitle;
     }
 
     @DeleteMapping("/signals/{id}")
     void deleteSignal(@PathVariable Integer id) {
-        titleRepository.deleteById(id);
-        signalDataService.deleteByTitleId(id);
+        signalRepository.deleteById(id);
     }
     
-    @GetMapping("/signaldata/{id}")
+    @GetMapping("/signals/{id}/data")
     List<SignalDataXandY> signalData(@PathVariable Integer id) {
-        return dataRepository.findByTitleId(id);
+        return signalDataRepository.findBySignalId(id);
     }
     
 }

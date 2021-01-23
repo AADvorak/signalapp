@@ -7,9 +7,12 @@ package com.example.signalapp.signals;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -25,19 +28,19 @@ public class SignalData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @Column(name = "signal_title_id")
-    private Integer signalTitleId;
-    
     @Column(name = "x")
     private Double x;
     
     @Column(name = "y")
     private Double y;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "signal_id", nullable = false)
+    private Signal signal;
+    
     SignalData () {}
 
-    SignalData(Integer signalTitleId, Double x, Double y) {
-        this.signalTitleId = signalTitleId;
+    SignalData(Double x, Double y) {
         this.x = x;
         this.y = y;
     }
@@ -48,14 +51,6 @@ public class SignalData {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getSignalTitleId() {
-        return signalTitleId;
-    }
-
-    public void setSignalTitleId(Integer signalTitleId) {
-        this.signalTitleId = signalTitleId;
     }
 
     public Double getX() {
@@ -72,6 +67,14 @@ public class SignalData {
 
     public void setY(Double y) {
         this.y = y;
+    }
+
+    public Signal getSignal() {
+        return signal;
+    }
+
+    public void setSignal(Signal signal) {
+        this.signal = signal;
     }
     
 }

@@ -9,10 +9,16 @@ package com.example.signalapp.signals;
  *
  * @author anton
  */
-public interface SignalDataXandY {
+public class Id {
     
-    Double getX();
+    private final Integer id;
 
-    Double getY();
+    public Id(Integer id) {
+        this.id = id;
+    }
 
+    public Integer getId() {
+        return id;
+    }
+    
 }

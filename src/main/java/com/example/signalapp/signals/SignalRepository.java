@@ -7,13 +7,15 @@ package com.example.signalapp.signals;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  *
  * @author anton
  */
-public interface SignalTitleRepository extends JpaRepository <SignalTitle, Integer> {
+public interface SignalRepository extends JpaRepository <Signal, Integer> {
 
-    public List<SignalTitle> findAllByOrderByCreateTimeDesc();
+    @Query(value = "select s.id, s.name, s.description from signal s order by create_time desc", nativeQuery = true)
+    public List<SignalIdNameDescription> findAllIdNameDescription();
     
 }

@@ -10,12 +10,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 /**
- * 
+ *
  * @author anton
  */
 public interface SignalDataRepository extends JpaRepository <SignalData, Integer> {
     
-    @Query(value = "select d.x, d.y from signal_data d where d.signal_title_id = ?1", nativeQuery = true)
-    public List<SignalDataXandY> findByTitleId(Integer titleId);
+    @Query(value = "select d.x, d.y from signal_data d where d.signal_id = ?1", nativeQuery = true)
+    public List<SignalDataXandY> findBySignalId(Integer signalId);
     
 }

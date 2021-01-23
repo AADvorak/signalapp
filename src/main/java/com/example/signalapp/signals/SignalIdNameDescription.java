@@ -9,10 +9,12 @@ package com.example.signalapp.signals;
  *
  * @author anton
  */
-public interface SignalDataXandY {
+public interface SignalIdNameDescription {
     
-    Double getX();
-
-    Double getY();
-
+    Integer getId();
+    
+    String getName();
+    
+    String getDescription();
+    
 }
