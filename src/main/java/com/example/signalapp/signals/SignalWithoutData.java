@@ -9,7 +9,7 @@ package com.example.signalapp.signals;
  *
  * @author anton
  */
-public interface SignalIdNameDescription {
+public interface SignalWithoutData {
     
     Integer getId();
     

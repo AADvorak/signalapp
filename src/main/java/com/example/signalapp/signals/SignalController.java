@@ -30,8 +30,8 @@ public class SignalController {
     }
 
     @GetMapping("/signals")
-    List<SignalIdNameDescription> signals() {
-        return signalRepository.findAllIdNameDescription();
+    List<SignalWithoutData> signals() {
+        return signalRepository.findAllWithoutData();
     }
     
     @PostMapping("/signals")

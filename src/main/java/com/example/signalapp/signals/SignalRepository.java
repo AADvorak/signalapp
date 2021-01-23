@@ -16,6 +16,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface SignalRepository extends JpaRepository <Signal, Integer> {
 
     @Query(value = "select s.id, s.name, s.description from signal s order by create_time desc", nativeQuery = true)
-    public List<SignalIdNameDescription> findAllIdNameDescription();
+    public List<SignalWithoutData> findAllWithoutData();
     
 }
