@@ -33,7 +33,7 @@ public class ModuleController {
     }
     
     @PostMapping("/modules")
-    Module newSignal(@RequestBody Module newModule) {
+    Module newModule(@RequestBody Module newModule) {
         return repository.save(newModule);
     }
     
@@ -53,7 +53,7 @@ public class ModuleController {
     }
 
     @DeleteMapping("/modules/{id}")
-    void deleteSignal(@PathVariable Integer id) {
+    void deleteModule(@PathVariable Integer id) {
         repository.deleteById(id);
     }
 
