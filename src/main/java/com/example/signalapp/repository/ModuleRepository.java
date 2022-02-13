@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.example.signalapp.modules;
+package com.example.signalapp.repository;
 
+import com.example.signalapp.model.Module;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

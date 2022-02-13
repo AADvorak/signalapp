@@ -3,16 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.example.signalapp.signals;
+package com.example.signalapp.dto;
 
-/**
- *
- * @author anton
- */
-public interface SignalDataXandY {
+import lombok.Data;
+
+@Data
+public class IdDtoResponse {
     
-    Double getX();
-
-    Double getY();
-
+    private final Integer id;
+    
 }

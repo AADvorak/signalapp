@@ -3,7 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.example.signalapp.signals;
+package com.example.signalapp.model;
+
+import com.example.signalapp.dto.SignalDataDto;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +25,10 @@ import javax.persistence.Table;
  *
  * @author anton
  */
+@Getter
+@Setter
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "signal_data")
 public class SignalData {
@@ -37,44 +47,10 @@ public class SignalData {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "signal_id", nullable = false)
     private Signal signal;
-    
-    SignalData () {}
 
-    SignalData(Double x, Double y) {
-        this.x = x;
-        this.y = y;
+    public SignalData(SignalDataDto dto) {
+        x = dto.getX();
+        y = dto.getY();
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Double getX() {
-        return x;
-    }
-
-    public void setX(Double x) {
-        this.x = x;
-    }
-
-    public Double getY() {
-        return y;
-    }
-
-    public void setY(Double y) {
-        this.y = y;
-    }
-
-    public Signal getSignal() {
-        return signal;
-    }
-
-    public void setSignal(Signal signal) {
-        this.signal = signal;
-    }
-    
 }
