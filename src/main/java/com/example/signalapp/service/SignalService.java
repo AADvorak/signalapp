@@ -1,45 +1,58 @@
 package com.example.signalapp.service;
 
-import com.example.signalapp.dao.SignalDao;
-import com.example.signalapp.daoimpl.SignalDaoImpl;
 import com.example.signalapp.dto.IdDtoResponse;
 import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.SignalDtoRequest;
 import com.example.signalapp.dto.SignalDtoResponse;
+import com.example.signalapp.error.DataErrorCode;
+import com.example.signalapp.error.DataException;
 import com.example.signalapp.model.Signal;
+import com.example.signalapp.repository.SignalRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SignalService {
 
-    SignalDao signalDao;
-
-    public SignalService(SignalDaoImpl signalDao) {
-        this.signalDao = signalDao;
-    }
+    private final SignalRepository signalRepository;
 
     public List<SignalDtoResponse> getAll() {
-        return signalDao.getAll().stream().map(signal -> new SignalDtoResponse(signal.getId(),
+        return signalRepository.findAll().stream().map(signal -> new SignalDtoResponse(signal.getId(),
                 signal.getName(), signal.getDescription())).collect(Collectors.toList());
     }
 
     public IdDtoResponse add(SignalDtoRequest request) {
-        return new IdDtoResponse(signalDao.insert(new Signal(request)).getId());
+        return new IdDtoResponse(signalRepository.save(new Signal(request)).getId());
     }
 
     public void update(SignalDtoRequest request, int id) {
-        signalDao.update(new Signal(request), id);
+        Signal signal = new Signal(request);
+        signalRepository.findById(id).map(existingSignal -> {
+            existingSignal.setName(signal.getName());
+            existingSignal.setDescription(signal.getDescription());
+            existingSignal.setData(signal.getData());
+            return signalRepository.save(existingSignal);
+        }).orElseGet(() -> {
+            signal.setId(id);
+            return signalRepository.save(signal);
+        });
     }
 
     public void delete(int id) {
-        signalDao.delete(id);
+        signalRepository.deleteById(id);
     }
 
-    public List<SignalDataDto> getData(int id) {
-        return signalDao.getData(id).stream().map(item ->
+    public List<SignalDataDto> getData(int id) throws DataException {
+        Optional<Signal> optionalSignal = signalRepository.findById(id);
+        if (optionalSignal.isEmpty()) {
+            throw new DataException(DataErrorCode.SIGNAL_DOES_NOT_EXIST);
+        }
+        return optionalSignal.get().getData().stream().map(item ->
                 new SignalDataDto(item.getX(), item.getY())).collect(Collectors.toList());
     }
 

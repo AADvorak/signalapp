@@ -1,20 +1,24 @@
 package com.example.signalapp.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ModuleDtoResponse {
 
-    private final int id;
+    private int id;
 
-    private final String module;
+    private String module;
 
-    private final String name;
+    private String name;
 
-    private final String container;
+    private String container;
 
-    private final boolean forMenu;
+    private boolean forMenu;
 
-    private final boolean transformer;
+    private boolean transformer;
 
 }
