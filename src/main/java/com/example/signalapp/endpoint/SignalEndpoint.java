@@ -2,11 +2,11 @@ package com.example.signalapp.endpoint;
 
 import java.util.List;
 
-import com.example.signalapp.dto.IdDtoResponse;
+import com.example.signalapp.dto.response.IdDtoResponse;
 import com.example.signalapp.dto.SignalDataDto;
-import com.example.signalapp.dto.SignalDtoRequest;
-import com.example.signalapp.dto.SignalDtoResponse;
-import com.example.signalapp.error.DataException;
+import com.example.signalapp.dto.request.SignalDtoRequest;
+import com.example.signalapp.dto.response.SignalDtoResponse;
+import com.example.signalapp.error.SignalAppDataException;
 import com.example.signalapp.service.SignalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -46,7 +46,7 @@ public class SignalEndpoint {
     }
     
     @GetMapping(path = "/{id}/data", produces = MediaType.APPLICATION_JSON_VALUE)
-    List<SignalDataDto> getData(@PathVariable int id) throws DataException {
+    List<SignalDataDto> getData(@PathVariable int id) throws SignalAppDataException {
         return service.getData(id);
     }
     

@@ -5,7 +5,7 @@
  */
 package com.example.signalapp.model;
 
-import com.example.signalapp.dto.SignalDtoRequest;
+import com.example.signalapp.dto.request.SignalDtoRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

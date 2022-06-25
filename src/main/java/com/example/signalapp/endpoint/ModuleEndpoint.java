@@ -2,8 +2,8 @@ package com.example.signalapp.endpoint;
 
 import java.util.List;
 
-import com.example.signalapp.dto.ModuleDtoRequest;
-import com.example.signalapp.dto.ModuleDtoResponse;
+import com.example.signalapp.dto.request.ModuleDtoRequest;
+import com.example.signalapp.dto.response.ModuleDtoResponse;
 import com.example.signalapp.service.ModuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

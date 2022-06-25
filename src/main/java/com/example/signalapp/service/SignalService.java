@@ -1,11 +1,11 @@
 package com.example.signalapp.service;
 
-import com.example.signalapp.dto.IdDtoResponse;
+import com.example.signalapp.dto.response.IdDtoResponse;
 import com.example.signalapp.dto.SignalDataDto;
-import com.example.signalapp.dto.SignalDtoRequest;
-import com.example.signalapp.dto.SignalDtoResponse;
-import com.example.signalapp.error.DataErrorCode;
-import com.example.signalapp.error.DataException;
+import com.example.signalapp.dto.request.SignalDtoRequest;
+import com.example.signalapp.dto.response.SignalDtoResponse;
+import com.example.signalapp.error.SignalAppDataErrorCode;
+import com.example.signalapp.error.SignalAppDataException;
 import com.example.signalapp.model.Signal;
 import com.example.signalapp.repository.SignalRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,10 +47,10 @@ public class SignalService {
         signalRepository.deleteById(id);
     }
 
-    public List<SignalDataDto> getData(int id) throws DataException {
+    public List<SignalDataDto> getData(int id) throws SignalAppDataException {
         Optional<Signal> optionalSignal = signalRepository.findById(id);
         if (optionalSignal.isEmpty()) {
-            throw new DataException(DataErrorCode.SIGNAL_DOES_NOT_EXIST);
+            throw new SignalAppDataException(SignalAppDataErrorCode.SIGNAL_DOES_NOT_EXIST);
         }
         return optionalSignal.get().getData().stream().map(item ->
                 new SignalDataDto(item.getX(), item.getY())).collect(Collectors.toList());

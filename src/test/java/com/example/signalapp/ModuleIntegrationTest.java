@@ -1,7 +1,7 @@
 package com.example.signalapp;
 
-import com.example.signalapp.dto.ModuleDtoRequest;
-import com.example.signalapp.dto.ModuleDtoResponse;
+import com.example.signalapp.dto.request.ModuleDtoRequest;
+import com.example.signalapp.dto.response.ModuleDtoResponse;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

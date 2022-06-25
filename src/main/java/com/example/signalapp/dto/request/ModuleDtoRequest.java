@@ -1,4 +1,4 @@
-package com.example.signalapp.dto;
+package com.example.signalapp.dto.request;
 
 import com.example.signalapp.validator.Container;
 import com.example.signalapp.validator.Module;

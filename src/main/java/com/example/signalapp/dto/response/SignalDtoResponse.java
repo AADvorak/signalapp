@@ -1,4 +1,4 @@
-package com.example.signalapp.dto;
+package com.example.signalapp.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
