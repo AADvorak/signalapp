@@ -29,9 +29,15 @@ public class GlobalErrorHandler {
 
     @ExceptionHandler(SignalAppDataException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public List<ErrorDtoResponse> handleSignalAppDataException(SignalAppDataException exc) {
-        List<ErrorDtoResponse> errors = new ArrayList<>();
-        errors.add(new ErrorDtoResponse(exc.getErrorCode().toString(), exc.getErrorCode().getDescription()));
+    public List<FieldErrorDtoResponse> handleSignalAppDataException(SignalAppDataException exc) {
+        List<FieldErrorDtoResponse> errors = new ArrayList<>();
+        if (exc.getFields().size() == 0) {
+            errors.add(new FieldErrorDtoResponse(exc.getErrorCode().toString(),null,
+                    exc.getErrorCode().getDescription()));
+        } else {
+            exc.getFields().forEach(field -> errors.add(new FieldErrorDtoResponse(exc.getErrorCode().toString(),
+                    field, exc.getErrorCode().getDescription())));
+        }
         return errors;
     }
 

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.UUID.randomUUID;
@@ -38,7 +40,9 @@ public class UserService extends ServiceBase {
         try {
             user = userRepository.save(UserMapper.INSTANCE.dtoToUser(request));
         } catch (DataIntegrityViolationException ex) {
-            throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_EXISTS);
+            List<String> fields = new ArrayList<>();
+            fields.add("email");
+            throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_EXISTS, fields);
         }
         return new ResponseWithToken<>(UserMapper.INSTANCE.userToDto(user), generateAndSaveToken(user));
     }
@@ -46,7 +50,10 @@ public class UserService extends ServiceBase {
     public ResponseWithToken<UserDtoResponse> login(LoginDtoRequest request) throws SignalAppDataException {
         User user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword());
         if (user == null) {
-            throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD);
+            List<String> fields = new ArrayList<>();
+            fields.add("email");
+            fields.add("password");
+            throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD, fields);
         }
         return new ResponseWithToken<>(UserMapper.INSTANCE.userToDto(user), generateAndSaveToken(user));
     }

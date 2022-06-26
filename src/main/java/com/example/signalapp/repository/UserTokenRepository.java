@@ -12,7 +12,7 @@ public interface UserTokenRepository extends JpaRepository<UserToken, UserPK> {
 
     @Query(value = "select user_id, token, last_action_time\n" +
             "from user_token\n" +
-            "where token = ? and extract(epoch from (? - last_action_time))) < ?",
+            "where token = ? and extract(epoch from (? - last_action_time)) < ?",
             nativeQuery = true)
     UserToken findActiveToken(String token, LocalDateTime currentTime, int userIdleTimeout);
 

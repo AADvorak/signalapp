@@ -20,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 /**
  *
@@ -30,27 +31,21 @@ import javax.persistence.Table;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "signal_data")
 public class SignalData {
     
     @Id
-    @Column(name = "id")
+    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private int id;
     
-    @Column(name = "x")
-    private Double x;
+    @Column
+    private BigDecimal x;
     
-    @Column(name = "y")
-    private Double y;
+    @Column
+    private BigDecimal y;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "signal_id", nullable = false)
     private Signal signal;
-
-    public SignalData(SignalDataDto dto) {
-        x = dto.getX();
-        y = dto.getY();
-    }
 
 }

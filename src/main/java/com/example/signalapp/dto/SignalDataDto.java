@@ -1,16 +1,18 @@
 package com.example.signalapp.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+import java.math.BigDecimal;
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SignalDataDto {
 
-    private double x;
+    private BigDecimal x;
 
-    private double y;
+    private BigDecimal y;
 
 }

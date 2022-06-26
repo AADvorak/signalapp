@@ -1,7 +1,6 @@
 package com.example.signalapp.service;
 
 import com.example.signalapp.ApplicationProperties;
-import com.example.signalapp.error.SignalAppAccessException;
 import com.example.signalapp.error.SignalAppUnauthorizedException;
 import com.example.signalapp.model.User;
 import com.example.signalapp.model.UserToken;

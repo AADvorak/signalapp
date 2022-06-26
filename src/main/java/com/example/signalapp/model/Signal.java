@@ -6,6 +6,7 @@
 package com.example.signalapp.model;
 
 import com.example.signalapp.dto.request.SignalDtoRequest;
+import com.example.signalapp.mapper.SignalDataMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,15 +15,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  *
@@ -33,30 +26,34 @@ import javax.persistence.Table;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "signal")
 public class Signal {
     
     @Id
-    @Column(name = "id")
+    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private int id;
     
-    @Column(name = "name")
+    @Column
     private String name;
     
-    @Column(name = "description")
+    @Column
     private String description;
     
-    @Column(name = "create_time")
+    @Column
     private LocalDateTime createTime = LocalDateTime.now();
-    
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "signal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SignalData> data;
 
-    public Signal(SignalDtoRequest dtoRequest) {
+    public Signal(SignalDtoRequest dtoRequest, User user) {
         name = dtoRequest.getName();
         description = dtoRequest.getDescription();
-        setData(dtoRequest.getData().stream().map(SignalData::new).collect(Collectors.toList()));
+        this.user = user;
+        setData(dtoRequest.getData().stream().map(SignalDataMapper.INSTANCE::dtoToSignalData).collect(Collectors.toList()));
     }
 
     public void setData(List<SignalData> data) {

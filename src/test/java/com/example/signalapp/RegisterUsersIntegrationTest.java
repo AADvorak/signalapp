@@ -1,7 +1,6 @@
 package com.example.signalapp;
 
 import com.example.signalapp.dto.request.UserDtoRequest;
-import com.example.signalapp.dto.response.ErrorDtoResponse;
 import com.example.signalapp.dto.response.FieldErrorDtoResponse;
 import com.example.signalapp.dto.response.UserDtoResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -151,7 +150,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
         template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
+        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
                 () -> assertEquals("EMAIL_ALREADY_EXISTS", error.getCode()),
                 () -> assertEquals("Email already exists", error.getMessage()));

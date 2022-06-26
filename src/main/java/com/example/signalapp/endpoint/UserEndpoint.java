@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -24,7 +23,7 @@ public class UserEndpoint extends EndpointBase {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDtoResponse post(@Valid @RequestBody UserDtoRequest user, HttpServletResponse response) throws SignalAppDataException {
         ResponseWithToken<UserDtoResponse> responseWithToken = userService.register(user);
-        response.addCookie(new Cookie(JAVASESSIONID, responseWithToken.getToken()));
+        setCookieWithTokenToResponse(responseWithToken.getToken(), response);
         return responseWithToken.getResponse();
     }
 

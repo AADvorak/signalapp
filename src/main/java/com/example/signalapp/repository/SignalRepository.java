@@ -8,8 +8,18 @@ package com.example.signalapp.repository;
 import com.example.signalapp.model.Signal;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /**
  *
  * @author anton
  */
-public interface SignalRepository extends JpaRepository <Signal, Integer> {}
+public interface SignalRepository extends JpaRepository <Signal, Integer> {
+
+    List<Signal> findByUserId(int userId);
+
+    Signal findByIdAndUserId(int id, int userId);
+
+    int deleteByIdAndUserId(int id, int userId);
+
+}
