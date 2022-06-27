@@ -1,6 +1,8 @@
 package com.example.signalapp.service;
 
 import com.example.signalapp.ApplicationProperties;
+import com.example.signalapp.dto.request.ChangePasswordDtoRequest;
+import com.example.signalapp.dto.request.EditUserDtoRequest;
 import com.example.signalapp.dto.request.LoginDtoRequest;
 import com.example.signalapp.dto.request.UserDtoRequest;
 import com.example.signalapp.dto.response.ResponseWithToken;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.UUID.randomUUID;
@@ -40,9 +43,7 @@ public class UserService extends ServiceBase {
         try {
             user = userRepository.save(UserMapper.INSTANCE.dtoToUser(request));
         } catch (DataIntegrityViolationException ex) {
-            List<String> fields = new ArrayList<>();
-            fields.add("email");
-            throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_EXISTS, fields);
+            throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_EXISTS, List.of("email"));
         }
         return new ResponseWithToken<>(UserMapper.INSTANCE.userToDto(user), generateAndSaveToken(user));
     }
@@ -50,10 +51,7 @@ public class UserService extends ServiceBase {
     public ResponseWithToken<UserDtoResponse> login(LoginDtoRequest request) throws SignalAppDataException {
         User user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword());
         if (user == null) {
-            List<String> fields = new ArrayList<>();
-            fields.add("email");
-            fields.add("password");
-            throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD, fields);
+            throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD, List.of("email", "password"));
         }
         return new ResponseWithToken<>(UserMapper.INSTANCE.userToDto(user), generateAndSaveToken(user));
     }
@@ -70,6 +68,34 @@ public class UserService extends ServiceBase {
         if (userRepository.deleteByToken(token) == 0) {
             throw new SignalAppUnauthorizedException();
         }
+    }
+
+    public UserDtoResponse editCurrentUser(String token, EditUserDtoRequest request) throws SignalAppUnauthorizedException,
+            SignalAppDataException {
+        User user = getUserByToken(token);
+        if (!Objects.equals(user.getEmail(), request.getEmail())) {
+            user.setEmailConfirmed(false);
+        }
+        user.setEmail(request.getEmail());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setPatronymic(request.getPatronymic());
+        try {
+            user = userRepository.save(user);
+        } catch (DataIntegrityViolationException ex) {
+            throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_EXISTS, List.of("email"));
+        }
+        return UserMapper.INSTANCE.userToDto(user);
+    }
+
+    public void changePasswordCurrentUser(String token, ChangePasswordDtoRequest request)
+            throws SignalAppUnauthorizedException, SignalAppDataException {
+        User user = getUserByToken(token);
+        if (!Objects.equals(user.getPassword(), request.getOldPassword())) {
+            throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_OLD_PASSWORD, List.of("oldPassword"));
+        }
+        user.setPassword(request.getPassword());
+        userRepository.save(user);
     }
 
     public UserDtoResponse getCurrentUserInfo(String token) throws SignalAppUnauthorizedException {

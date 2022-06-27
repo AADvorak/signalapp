@@ -1,5 +1,7 @@
 package com.example.signalapp.endpoint;
 
+import com.example.signalapp.dto.request.ChangePasswordDtoRequest;
+import com.example.signalapp.dto.request.EditUserDtoRequest;
 import com.example.signalapp.dto.request.UserDtoRequest;
 import com.example.signalapp.dto.response.ResponseWithToken;
 import com.example.signalapp.dto.response.UserDtoResponse;
@@ -32,9 +34,22 @@ public class UserEndpoint extends EndpointBase {
         userService.deleteCurrentUser(sessionId);
     }
 
-    @GetMapping("/me")
+    @GetMapping(path = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDtoResponse getCurrentUserInfo(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId) throws SignalAppUnauthorizedException {
         return userService.getCurrentUserInfo(sessionId);
+    }
+
+    @PutMapping(path = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserDtoResponse editCurrentUser(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                                           @Valid @RequestBody EditUserDtoRequest request) throws SignalAppUnauthorizedException, SignalAppDataException {
+        return userService.editCurrentUser(sessionId, request);
+    }
+
+    @PutMapping(path = "/me/password", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void editCurrentUserPassword(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                                        @Valid @RequestBody ChangePasswordDtoRequest request)
+            throws SignalAppUnauthorizedException, SignalAppDataException {
+        userService.changePasswordCurrentUser(sessionId, request);
     }
 
 }
