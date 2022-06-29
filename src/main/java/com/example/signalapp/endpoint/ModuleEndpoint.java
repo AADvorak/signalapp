@@ -16,7 +16,7 @@ import javax.validation.Valid;
  * @author anton
  */
 @RestController
-@RequestMapping("/modules")
+@RequestMapping("/api/modules")
 @RequiredArgsConstructor
 public class ModuleEndpoint {
     

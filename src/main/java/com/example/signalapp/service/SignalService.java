@@ -42,7 +42,7 @@ public class SignalService extends ServiceBase {
     public void update(String token, SignalDtoRequest request, int id) throws SignalAppUnauthorizedException, SignalAppDataException {
         Signal signal = signalRepository.findByIdAndUserId(id, getUserByToken(token).getId());
         if (signal == null) {
-            throw new SignalAppDataException(SignalAppDataErrorCode.SIGNAL_DOES_NOT_EXIST, new ArrayList<>());
+            throw new SignalAppDataException(SignalAppDataErrorCode.SIGNAL_DOES_NOT_EXIST);
         }
         signal.setName(request.getName());
         signal.setDescription(request.getDescription());
@@ -58,7 +58,7 @@ public class SignalService extends ServiceBase {
     public List<SignalDataDto> getData(String token, int id) throws SignalAppDataException, SignalAppUnauthorizedException {
         Signal signal = signalRepository.findByIdAndUserId(id, getUserByToken(token).getId());
         if (signal == null) {
-            throw new SignalAppDataException(SignalAppDataErrorCode.SIGNAL_DOES_NOT_EXIST, new ArrayList<>());
+            throw new SignalAppDataException(SignalAppDataErrorCode.SIGNAL_DOES_NOT_EXIST);
         }
         return signal.getData().stream().map(SignalDataMapper.INSTANCE::signalDataToDto).collect(Collectors.toList());
     }

@@ -5,4 +5,7 @@ import com.example.signalapp.model.UserPK;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserConfirmRepository extends JpaRepository<UserConfirm, UserPK> {
+
+    UserConfirm findByCode(String code);
+
 }

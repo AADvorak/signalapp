@@ -31,11 +31,11 @@ public class GlobalErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public List<FieldErrorDtoResponse> handleSignalAppDataException(SignalAppDataException exc) {
         List<FieldErrorDtoResponse> errors = new ArrayList<>();
-        if (exc.getFields().size() == 0) {
+        if (exc.getErrorCode().getFields().size() == 0) {
             errors.add(new FieldErrorDtoResponse(exc.getErrorCode().toString(),null,
                     exc.getErrorCode().getDescription()));
         } else {
-            exc.getFields().forEach(field -> errors.add(new FieldErrorDtoResponse(exc.getErrorCode().toString(),
+            exc.getErrorCode().getFields().forEach(field -> errors.add(new FieldErrorDtoResponse(exc.getErrorCode().toString(),
                     field, exc.getErrorCode().getDescription())));
         }
         return errors;

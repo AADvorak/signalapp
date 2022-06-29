@@ -19,7 +19,7 @@ import javax.validation.Valid;
  * @author anton
  */
 @RestController
-@RequestMapping("/signals")
+@RequestMapping("/api/signals")
 @RequiredArgsConstructor
 public class SignalEndpoint extends EndpointBase {
 
@@ -45,7 +45,7 @@ public class SignalEndpoint extends EndpointBase {
     }
 
     @DeleteMapping("/{id}")
-    void deleteSignal(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+    void delete(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
                       @PathVariable int id) throws SignalAppUnauthorizedException {
         service.delete(sessionId, id);
     }

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -50,6 +51,22 @@ public class UserEndpoint extends EndpointBase {
                                         @Valid @RequestBody ChangePasswordDtoRequest request)
             throws SignalAppUnauthorizedException, SignalAppDataException {
         userService.changePasswordCurrentUser(sessionId, request);
+    }
+
+    @PostMapping("/confirm/{host}")
+    public void postMailConfirm(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                                @PathVariable String host) throws SignalAppUnauthorizedException, MessagingException, SignalAppDataException {
+        userService.makeUserEmailConfirmation(sessionId, host);
+    }
+
+    @GetMapping(path = "/confirm/{code}", produces = MediaType.TEXT_HTML_VALUE)
+    public String getMailConfirm(@PathVariable String code) {
+        return userService.confirmEmail(code);
+    }
+
+    @PostMapping(path = "/restore/{email}")
+    public void restorePassword(@PathVariable String email) throws MessagingException, SignalAppDataException {
+        userService.restorePassword(email);
     }
 
 }
