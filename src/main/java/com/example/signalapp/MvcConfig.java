@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 public class MvcConfig implements WebMvcConfigurer {
     
-    private static final String[] RESOURCES_FOLDERS = {"pages", "js", "html", "img", "modules", "css"};
+    private static final String[] RESOURCES_FOLDERS = {"pages", "js", "html", "img", "css", "lib"};
     
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

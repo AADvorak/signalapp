@@ -19,6 +19,10 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalErrorHandler {
 
+    @ExceptionHandler(SignalAppNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void handleSignalAppNotFoundException(SignalAppNotFoundException exc) {}
+
     @ExceptionHandler(SignalAppUnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public void handleSignalAppUnauthorizedException(SignalAppUnauthorizedException exc) {}

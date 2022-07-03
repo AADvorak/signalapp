@@ -7,6 +7,7 @@ import com.example.signalapp.dto.request.SignalDtoRequest;
 import com.example.signalapp.dto.response.SignalDtoResponse;
 import com.example.signalapp.error.SignalAppDataErrorCode;
 import com.example.signalapp.error.SignalAppDataException;
+import com.example.signalapp.error.SignalAppNotFoundException;
 import com.example.signalapp.error.SignalAppUnauthorizedException;
 import com.example.signalapp.mapper.SignalDataMapper;
 import com.example.signalapp.mapper.SignalMapper;
@@ -55,10 +56,10 @@ public class SignalService extends ServiceBase {
         signalRepository.deleteByIdAndUserId(id, getUserByToken(token).getId());
     }
 
-    public List<SignalDataDto> getData(String token, int id) throws SignalAppDataException, SignalAppUnauthorizedException {
+    public List<SignalDataDto> getData(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
         Signal signal = signalRepository.findByIdAndUserId(id, getUserByToken(token).getId());
         if (signal == null) {
-            throw new SignalAppDataException(SignalAppDataErrorCode.SIGNAL_DOES_NOT_EXIST);
+            throw new SignalAppNotFoundException();
         }
         return signal.getData().stream().map(SignalDataMapper.INSTANCE::signalDataToDto).collect(Collectors.toList());
     }

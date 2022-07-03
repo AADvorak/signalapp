@@ -21,4 +21,6 @@ public class ModuleDtoResponse {
 
     private boolean transformer;
 
+    private boolean personal;
+
 }

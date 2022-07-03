@@ -11,6 +11,7 @@ public enum SignalAppDataErrorCode {
 
     SIGNAL_DOES_NOT_EXIST("Signal does not exist", List.of()),
     EMAIL_ALREADY_EXISTS("Email already exists", List.of("email")),
+    MODULE_ALREADY_EXISTS("Module already exists", List.of("module")),
     EMAIL_ALREADY_CONFIRMED("Email is already confirmed", List.of()),
     WRONG_EMAIL_PASSWORD("Wrong email and password pair", List.of("email", "password")),
     WRONG_EMAIL("Email does not exist or is not confirmed", List.of("email")),

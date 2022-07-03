@@ -7,6 +7,7 @@ import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.request.SignalDtoRequest;
 import com.example.signalapp.dto.response.SignalDtoResponse;
 import com.example.signalapp.error.SignalAppDataException;
+import com.example.signalapp.error.SignalAppNotFoundException;
 import com.example.signalapp.error.SignalAppUnauthorizedException;
 import com.example.signalapp.service.SignalService;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ public class SignalEndpoint extends EndpointBase {
 
     @GetMapping(path = "/{id}/data", produces = MediaType.APPLICATION_JSON_VALUE)
     List<SignalDataDto> getData(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                @PathVariable int id) throws SignalAppDataException, SignalAppUnauthorizedException {
+                                @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
         return service.getData(sessionId, id);
     }
 

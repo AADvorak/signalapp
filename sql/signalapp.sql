@@ -12,16 +12,16 @@ drop table if exists public.user;
 
 create table public.user
 (
-    id              serial       not null
+    id              serial                              not null
         constraint user_pk
             primary key,
     first_name      varchar(100),
     last_name       varchar(100),
     patronymic      varchar(100),
-    email           varchar(100) not null unique,
-    password        varchar(100) not null,
-    email_confirmed boolean      not null,
-    create_time timestamp default CURRENT_TIMESTAMP not null
+    email           varchar(100)                        not null unique,
+    password        varchar(100)                        not null,
+    email_confirmed boolean                             not null,
+    create_time     timestamp default CURRENT_TIMESTAMP not null
 );
 
 create table public.user_token
@@ -45,6 +45,10 @@ create table public.module
     id          serial  not null
         constraint module_pk
             primary key,
+    user_id     integer null
+        constraint module_user_id_fk
+            references "user"
+            on update cascade on delete cascade,
     module      varchar(100),
     name        varchar(100),
     container   varchar(10),
@@ -52,12 +56,14 @@ create table public.module
     transformer boolean not null
 );
 
+create unique index module_unique_idx on public.module (lower(module.module));
+
 create table public.signal
 (
     id          serial                              not null
         constraint signal_pk
             primary key,
-    user_id integer not null
+    user_id     integer                             not null
         constraint signal_user_id_fk
             references "user"
             on update cascade on delete cascade,
