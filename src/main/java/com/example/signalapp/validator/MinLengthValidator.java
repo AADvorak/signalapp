@@ -13,6 +13,6 @@ public class MinLengthValidator implements ConstraintValidator<MinLength, String
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        return s == null || s.length() >= applicationProperties.getMinPasswordLength();
+        return s != null && s.length() >= applicationProperties.getMinPasswordLength();
     }
 }

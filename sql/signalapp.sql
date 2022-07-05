@@ -87,10 +87,10 @@ create table public.signal_data
 
 INSERT INTO public.module (module, name, container, for_menu, transformer)
 VALUES ('DummyTransformer', 'Dummy transformer', null, false, true),
-       ('LinearAmp', 'Linear amplifier', 'right', false, true),
+       ('LinearAmp', 'Linear amplifier', 'modal', false, true),
        ('Integrator', 'Integrator', null, false, true),
        ('Differentiator', 'Differentiator', null, false, true),
        ('Inverter', 'Inverter', null, false, true),
        ('SpectrumAnalyser', 'Spectrum analyser', null, false, true),
        ('SelfCorrelator', 'Self correlator', null, false, true),
-       ('LinearOscillator', 'Linear oscillator', 'right', false, true);
+       ('LinearOscillator', 'Linear oscillator', 'modal', false, true);

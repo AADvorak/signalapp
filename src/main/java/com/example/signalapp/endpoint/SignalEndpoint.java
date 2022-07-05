@@ -47,7 +47,7 @@ public class SignalEndpoint extends EndpointBase {
 
     @DeleteMapping("/{id}")
     void delete(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                      @PathVariable int id) throws SignalAppUnauthorizedException {
+                @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
         service.delete(sessionId, id);
     }
 

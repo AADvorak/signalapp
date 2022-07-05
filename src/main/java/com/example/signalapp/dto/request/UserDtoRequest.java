@@ -28,7 +28,6 @@ public class UserDtoRequest {
     @Email
     private String email;
 
-    @NotEmpty
     @MaxLength
     @MinLength
     private String password;

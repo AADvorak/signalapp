@@ -92,7 +92,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
-                () -> assertEquals("NotEmpty", error.getCode()),
+                () -> assertEquals("MinLength", error.getCode()),
                 () -> assertEquals("password", error.getField()));
     }
 
@@ -104,7 +104,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
-                () -> assertEquals("NotEmpty", error.getCode()),
+                () -> assertEquals("MinLength", error.getCode()),
                 () -> assertEquals("password", error.getField()));
     }
 

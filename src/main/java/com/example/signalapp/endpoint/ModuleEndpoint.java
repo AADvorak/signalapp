@@ -53,13 +53,15 @@ public class ModuleEndpoint extends EndpointBase {
     }
 
     @GetMapping(path = "/{id}/html", produces = MediaType.TEXT_HTML_VALUE)
-    public String getHtml(@PathVariable Integer id) throws SignalAppNotFoundException {
-        return moduleService.getFile(id, "html");
+    public String getHtml(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                          @PathVariable Integer id) throws SignalAppNotFoundException {
+        return moduleService.getFile(sessionId, id, "html");
     }
 
     @GetMapping(path = "/{id}/js", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String getJs(@PathVariable Integer id) throws SignalAppNotFoundException {
-        return moduleService.getFile(id, "js");
+    public String getJs(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                        @PathVariable Integer id) throws SignalAppNotFoundException {
+        return moduleService.getFile(sessionId, id, "js");
     }
 
     @PutMapping(path = "/{id}/html", consumes = MediaType.TEXT_HTML_VALUE)

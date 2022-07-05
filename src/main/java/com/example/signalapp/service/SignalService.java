@@ -17,7 +17,6 @@ import com.example.signalapp.repository.UserTokenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,8 +51,10 @@ public class SignalService extends ServiceBase {
     }
 
     @Transactional
-    public void delete(String token, int id) throws SignalAppUnauthorizedException {
-        signalRepository.deleteByIdAndUserId(id, getUserByToken(token).getId());
+    public void delete(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+        if (signalRepository.deleteByIdAndUserId(id, getUserByToken(token).getId()) == 0) {
+            throw new SignalAppNotFoundException();
+        }
     }
 
     public List<SignalDataDto> getData(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {

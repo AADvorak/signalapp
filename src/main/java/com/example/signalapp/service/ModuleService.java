@@ -16,6 +16,7 @@ import com.example.signalapp.repository.ModuleRepository;
 import com.example.signalapp.repository.UserTokenRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -68,6 +69,7 @@ public class ModuleService extends ServiceBase {
         return ModuleMapper.INSTANCE.moduleToDto(moduleRepository.save(module));
     }
 
+    @Transactional
     public void delete(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
         if (moduleRepository.deleteByIdAndUserId(id, getUserByToken(token).getId()) == 0) {
             throw new SignalAppNotFoundException();
@@ -75,8 +77,16 @@ public class ModuleService extends ServiceBase {
         // todo delete files
     }
 
-    public String getFile(int id, String extension) throws SignalAppNotFoundException {
+    public String getFile(String token, int id, String extension) throws SignalAppNotFoundException {
+        User user = null;
+        try {
+            user = getUserByToken(token);
+        } catch (SignalAppUnauthorizedException ignored) {}
         Module module = moduleRepository.findById(id).orElseThrow(SignalAppNotFoundException::new);
+        if (user == null && module.getUser() != null || user != null && module.getUser() != null
+                && user.getId() != module.getUser().getId()) {
+            throw new SignalAppNotFoundException();
+        }
         try {
             return fileManager.readModuleFromFile(module.getModule().toLowerCase(), extension);
         } catch (IOException e) {
