@@ -34,28 +34,31 @@ import static java.util.UUID.randomUUID;
 @Service
 public class UserService extends ServiceBase {
 
-    private static final String EMAIL_CONFIRM_OK_PAGE = "<!DOCTYPE html>\n" +
-            "<html lang=\"en\">\n" +
-            "<head>\n" +
-            "  <meta charset=\"UTF-8\">\n" +
-            "  <title>SignalApp</title>\n" +
-            "  <link rel=\"shortcut icon\" href=\"/img/favicon.svg\" type=\"image/x-icon\">\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<div style=\"color: darkslateblue;\">Email confirmed successfully</div>\n" +
-            "</body>\n" +
-            "</html>";
-    private static final String EMAIL_CONFIRM_ERROR_PAGE = "<!DOCTYPE html>\n" +
-            "<html lang=\"en\">\n" +
-            "<head>\n" +
-            "  <meta charset=\"UTF-8\">\n" +
-            "  <title>SignalApp</title>\n" +
-            "  <link rel=\"shortcut icon\" href=\"/img/favicon.svg\" type=\"image/x-icon\">\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<div style=\"color: brown;\">Email confirm error</div>\n" +
-            "</body>\n" +
-            "</html>";
+    private static final String EMAIL_CONFIRM_OK = "email-confirm-ok";
+    private static final String EMAIL_CONFIRM_ERROR = "email-confirm-error";
+
+//    private static final String EMAIL_CONFIRM_OK_PAGE = "<!DOCTYPE html>\n" +
+//            "<html lang=\"en\">\n" +
+//            "<head>\n" +
+//            "  <meta charset=\"UTF-8\">\n" +
+//            "  <title>SignalApp</title>\n" +
+//            "  <link rel=\"shortcut icon\" href=\"/img/favicon.svg\" type=\"image/x-icon\">\n" +
+//            "</head>\n" +
+//            "<body>\n" +
+//            "<div style=\"color: darkslateblue;\">Email confirmed successfully</div>\n" +
+//            "</body>\n" +
+//            "</html>";
+//    private static final String EMAIL_CONFIRM_ERROR_PAGE = "<!DOCTYPE html>\n" +
+//            "<html lang=\"en\">\n" +
+//            "<head>\n" +
+//            "  <meta charset=\"UTF-8\">\n" +
+//            "  <title>SignalApp</title>\n" +
+//            "  <link rel=\"shortcut icon\" href=\"/img/favicon.svg\" type=\"image/x-icon\">\n" +
+//            "</head>\n" +
+//            "<body>\n" +
+//            "<div style=\"color: brown;\">Email confirm error</div>\n" +
+//            "</body>\n" +
+//            "</html>";
 
     private final UserRepository userRepository;
 
@@ -153,10 +156,10 @@ public class UserService extends ServiceBase {
     public String confirmEmail(String code) {
         UserConfirm userConfirm = userConfirmRepository.findByCode(code);
         if (userConfirm == null || userRepository.updateSetEmailConfirmedTrue(userConfirm.getId().getUser().getId()) == 0) {
-            return EMAIL_CONFIRM_ERROR_PAGE;
+            return EMAIL_CONFIRM_ERROR;
         }
         userConfirmRepository.delete(userConfirm);
-        return EMAIL_CONFIRM_OK_PAGE;
+        return EMAIL_CONFIRM_OK;
     }
 
     public void restorePassword(String email) throws SignalAppDataException, MessagingException {
