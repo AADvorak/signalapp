@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+
+  signalapp:
+    build: .
+    ports:
+      - '8080:8080'
+    depends_on:
+      - signalapp-postgres
+    volumes:
+      - ../../:/signalapp
+      - ../../../signalappres/:/signalapp/signalappres
+    stdin_open: true
+    tty: true
+    networks:
+      signalapp-net:
+
+  signalapp-postgres:
+    image: postgres:14.4-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ../../sql/signalapp.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+      signalapp-net:
+
+networks:
+  signalapp-net:
