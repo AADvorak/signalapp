@@ -1,5 +1,6 @@
 package com.example.signalapp.dto.request;
 
+import com.example.signalapp.service.UserService;
 import com.example.signalapp.validator.MaxLength;
 import com.example.signalapp.validator.MinLength;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +30,7 @@ public class UserDtoRequest {
     @Email
     private String email;
 
-    @MaxLength
+    @Size(max = UserService.MAX_PASSWORD_LENGTH)
     @MinLength
     private String password;
 

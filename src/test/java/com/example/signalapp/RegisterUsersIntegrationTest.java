@@ -3,6 +3,7 @@ package com.example.signalapp;
 import com.example.signalapp.dto.request.UserDtoRequest;
 import com.example.signalapp.dto.response.FieldErrorDtoResponse;
 import com.example.signalapp.dto.response.UserDtoResponse;
+import com.example.signalapp.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
     @Test
     public void testRegisterOk() {
         UserDtoRequest userDtoRequest = createUser(email1);
+        userDtoRequest.setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH));
         ResponseEntity<UserDtoResponse> response = template.postForEntity(fullUrl(USERS_URL), userDtoRequest, UserDtoResponse.class);
         assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
                 () -> assertEquals(userDtoRequest.getEmail(), Objects.requireNonNull(response.getBody()).getEmail()),
@@ -123,12 +125,12 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
     @Test
     public void testRegisterLongPassword() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser(email1);
-        userDtoRequest.setPassword(RandomStringUtils.randomAlphanumeric(applicationProperties.getMaxNameLength() + 1));
+        userDtoRequest.setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH + 1));
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
-                () -> assertEquals("MaxLength", error.getCode()),
+                () -> assertEquals("Size", error.getCode()),
                 () -> assertEquals("password", error.getField()));
     }
 

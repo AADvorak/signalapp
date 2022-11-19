@@ -19,7 +19,7 @@ create table public.user
     last_name       varchar(100),
     patronymic      varchar(100),
     email           varchar(100)                        not null unique,
-    password        varchar(100)                        not null,
+    password        varchar(60)                         not null,
     email_confirmed boolean                             not null,
     create_time     timestamp default CURRENT_TIMESTAMP not null
 );
