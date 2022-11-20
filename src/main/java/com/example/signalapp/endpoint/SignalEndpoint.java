@@ -1,5 +1,6 @@
 package com.example.signalapp.endpoint;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.example.signalapp.dto.response.IdDtoResponse;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.validation.Valid;
 
 /**
@@ -55,6 +57,13 @@ public class SignalEndpoint extends EndpointBase {
     List<SignalDataDto> getData(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
                                 @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
         return service.getData(sessionId, id);
+    }
+
+    @PostMapping(path = "/wav/{fileName}", consumes = "audio/wave")
+    void postWav(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                 @PathVariable String fileName, @RequestBody byte[] data)
+            throws UnsupportedAudioFileException, SignalAppUnauthorizedException, IOException {
+        service.importWav(sessionId, fileName, data);
     }
 
 }
