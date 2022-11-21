@@ -58,7 +58,7 @@ public class ModuleEndpoint extends EndpointBase {
         return moduleService.getFile(sessionId, id, "html");
     }
 
-    @GetMapping(path = "/{id}/js", produces = MediaType.TEXT_PLAIN_VALUE)
+    @GetMapping(path = "/{id}/js", produces = "application/javascript")
     public String getJs(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
                         @PathVariable Integer id) throws SignalAppNotFoundException {
         return moduleService.getFile(sessionId, id, "js");

@@ -1,5 +1,3 @@
-drop table if exists public.signal_data;
-
 drop table if exists public.signal;
 
 drop table if exists public.user_token;
@@ -69,20 +67,8 @@ create table public.signal
             on update cascade on delete cascade,
     name        varchar(100),
     description varchar,
-    create_time timestamp default CURRENT_TIMESTAMP not null
-);
-
-create table public.signal_data
-(
-    id        serial  not null
-        constraint signal_data_pk
-            primary key,
-    signal_id integer not null
-        constraint signal_data_signal_id_fk
-            references signal
-            on update cascade on delete cascade,
-    x         numeric,
-    y         numeric
+    create_time timestamp default CURRENT_TIMESTAMP not null,
+    max_abs_y   numeric                             not null
 );
 
 INSERT INTO public.module (module, name, container, for_menu, transformer)

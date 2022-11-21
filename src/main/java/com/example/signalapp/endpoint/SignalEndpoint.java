@@ -36,14 +36,14 @@ public class SignalEndpoint extends EndpointBase {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     IdDtoResponse post(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                       @RequestBody @Valid SignalDtoRequest signalDtoRequest) throws SignalAppUnauthorizedException {
+                       @RequestBody @Valid SignalDtoRequest signalDtoRequest) throws SignalAppUnauthorizedException, IOException {
         return service.add(sessionId, signalDtoRequest);
     }
 
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     void put(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
              @RequestBody @Valid SignalDtoRequest signalDtoRequest, @PathVariable int id)
-            throws SignalAppUnauthorizedException, SignalAppDataException {
+            throws SignalAppUnauthorizedException, SignalAppDataException, IOException {
         service.update(sessionId, signalDtoRequest, id);
     }
 
@@ -55,8 +55,15 @@ public class SignalEndpoint extends EndpointBase {
 
     @GetMapping(path = "/{id}/data", produces = MediaType.APPLICATION_JSON_VALUE)
     List<SignalDataDto> getData(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+                                @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException,
+            UnsupportedAudioFileException, IOException {
         return service.getData(sessionId, id);
+    }
+
+    @GetMapping(path = "/{id}/wav", produces = "audio/wave")
+    byte[] getWav(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                                @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
+        return service.getWav(sessionId, id);
     }
 
     @PostMapping(path = "/wav/{fileName}", consumes = "audio/wave")

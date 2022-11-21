@@ -6,15 +6,13 @@
 package com.example.signalapp.model;
 
 import com.example.signalapp.dto.request.SignalDtoRequest;
-import com.example.signalapp.mapper.SignalDataMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.*;
 
 /**
@@ -46,28 +44,14 @@ public class Signal {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "signal", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SignalData> data;
+    @Column(name = "max_abs_y")
+    private BigDecimal maxAbsY;
 
-    public Signal(SignalDtoRequest dtoRequest, User user) {
+    public Signal(SignalDtoRequest dtoRequest, User user, BigDecimal maxAbsY) {
         name = dtoRequest.getName();
         description = dtoRequest.getDescription();
+        this.maxAbsY = maxAbsY;
         this.user = user;
-        setData(dtoRequest.getData().stream().map(SignalDataMapper.INSTANCE::dtoToSignalData).collect(Collectors.toList()));
-    }
-
-    public void setData(List<SignalData> data) {
-        if (this.data == null) {
-            this.data = data;
-        } else {
-            this.data.clear();
-            this.data.addAll(data);
-        }
-        this.setSignalToData();
-    }
-    
-    public void setSignalToData() {
-        this.data.forEach(item -> item.setSignal(this));
     }
     
 }
