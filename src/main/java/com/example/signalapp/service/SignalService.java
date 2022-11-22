@@ -25,6 +25,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -141,11 +143,13 @@ public class SignalService extends ServiceBase {
 
     private void writeSignalDataToWavFile(Signal signal, List<SignalDataDto> data) throws IOException {
         // todo check signal format
-        float sampleRate = Math.round(1 / (data.get(1).getX().floatValue() - data.get(0).getX().floatValue()));
+        MathContext divideMc = new MathContext(10, RoundingMode.HALF_DOWN);
+        float sampleRate = Math.round(BigDecimal.ONE.divide(data.get(1).getX().subtract(data.get(0).getX()), divideMc)
+                .round(new MathContext(0, RoundingMode.HALF_UP)).floatValue());
         AudioFormat format = new AudioFormat(sampleRate, 16, 1, true, false);
         double[] samples = new double[data.size()];
         for (int i = 0; i < samples.length; i++) {
-            samples[i] = data.get(i).getY().divide(signal.getMaxAbsY()).doubleValue() ;
+            samples[i] = data.get(i).getY().divide(signal.getMaxAbsY(), divideMc).doubleValue();
         }
         writeSamplesToWavFile(signal, samples, format);
     }
@@ -159,8 +163,8 @@ public class SignalService extends ServiceBase {
     }
 
     private BigDecimal getMaxAbsY(List<SignalDataDto> data) {
-        return BigDecimal.valueOf(data.stream().map(point -> Math.abs(point.getY().doubleValue()))
-                .max(Comparator.naturalOrder()).orElse(0.0));
+        return data.stream().map(point -> point.getY().abs())
+                .max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
     }
 
 }
