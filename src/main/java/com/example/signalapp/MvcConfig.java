@@ -29,6 +29,10 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addResourceHandler("/" + folder + "/**")
                 .addResourceLocations("file:" + SignalApplication.RESOURCES_PATH + folder + "/");
         }
+
+        registry
+                .addResourceHandler("/")
+                .addResourceLocations("file:" + SignalApplication.RESOURCES_PATH + "pages/index.html");
         
     }
 }

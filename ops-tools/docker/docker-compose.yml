@@ -11,6 +11,7 @@ services:
     volumes:
       - ../../:/signalapp
       - ../../../signalappres/:/signalapp/signalappres
+      - ../../../signalappdata/:/signalapp/signalappdata
     stdin_open: true
     tty: true
     networks:
@@ -24,8 +25,6 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
-    volumes:
-      - ../../sql/signalapp.sql:/docker-entrypoint-initdb.d/create_tables.sql
     networks:
       signalapp-net:
 
