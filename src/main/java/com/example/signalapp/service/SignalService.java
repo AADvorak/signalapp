@@ -7,10 +7,7 @@ import com.example.signalapp.dto.response.IdDtoResponse;
 import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.request.SignalDtoRequest;
 import com.example.signalapp.dto.response.SignalDtoResponse;
-import com.example.signalapp.error.SignalAppDataErrorCode;
-import com.example.signalapp.error.SignalAppDataException;
-import com.example.signalapp.error.SignalAppNotFoundException;
-import com.example.signalapp.error.SignalAppUnauthorizedException;
+import com.example.signalapp.error.*;
 import com.example.signalapp.file.FileManager;
 import com.example.signalapp.mapper.SignalMapper;
 import com.example.signalapp.model.Signal;
@@ -34,6 +31,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class SignalService extends ServiceBase {
+
+    public static final int MAX_SIGNAL_LENGTH = 1024000;
 
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
@@ -112,7 +111,10 @@ public class SignalService extends ServiceBase {
     }
 
     public void importWav(String token, String fileName, byte[] data)
-            throws SignalAppUnauthorizedException, UnsupportedAudioFileException, IOException {
+            throws SignalAppUnauthorizedException, UnsupportedAudioFileException, IOException, SignalAppException {
+        if (data.length > 2 * MAX_SIGNAL_LENGTH) {
+            throw new SignalAppException(SignalAppErrorCode.TOO_LONG_FILE);
+        }
         User user = getUserByToken(token);
         AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(data));
         long sampleCount = asr.getSampleCount();

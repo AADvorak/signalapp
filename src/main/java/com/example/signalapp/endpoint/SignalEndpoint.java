@@ -8,6 +8,7 @@ import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.request.SignalDtoRequest;
 import com.example.signalapp.dto.response.SignalDtoResponse;
 import com.example.signalapp.error.SignalAppDataException;
+import com.example.signalapp.error.SignalAppException;
 import com.example.signalapp.error.SignalAppNotFoundException;
 import com.example.signalapp.error.SignalAppUnauthorizedException;
 import com.example.signalapp.service.SignalService;
@@ -69,7 +70,7 @@ public class SignalEndpoint extends EndpointBase {
     @PostMapping(path = "/wav/{fileName}", consumes = "audio/wave")
     void postWav(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
                  @PathVariable String fileName, @RequestBody byte[] data)
-            throws UnsupportedAudioFileException, SignalAppUnauthorizedException, IOException {
+            throws UnsupportedAudioFileException, SignalAppUnauthorizedException, IOException, SignalAppException {
         service.importWav(sessionId, fileName, data);
     }
 
