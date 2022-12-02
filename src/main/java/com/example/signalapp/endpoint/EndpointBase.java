@@ -10,6 +10,7 @@ public class EndpointBase {
     protected void setCookieWithTokenToResponse(String token, HttpServletResponse response) {
         Cookie cookie = new Cookie(JAVASESSIONID, token);
         cookie.setPath("/");
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
     }
 

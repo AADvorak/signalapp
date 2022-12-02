@@ -7,6 +7,7 @@ import com.example.signalapp.dto.response.IdDtoResponse;
 import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.request.SignalDtoRequest;
 import com.example.signalapp.dto.response.SignalDtoResponse;
+import com.example.signalapp.dto.response.SignalWithDataDtoResponse;
 import com.example.signalapp.error.*;
 import com.example.signalapp.file.FileManager;
 import com.example.signalapp.mapper.SignalMapper;
@@ -57,11 +58,8 @@ public class SignalService extends ServiceBase {
     }
 
     public void update(String token, SignalDtoRequest request, int id) throws SignalAppUnauthorizedException,
-            SignalAppDataException, IOException {
-        Signal signal = signalRepository.findByIdAndUserId(id, getUserByToken(token).getId());
-        if (signal == null) {
-            throw new SignalAppDataException(SignalAppDataErrorCode.SIGNAL_DOES_NOT_EXIST);
-        }
+            IOException, SignalAppNotFoundException {
+        Signal signal = getSignalByUserTokenAndId(token, id);
         BigDecimal maxAbsY = getMaxAbsY(request.getData());
         signal.setName(request.getName());
         signal.setDescription(request.getDescription());
@@ -80,34 +78,22 @@ public class SignalService extends ServiceBase {
         }
     }
 
+    public SignalWithDataDtoResponse getSignalWithData(String token, int id) throws SignalAppNotFoundException,
+            SignalAppUnauthorizedException, UnsupportedAudioFileException, IOException {
+        Signal signal = getSignalByUserTokenAndId(token, id);
+        SignalWithDataDtoResponse response = SignalMapper.INSTANCE.signalToDtoWithData(signal);
+        response.setData(getDataForSignal(signal));
+        return response;
+    }
+
     public List<SignalDataDto> getData(String token, int id) throws SignalAppUnauthorizedException,
             SignalAppNotFoundException, IOException, UnsupportedAudioFileException {
-        Signal signal = signalRepository.findByIdAndUserId(id, getUserByToken(token).getId());
-        if (signal == null) {
-            throw new SignalAppNotFoundException();
-        }
-        byte[] bytes = fileManager.readWavFromFile(signal.getUser().getId(), signal.getId());
-        AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(bytes));
-        double[] samples = new double[(int)asr.getSampleCount() / 2];
-        asr.getMonoSamples(samples);
-        List<SignalDataDto> data = new ArrayList<>();
-        double step = 1 / asr.getFormat().getFrameRate();
-        for (int i = 0; i < samples.length; i++) {
-            SignalDataDto point = new SignalDataDto();
-            point.setX(BigDecimal.valueOf(i * step));
-            point.setY(BigDecimal.valueOf(samples[i]).multiply(signal.getMaxAbsY()));
-            data.add(point);
-        }
-        return data;
+        return getDataForSignal(getSignalByUserTokenAndId(token,id));
     }
 
     public byte[] getWav(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
-        User user = getUserByToken(token);
-        Signal signal = signalRepository.findByIdAndUserId(id, getUserByToken(token).getId());
-        if (signal == null) {
-            throw new SignalAppNotFoundException();
-        }
-        return fileManager.readWavFromFile(user.getId(), signal.getId());
+        Signal signal = getSignalByUserTokenAndId(token, id);
+        return fileManager.readWavFromFile(signal.getUser().getId(), signal.getId());
     }
 
     public void importWav(String token, String fileName, byte[] data)
@@ -129,6 +115,31 @@ public class SignalService extends ServiceBase {
             makeAndSaveSignal(fileName + " (right)", rightSamples, asr.getFormat(), user);
             makeAndSaveSignal(fileName + " (left)", leftSamples, asr.getFormat(), user);
         }
+    }
+
+    private Signal getSignalByUserTokenAndId(String token, int id)
+            throws SignalAppNotFoundException, SignalAppUnauthorizedException {
+        Signal signal = signalRepository.findByIdAndUserId(id, getUserByToken(token).getId());
+        if (signal == null) {
+            throw new SignalAppNotFoundException();
+        }
+        return signal;
+    }
+
+    private List<SignalDataDto> getDataForSignal(Signal signal) throws IOException, UnsupportedAudioFileException {
+        byte[] bytes = fileManager.readWavFromFile(signal.getUser().getId(), signal.getId());
+        AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(bytes));
+        double[] samples = new double[(int)asr.getSampleCount() / 2];
+        asr.getMonoSamples(samples);
+        List<SignalDataDto> data = new ArrayList<>();
+        double step = 1 / asr.getFormat().getFrameRate();
+        for (int i = 0; i < samples.length; i++) {
+            SignalDataDto point = new SignalDataDto();
+            point.setX(BigDecimal.valueOf(i * step));
+            point.setY(BigDecimal.valueOf(samples[i]).multiply(signal.getMaxAbsY()));
+            data.add(point);
+        }
+        return data;
     }
 
     private void makeAndSaveSignal(String fileName, double[] samples, AudioFormat format, User user) throws IOException {

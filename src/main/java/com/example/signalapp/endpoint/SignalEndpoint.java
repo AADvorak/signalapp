@@ -7,6 +7,7 @@ import com.example.signalapp.dto.response.IdDtoResponse;
 import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.request.SignalDtoRequest;
 import com.example.signalapp.dto.response.SignalDtoResponse;
+import com.example.signalapp.dto.response.SignalWithDataDtoResponse;
 import com.example.signalapp.error.SignalAppDataException;
 import com.example.signalapp.error.SignalAppException;
 import com.example.signalapp.error.SignalAppNotFoundException;
@@ -44,7 +45,7 @@ public class SignalEndpoint extends EndpointBase {
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     void put(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
              @RequestBody @Valid SignalDtoRequest signalDtoRequest, @PathVariable int id)
-            throws SignalAppUnauthorizedException, SignalAppDataException, IOException {
+            throws SignalAppUnauthorizedException, IOException, SignalAppNotFoundException {
         service.update(sessionId, signalDtoRequest, id);
     }
 
@@ -52,6 +53,13 @@ public class SignalEndpoint extends EndpointBase {
     void delete(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
                 @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
         service.delete(sessionId, id);
+    }
+
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    SignalWithDataDtoResponse getSignalWithData(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                                                @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException,
+            UnsupportedAudioFileException, IOException {
+        return service.getSignalWithData(sessionId, id);
     }
 
     @GetMapping(path = "/{id}/data", produces = MediaType.APPLICATION_JSON_VALUE)
