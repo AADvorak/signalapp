@@ -8,6 +8,7 @@ public class SignalApplication {
 
     public static String RESOURCES_PATH = "signalappres/";
     public static String DATA_PATH = "signalappdata/";
+    public static String FRONTEND_PATH = "signalapp-frontend/";
 
     public static void main(String[] args) {
         if (args.length > 0) {
@@ -15,6 +16,9 @@ public class SignalApplication {
         }
         if (args.length > 1) {
             DATA_PATH = args[1];
+        }
+        if (args.length > 2) {
+            FRONTEND_PATH = args[2];
         }
         SpringApplication.run(SignalApplication.class, args);
     }

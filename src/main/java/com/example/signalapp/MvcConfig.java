@@ -6,10 +6,8 @@
 package com.example.signalapp;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.http.MediaType;
+import org.springframework.web.servlet.config.annotation.*;
 
 
 /**
@@ -21,20 +19,32 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class MvcConfig implements WebMvcConfigurer {
     
     private static final String[] RESOURCES_FOLDERS = {"pages", "js", "html", "img", "css", "lib"};
-    
+    private static final String[] FRONTEND_FOLDERS = {"200", "404", "_nuxt"};
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         
-        for (String folder: RESOURCES_FOLDERS) {
+        for (String folder : RESOURCES_FOLDERS) {
             registry
                 .addResourceHandler("/" + folder + "/**")
                 .addResourceLocations("file:" + SignalApplication.RESOURCES_PATH + folder + "/");
         }
 
+        for (String folder : FRONTEND_FOLDERS) {
+            registry
+                    .addResourceHandler("/" + folder + "/**")
+                    .addResourceLocations("file:" + SignalApplication.FRONTEND_PATH + folder + "/");
+        }
+
         registry
                 .addResourceHandler("/")
-                .addResourceLocations("file:" + SignalApplication.RESOURCES_PATH + "pages/index.html");
+                .addResourceLocations("file:" + SignalApplication.FRONTEND_PATH + "index.html");
         
+    }
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer.mediaType("mjs", new MediaType("text","javascript"));
     }
 
     @Override

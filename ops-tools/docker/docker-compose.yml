@@ -11,6 +11,7 @@ services:
     volumes:
       - ../../:/signalapp
       - ../../../signalappres/:/signalapp/signalappres
+      - ../../../signalapp-frontend/.output/public/:/signalapp/signalapp-frontend
       - ../../../signalappdata/:/signalapp/signalappdata
     stdin_open: true
     tty: true
