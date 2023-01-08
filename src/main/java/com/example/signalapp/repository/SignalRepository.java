@@ -6,17 +6,24 @@
 package com.example.signalapp.repository;
 
 import com.example.signalapp.model.Signal;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
  *
  * @author anton
  */
-public interface SignalRepository extends JpaRepository <Signal, Integer> {
+public interface SignalRepository extends PagingAndSortingRepository<Signal, Integer> {
 
-    List<Signal> findByUserId(int userId);
+    Page<Signal> findByUserId(int userId, Pageable pageable);
+
+    @Query(value = "select * from signal " +
+            "where user_id = :userId " +
+            "and (upper(name) like upper(:filter) " +
+            "or upper(description) like upper(:filter))", nativeQuery = true)
+    Page<Signal> findByUserIdAndFilter(int userId, Pageable pageable, String filter);
 
     Signal findByIdAndUserId(int id, int userId);
 

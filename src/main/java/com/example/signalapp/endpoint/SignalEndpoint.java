@@ -6,9 +6,9 @@ import java.util.List;
 import com.example.signalapp.dto.response.IdDtoResponse;
 import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.request.SignalDtoRequest;
+import com.example.signalapp.dto.response.ResponseWithTotalCounts;
 import com.example.signalapp.dto.response.SignalDtoResponse;
 import com.example.signalapp.dto.response.SignalWithDataDtoResponse;
-import com.example.signalapp.error.SignalAppDataException;
 import com.example.signalapp.error.SignalAppException;
 import com.example.signalapp.error.SignalAppNotFoundException;
 import com.example.signalapp.error.SignalAppUnauthorizedException;
@@ -31,9 +31,14 @@ public class SignalEndpoint extends EndpointBase {
     private final SignalService service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    List<SignalDtoResponse> getAll(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId)
+    ResponseWithTotalCounts<SignalDtoResponse> get(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                                                   @RequestParam(required = false) String filter,
+                                                   @RequestParam(required = false, defaultValue = "0") int page,
+                                                   @RequestParam(required = false, defaultValue = "0") int size,
+                                                   @RequestParam(required = false) String sortBy,
+                                                   @RequestParam(required = false) String sortDir)
             throws SignalAppUnauthorizedException {
-        return service.getAll(sessionId);
+        return service.get(sessionId, filter, page, size, sortBy, sortDir);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -71,7 +76,7 @@ public class SignalEndpoint extends EndpointBase {
 
     @GetMapping(path = "/{id}/wav", produces = "audio/wave")
     byte[] getWav(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
+                  @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
         return service.getWav(sessionId, id);
     }
 

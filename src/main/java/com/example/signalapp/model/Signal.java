@@ -40,18 +40,17 @@ public class Signal {
     @Column
     private LocalDateTime createTime = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column
+    private int userId;
 
     @Column(name = "max_abs_y")
     private BigDecimal maxAbsY;
 
-    public Signal(SignalDtoRequest dtoRequest, User user, BigDecimal maxAbsY) {
+    public Signal(SignalDtoRequest dtoRequest, int userId, BigDecimal maxAbsY) {
         name = dtoRequest.getName();
         description = dtoRequest.getDescription();
         this.maxAbsY = maxAbsY;
-        this.user = user;
+        this.userId = userId;
     }
     
 }

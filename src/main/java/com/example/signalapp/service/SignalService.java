@@ -6,6 +6,7 @@ import com.example.signalapp.audio.AudioSampleReader;
 import com.example.signalapp.dto.response.IdDtoResponse;
 import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.request.SignalDtoRequest;
+import com.example.signalapp.dto.response.ResponseWithTotalCounts;
 import com.example.signalapp.dto.response.SignalDtoResponse;
 import com.example.signalapp.dto.response.SignalWithDataDtoResponse;
 import com.example.signalapp.error.*;
@@ -15,6 +16,10 @@ import com.example.signalapp.model.Signal;
 import com.example.signalapp.model.User;
 import com.example.signalapp.repository.SignalRepository;
 import com.example.signalapp.repository.UserTokenRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +33,12 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SignalService extends ServiceBase {
 
     public static final int MAX_SIGNAL_LENGTH = 1024000;
+    public static final int MAX_USER_SIGNALS_NUMBER = 100;
 
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
@@ -45,15 +50,25 @@ public class SignalService extends ServiceBase {
         this.fileManager = fileManager;
     }
 
-    public List<SignalDtoResponse> getAll(String token) throws SignalAppUnauthorizedException {
-        return signalRepository.findByUserId(getUserByToken(token).getId()).stream()
-                .map(SignalMapper.INSTANCE::signalToDto).collect(Collectors.toList());
+    public ResponseWithTotalCounts<SignalDtoResponse> get(String token, String filter, int page, int size,
+                                                          String sortBy, String sortDir)
+            throws SignalAppUnauthorizedException {
+        int userId = getUserByToken(token).getId();
+        Pageable pageable = PageRequest.of(page, size > MAX_USER_SIGNALS_NUMBER || size <= 0
+                ? MAX_USER_SIGNALS_NUMBER : size, getSort(sortBy, sortDir, filter));
+        Page<Signal> signalPage = filter != null && !filter.isEmpty()
+                ? signalRepository.findByUserIdAndFilter(userId, pageable, "%" + filter + "%")
+                : signalRepository.findByUserId(userId, pageable);
+        return new ResponseWithTotalCounts<>(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList(),
+                signalPage.getTotalElements(), signalPage.getTotalPages());
     }
 
     public IdDtoResponse add(String token, SignalDtoRequest request) throws SignalAppUnauthorizedException, IOException {
+        // todo check max signals number
         BigDecimal maxAbsY = getMaxAbsY(request.getData());
-        Signal signal = signalRepository.save(new Signal(request, getUserByToken(token), maxAbsY));
+        Signal signal = signalRepository.save(new Signal(request, getUserByToken(token).getId(), maxAbsY));
         writeSignalDataToWavFile(signal, request.getData());
+        // todo undo write in db if io exception
         return new IdDtoResponse(signal.getId());
     }
 
@@ -93,7 +108,7 @@ public class SignalService extends ServiceBase {
 
     public byte[] getWav(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
         Signal signal = getSignalByUserTokenAndId(token, id);
-        return fileManager.readWavFromFile(signal.getUser().getId(), signal.getId());
+        return fileManager.readWavFromFile(signal.getUserId(), signal.getId());
     }
 
     public void importWav(String token, String fileName, byte[] data)
@@ -127,7 +142,7 @@ public class SignalService extends ServiceBase {
     }
 
     private List<SignalDataDto> getDataForSignal(Signal signal) throws IOException, UnsupportedAudioFileException {
-        byte[] bytes = fileManager.readWavFromFile(signal.getUser().getId(), signal.getId());
+        byte[] bytes = fileManager.readWavFromFile(signal.getUserId(), signal.getId());
         AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(bytes));
         double[] samples = new double[(int)asr.getSampleCount() / 2];
         asr.getMonoSamples(samples);
@@ -148,7 +163,7 @@ public class SignalService extends ServiceBase {
         Signal signal = new Signal();
         signal.setName(fileName);
         signal.setDescription("Imported from file " + fileName);
-        signal.setUser(user);
+        signal.setUserId(user.getId());
         signal.setMaxAbsY(BigDecimal.ONE);
         signal = signalRepository.save(signal);
         writeSamplesToWavFile(signal, samples, newFormat);
@@ -172,12 +187,39 @@ public class SignalService extends ServiceBase {
         int numBytes = sampleCount * (format.getSampleSizeInBits() / 8);
         byte[] bytes = new byte[numBytes];
         AudioBytesCoder.encode(samples, bytes, sampleCount, format);
-        fileManager.writeBytesToWavFile(signal.getUser().getId(), signal.getId(), format, bytes);
+        fileManager.writeBytesToWavFile(signal.getUserId(), signal.getId(), format, bytes);
     }
 
     private BigDecimal getMaxAbsY(List<SignalDataDto> data) {
         return data.stream().map(point -> point.getY().abs())
                 .max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
+    }
+
+    private Sort getSort(String sortBy, String sortDir, String filter) {
+        String sortColumn = sortBy != null && !sortBy.isEmpty() ? sortBy : "createTime";
+        sortColumn = filter == null || filter.isEmpty() ? sortColumn : camelToSnake(sortColumn);
+        Sort sort = Sort.by(sortColumn);
+        return sortDir != null && sortDir.equals("asc") ? sort : sort.descending();
+    }
+
+    private String camelToSnake(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        StringBuilder result = new StringBuilder();
+        char c = str.charAt(0);
+        result.append(Character.toLowerCase(c));
+        for (int i = 1; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            if (Character.isUpperCase(ch)) {
+                result.append('_');
+                result.append(Character.toLowerCase(ch));
+            }
+            else {
+                result.append(ch);
+            }
+        }
+        return result.toString();
     }
 
 }
