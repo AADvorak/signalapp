@@ -17,6 +17,10 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface SignalRepository extends PagingAndSortingRepository<Signal, Integer> {
 
+    @Query(value = "select count(1) from signal " +
+            "where user_id = :userId", nativeQuery = true)
+    int countByUserId(int userId);
+
     Page<Signal> findByUserId(int userId, Pageable pageable);
 
     @Query(value = "select * from signal " +

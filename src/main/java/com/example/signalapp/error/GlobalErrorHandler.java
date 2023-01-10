@@ -111,6 +111,14 @@ public class GlobalErrorHandler {
         return errors;
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(SignalAppConflictException.class)
+    public List<ErrorDtoResponse> handleSignalAppConflictException(SignalAppConflictException e) {
+        List<ErrorDtoResponse> errors = new ArrayList<>();
+        errors.add(new ErrorDtoResponse("SIGNAL_APP_ERROR", e.getErrorCode().getDescription()));
+        return errors;
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(SignalAppException.class)
     public List<ErrorDtoResponse> handleSignalAppException(SignalAppException e) {

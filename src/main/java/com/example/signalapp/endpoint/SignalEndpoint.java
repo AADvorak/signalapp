@@ -9,6 +9,7 @@ import com.example.signalapp.dto.request.SignalDtoRequest;
 import com.example.signalapp.dto.response.ResponseWithTotalCounts;
 import com.example.signalapp.dto.response.SignalDtoResponse;
 import com.example.signalapp.dto.response.SignalWithDataDtoResponse;
+import com.example.signalapp.error.SignalAppConflictException;
 import com.example.signalapp.error.SignalAppException;
 import com.example.signalapp.error.SignalAppNotFoundException;
 import com.example.signalapp.error.SignalAppUnauthorizedException;
@@ -43,7 +44,8 @@ public class SignalEndpoint extends EndpointBase {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     IdDtoResponse post(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                       @RequestBody @Valid SignalDtoRequest signalDtoRequest) throws SignalAppUnauthorizedException, IOException {
+                       @RequestBody @Valid SignalDtoRequest signalDtoRequest) throws SignalAppUnauthorizedException,
+            IOException, SignalAppConflictException {
         return service.add(sessionId, signalDtoRequest);
     }
 

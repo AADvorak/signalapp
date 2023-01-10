@@ -38,7 +38,7 @@ import java.util.List;
 public class SignalService extends ServiceBase {
 
     public static final int MAX_SIGNAL_LENGTH = 1024000;
-    public static final int MAX_USER_SIGNALS_NUMBER = 100;
+    public static final int MAX_USER_STORED_SIGNALS_NUMBER = 25;
 
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
@@ -54,8 +54,8 @@ public class SignalService extends ServiceBase {
                                                           String sortBy, String sortDir)
             throws SignalAppUnauthorizedException {
         int userId = getUserByToken(token).getId();
-        Pageable pageable = PageRequest.of(page, size > MAX_USER_SIGNALS_NUMBER || size <= 0
-                ? MAX_USER_SIGNALS_NUMBER : size, getSort(sortBy, sortDir, filter));
+        Pageable pageable = PageRequest.of(page, size > MAX_USER_STORED_SIGNALS_NUMBER || size <= 0
+                ? MAX_USER_STORED_SIGNALS_NUMBER : size, getSort(sortBy, sortDir, filter));
         Page<Signal> signalPage = filter != null && !filter.isEmpty()
                 ? signalRepository.findByUserIdAndFilter(userId, pageable, "%" + filter + "%")
                 : signalRepository.findByUserId(userId, pageable);
@@ -63,15 +63,18 @@ public class SignalService extends ServiceBase {
                 signalPage.getTotalElements(), signalPage.getTotalPages());
     }
 
-    public IdDtoResponse add(String token, SignalDtoRequest request) throws SignalAppUnauthorizedException, IOException {
-        // todo check max signals number
+    @Transactional(rollbackFor = IOException.class)
+    public IdDtoResponse add(String token, SignalDtoRequest request) throws SignalAppUnauthorizedException,
+            IOException, SignalAppConflictException {
+        int userId = getUserByToken(token).getId();
+        checkStoredByUserSignalsNumber(userId);
         BigDecimal maxAbsY = getMaxAbsY(request.getData());
-        Signal signal = signalRepository.save(new Signal(request, getUserByToken(token).getId(), maxAbsY));
+        Signal signal = signalRepository.save(new Signal(request, userId, maxAbsY));
         writeSignalDataToWavFile(signal, request.getData());
-        // todo undo write in db if io exception
         return new IdDtoResponse(signal.getId());
     }
 
+    @Transactional(rollbackFor = IOException.class)
     public void update(String token, SignalDtoRequest request, int id) throws SignalAppUnauthorizedException,
             IOException, SignalAppNotFoundException {
         Signal signal = getSignalByUserTokenAndId(token, id);
@@ -79,8 +82,8 @@ public class SignalService extends ServiceBase {
         signal.setName(request.getName());
         signal.setDescription(request.getDescription());
         signal.setMaxAbsY(maxAbsY);
-        writeSignalDataToWavFile(signal, request.getData());
         signalRepository.save(signal);
+        writeSignalDataToWavFile(signal, request.getData());
     }
 
     @Transactional
@@ -111,12 +114,14 @@ public class SignalService extends ServiceBase {
         return fileManager.readWavFromFile(signal.getUserId(), signal.getId());
     }
 
+    @Transactional(rollbackFor = IOException.class)
     public void importWav(String token, String fileName, byte[] data)
             throws SignalAppUnauthorizedException, UnsupportedAudioFileException, IOException, SignalAppException {
         if (data.length > 2 * MAX_SIGNAL_LENGTH) {
             throw new SignalAppException(SignalAppErrorCode.TOO_LONG_FILE);
         }
         User user = getUserByToken(token);
+        checkStoredByUserSignalsNumber(user.getId());
         AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(data));
         long sampleCount = asr.getSampleCount();
         if (asr.getFormat().getChannels() == 1) {
@@ -200,6 +205,12 @@ public class SignalService extends ServiceBase {
         sortColumn = filter == null || filter.isEmpty() ? sortColumn : camelToSnake(sortColumn);
         Sort sort = Sort.by(sortColumn);
         return sortDir != null && sortDir.equals("asc") ? sort : sort.descending();
+    }
+
+    private void checkStoredByUserSignalsNumber(int userId) throws SignalAppConflictException {
+        if (signalRepository.countByUserId(userId) >= MAX_USER_STORED_SIGNALS_NUMBER) {
+            throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_SIGNALS_STORED);
+        }
     }
 
     private String camelToSnake(String str) {
