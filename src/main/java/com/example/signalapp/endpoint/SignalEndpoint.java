@@ -1,10 +1,10 @@
 package com.example.signalapp.endpoint;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.example.signalapp.dto.response.IdDtoResponse;
-import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.request.SignalDtoRequest;
 import com.example.signalapp.dto.response.ResponseWithTotalCounts;
 import com.example.signalapp.dto.response.SignalDtoResponse;
@@ -70,8 +70,8 @@ public class SignalEndpoint extends EndpointBase {
     }
 
     @GetMapping(path = "/{id}/data", produces = MediaType.APPLICATION_JSON_VALUE)
-    List<SignalDataDto> getData(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException,
+    List<BigDecimal> getData(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
+                             @PathVariable int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException,
             UnsupportedAudioFileException, IOException {
         return service.getData(sessionId, id);
     }

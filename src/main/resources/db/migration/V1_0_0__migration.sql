@@ -58,7 +58,9 @@ create table public.signal
     name        varchar(100),
     description varchar,
     create_time timestamp default CURRENT_TIMESTAMP not null,
-    max_abs_y   numeric                             not null
+    max_abs_y   numeric                             not null,
+    sample_rate numeric                             not null,
+    x_min       numeric                             not null
 );
 
 INSERT INTO public.module (module, name, container, for_menu, transformer)

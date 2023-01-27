@@ -46,10 +46,17 @@ public class Signal {
     @Column(name = "max_abs_y")
     private BigDecimal maxAbsY;
 
-    public Signal(SignalDtoRequest dtoRequest, int userId, BigDecimal maxAbsY) {
+    private BigDecimal sampleRate;
+
+    @Column(name = "x_min")
+    private BigDecimal xMin;
+
+    public Signal(SignalDtoRequest dtoRequest, int userId) {
         name = dtoRequest.getName();
         description = dtoRequest.getDescription();
-        this.maxAbsY = maxAbsY;
+        maxAbsY = dtoRequest.getMaxAbsY();
+        sampleRate = dtoRequest.getSampleRate();
+        xMin = dtoRequest.getXMin();
         this.userId = userId;
     }
     

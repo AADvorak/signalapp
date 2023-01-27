@@ -4,7 +4,6 @@ import com.example.signalapp.ApplicationProperties;
 import com.example.signalapp.audio.AudioBytesCoder;
 import com.example.signalapp.audio.AudioSampleReader;
 import com.example.signalapp.dto.response.IdDtoResponse;
-import com.example.signalapp.dto.SignalDataDto;
 import com.example.signalapp.dto.request.SignalDtoRequest;
 import com.example.signalapp.dto.response.ResponseWithTotalCounts;
 import com.example.signalapp.dto.response.SignalDtoResponse;
@@ -31,14 +30,13 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class SignalService extends ServiceBase {
 
     public static final int MAX_SIGNAL_LENGTH = 1024000;
-    public static final int MAX_USER_STORED_SIGNALS_NUMBER = 25;
+    public static final int MAX_USER_STORED_SIGNALS_NUMBER = 50;
 
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
@@ -68,8 +66,7 @@ public class SignalService extends ServiceBase {
             IOException, SignalAppConflictException {
         int userId = getUserByToken(token).getId();
         checkStoredByUserSignalsNumber(userId);
-        BigDecimal maxAbsY = getMaxAbsY(request.getData());
-        Signal signal = signalRepository.save(new Signal(request, userId, maxAbsY));
+        Signal signal = signalRepository.save(new Signal(request, userId));
         writeSignalDataToWavFile(signal, request.getData());
         return new IdDtoResponse(signal.getId());
     }
@@ -78,10 +75,11 @@ public class SignalService extends ServiceBase {
     public void update(String token, SignalDtoRequest request, int id) throws SignalAppUnauthorizedException,
             IOException, SignalAppNotFoundException {
         Signal signal = getSignalByUserTokenAndId(token, id);
-        BigDecimal maxAbsY = getMaxAbsY(request.getData());
         signal.setName(request.getName());
         signal.setDescription(request.getDescription());
-        signal.setMaxAbsY(maxAbsY);
+        signal.setMaxAbsY(request.getMaxAbsY());
+        signal.setSampleRate(request.getSampleRate());
+        signal.setXMin(request.getXMin());
         signalRepository.save(signal);
         writeSignalDataToWavFile(signal, request.getData());
     }
@@ -104,7 +102,7 @@ public class SignalService extends ServiceBase {
         return response;
     }
 
-    public List<SignalDataDto> getData(String token, int id) throws SignalAppUnauthorizedException,
+    public List<BigDecimal> getData(String token, int id) throws SignalAppUnauthorizedException,
             SignalAppNotFoundException, IOException, UnsupportedAudioFileException {
         return getDataForSignal(getSignalByUserTokenAndId(token,id));
     }
@@ -146,18 +144,14 @@ public class SignalService extends ServiceBase {
         return signal;
     }
 
-    private List<SignalDataDto> getDataForSignal(Signal signal) throws IOException, UnsupportedAudioFileException {
+    private List<BigDecimal> getDataForSignal(Signal signal) throws IOException, UnsupportedAudioFileException {
         byte[] bytes = fileManager.readWavFromFile(signal.getUserId(), signal.getId());
         AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(bytes));
         double[] samples = new double[(int)asr.getSampleCount() / 2];
         asr.getMonoSamples(samples);
-        List<SignalDataDto> data = new ArrayList<>();
-        double step = 1 / asr.getFormat().getFrameRate();
-        for (int i = 0; i < samples.length; i++) {
-            SignalDataDto point = new SignalDataDto();
-            point.setX(BigDecimal.valueOf(i * step));
-            point.setY(BigDecimal.valueOf(samples[i]).multiply(signal.getMaxAbsY()));
-            data.add(point);
+        List<BigDecimal> data = new ArrayList<>();
+        for (double sample : samples) {
+            data.add(BigDecimal.valueOf(sample).multiply(signal.getMaxAbsY()));
         }
         return data;
     }
@@ -170,19 +164,17 @@ public class SignalService extends ServiceBase {
         signal.setDescription("Imported from file " + fileName);
         signal.setUserId(user.getId());
         signal.setMaxAbsY(BigDecimal.ONE);
+        signal.setSampleRate(BigDecimal.valueOf(format.getSampleRate()));
+        signal.setXMin(BigDecimal.ZERO);
         signal = signalRepository.save(signal);
         writeSamplesToWavFile(signal, samples, newFormat);
     }
 
-    private void writeSignalDataToWavFile(Signal signal, List<SignalDataDto> data) throws IOException {
-        // todo check signal format
-        MathContext divideMc = new MathContext(10, RoundingMode.HALF_DOWN);
-        float sampleRate = Math.round(BigDecimal.ONE.divide(data.get(1).getX().subtract(data.get(0).getX()), divideMc)
-                .round(new MathContext(0, RoundingMode.HALF_UP)).floatValue());
-        AudioFormat format = new AudioFormat(sampleRate, 16, 1, true, false);
+    private void writeSignalDataToWavFile(Signal signal, List<BigDecimal> data) throws IOException {
+        AudioFormat format = new AudioFormat(signal.getSampleRate().floatValue(), 16, 1, true, false);
         double[] samples = new double[data.size()];
         for (int i = 0; i < samples.length; i++) {
-            samples[i] = data.get(i).getY().divide(signal.getMaxAbsY(), divideMc).doubleValue();
+            samples[i] = data.get(i).divide(signal.getMaxAbsY(), new MathContext(10, RoundingMode.HALF_DOWN)).doubleValue();
         }
         writeSamplesToWavFile(signal, samples, format);
     }
@@ -193,11 +185,6 @@ public class SignalService extends ServiceBase {
         byte[] bytes = new byte[numBytes];
         AudioBytesCoder.encode(samples, bytes, sampleCount, format);
         fileManager.writeBytesToWavFile(signal.getUserId(), signal.getId(), format, bytes);
-    }
-
-    private BigDecimal getMaxAbsY(List<SignalDataDto> data) {
-        return data.stream().map(point -> point.getY().abs())
-                .max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
     }
 
     private Sort getSort(String sortBy, String sortDir, String filter) {
