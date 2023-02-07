@@ -39,7 +39,14 @@ public class MvcConfig implements WebMvcConfigurer {
         registry
                 .addResourceHandler("/")
                 .addResourceLocations("file:" + SignalApplication.FRONTEND_PATH + "index.html");
-        
+
+        registry
+                .addResourceHandler("/favicon.svg")
+                .addResourceLocations("file:" + SignalApplication.FRONTEND_PATH + "favicon.svg");
+
+        registry
+                .addResourceHandler("/transformers.js")
+                .addResourceLocations("file:" + SignalApplication.FRONTEND_PATH + "transformers.js");
     }
 
     @Override
