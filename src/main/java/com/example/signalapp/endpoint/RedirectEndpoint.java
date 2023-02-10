@@ -14,25 +14,40 @@ import java.util.Map;
 @RequestMapping("/")
 public class RedirectEndpoint {
 
-    @GetMapping("/signalmanager")
+    @GetMapping("/signal-manager")
     public RedirectView redirectToSignalManager(RedirectAttributes attributes,
                                                 @RequestParam Map<String, String> requestParams) {
-        return redirectTo(attributes, "signalmanager", requestParams);
+        return redirectTo(attributes, "signal-manager", requestParams);
     }
 
-    @GetMapping("/signalgenerator")
+    @GetMapping("/signal-generator")
     public RedirectView redirectToSignalGenerator(RedirectAttributes attributes) {
-        return redirectTo(attributes, "signalgenerator");
+        return redirectTo(attributes, "signal-generator");
     }
 
-    @GetMapping("/signalrecorder")
+    @GetMapping("/signal-recorder")
     public RedirectView redirectToSignalRecorder(RedirectAttributes attributes) {
-        return redirectTo(attributes, "signalrecorder");
+        return redirectTo(attributes, "signal-recorder");
     }
 
     @GetMapping("/signin")
     public RedirectView redirectToSignIn(RedirectAttributes attributes) {
         return redirectTo(attributes, "signin");
+    }
+
+    @GetMapping("/signup")
+    public RedirectView redirectToSignUp(RedirectAttributes attributes) {
+        return redirectTo(attributes, "signup");
+    }
+
+    @GetMapping("/user-settings")
+    public RedirectView redirectToUserSettings(RedirectAttributes attributes) {
+        return redirectTo(attributes, "user-settings");
+    }
+
+    @GetMapping("/change-password")
+    public RedirectView redirectToChangePassword(RedirectAttributes attributes) {
+        return redirectTo(attributes, "change-password");
     }
 
     @GetMapping("/signal/{id}")

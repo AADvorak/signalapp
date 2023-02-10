@@ -10,6 +10,7 @@ import com.example.signalapp.dto.response.UserDtoResponse;
 import com.example.signalapp.error.SignalAppDataErrorCode;
 import com.example.signalapp.error.SignalAppDataException;
 import com.example.signalapp.error.SignalAppUnauthorizedException;
+import com.example.signalapp.file.FileManager;
 import com.example.signalapp.mail.MailTransport;
 import com.example.signalapp.mapper.UserMapper;
 import com.example.signalapp.model.User;
@@ -41,8 +42,8 @@ public class UserService extends ServiceBase {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(BCryptPasswordEncoder.BCryptVersion.$2A,
             new SecureRandom("OjKotPaniMatko".getBytes()));
 
-    private static final String EMAIL_CONFIRM_OK = "email-confirm-ok";
-    private static final String EMAIL_CONFIRM_ERROR = "email-confirm-error";
+    public static final String EMAIL_CONFIRM_OK = "email-confirm-ok";
+    public static final String EMAIL_CONFIRM_ERROR = "email-confirm-error";
 
     private final UserRepository userRepository;
 
@@ -50,12 +51,16 @@ public class UserService extends ServiceBase {
 
     private final MailTransport mailTransport;
 
+    private final FileManager fileManager;
+
     public UserService(UserTokenRepository userTokenRepository, ApplicationProperties applicationProperties,
-                       UserRepository userRepository, UserConfirmRepository userConfirmRepository, MailTransport mailTransport) {
+                       UserRepository userRepository, UserConfirmRepository userConfirmRepository,
+                       MailTransport mailTransport, FileManager fileManager) {
         super(userTokenRepository, applicationProperties);
         this.userRepository = userRepository;
         this.userConfirmRepository = userConfirmRepository;
         this.mailTransport = mailTransport;
+        this.fileManager = fileManager;
     }
 
     public ResponseWithToken<UserDtoResponse> register(UserDtoRequest request) throws SignalAppDataException {
@@ -89,8 +94,11 @@ public class UserService extends ServiceBase {
 
     @Transactional
     public void deleteCurrentUser(String token) throws SignalAppUnauthorizedException {
+        int userId = getUserByToken(token).getId();
         if (userRepository.deleteByToken(token) == 0) {
             throw new SignalAppUnauthorizedException();
+        } else {
+            fileManager.deleteAllUserData(userId);
         }
     }
 
@@ -126,6 +134,7 @@ public class UserService extends ServiceBase {
         return UserMapper.INSTANCE.userToDto(getUserByToken(token));
     }
 
+    @Transactional(rollbackFor = MessagingException.class)
     public void makeUserEmailConfirmation(String token, String host) throws SignalAppUnauthorizedException,
             MessagingException, SignalAppDataException {
         User user = getUserByToken(token);
@@ -150,6 +159,7 @@ public class UserService extends ServiceBase {
         return EMAIL_CONFIRM_OK;
     }
 
+    @Transactional(rollbackFor = MessagingException.class)
     public void restorePassword(String email) throws SignalAppDataException, MessagingException {
         User user = userRepository.findByEmailAndEmailConfirmedTrue(email);
         if (user == null) {
@@ -159,7 +169,6 @@ public class UserService extends ServiceBase {
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
         mailTransport.sendNewPassword(newPassword, user.getEmail());
-        // todo undo password change in db after email error
     }
 
     private String generateAndSaveToken(User user) {

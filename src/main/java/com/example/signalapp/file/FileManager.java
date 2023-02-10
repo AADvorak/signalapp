@@ -57,6 +57,10 @@ public class FileManager {
         deleteDirRecursively(new File(getWavDir(userId, signalId)));
     }
 
+    public void deleteAllUserData(int userId) {
+        deleteDirRecursively(new File(SignalApplication.DATA_PATH + SIGNALS_PATH + userId));
+    }
+
     private void deleteDirRecursively(File dir) {
         FileSystemUtils.deleteRecursively(dir);
     }
