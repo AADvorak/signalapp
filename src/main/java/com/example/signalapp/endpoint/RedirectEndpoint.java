@@ -50,6 +50,11 @@ public class RedirectEndpoint {
         return redirectTo(attributes, "change-password");
     }
 
+    @GetMapping("/restore-password")
+    public RedirectView redirectToRestorePassword(RedirectAttributes attributes) {
+        return redirectTo(attributes, "restore-password");
+    }
+
     @GetMapping("/signal/{id}")
     public RedirectView redirectToSignal(RedirectAttributes attributes, @PathVariable String id) {
         return redirectTo(attributes, "signal/" + id);
