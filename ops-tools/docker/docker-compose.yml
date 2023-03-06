@@ -3,7 +3,9 @@ version: '3'
 services:
 
   signalapp:
-    build: .
+    build:
+      context: ./images/app
+      dockerfile: Dockerfile
     ports:
       - '8080:8080'
     depends_on:
@@ -11,7 +13,6 @@ services:
     volumes:
       - ../../:/signalapp
       - ../../../signalappres/:/signalapp/signalappres
-      - ../../../signalapp-frontend/.output/public/:/signalapp/signalapp-frontend
       - ../../../signalappdata/:/signalapp/signalappdata
     stdin_open: true
     tty: true
@@ -26,6 +27,31 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
+    networks:
+      signalapp-net:
+
+  signalapp-frontend:
+    build:
+      context: ./images/frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - ../../../signalapp-frontend/:/signalapp-frontend
+    networks:
+      signalapp-net:
+
+  signalapp-nginx:
+    image: nginx:1.23-alpine
+    ports:
+      - '80:80'
+    depends_on:
+      - signalapp
+      - signalapp-frontend
+    volumes:
+      - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../../nginx/mime.types:/etc/nginx/mime.types
+      - ../../../signalappres/:/usr/share/nginx/static
     networks:
       signalapp-net:
 

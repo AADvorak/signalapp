@@ -55,9 +55,11 @@ public class UserEndpoint extends EndpointBase {
 
     @PostMapping("/confirm")
     public void postMailConfirm(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                @RequestHeader(name = "Host", defaultValue = "localhost:8080") String host)
+                                @RequestHeader(name = "Host", defaultValue = "localhost:8080") String hostFromHeader,
+                                @RequestBody String hostFromBody)
             throws SignalAppUnauthorizedException, MessagingException, SignalAppDataException {
-        userService.makeUserEmailConfirmation(sessionId, host);
+        userService.makeUserEmailConfirmation(sessionId, hostFromBody != null && !hostFromBody.isEmpty()
+                ? hostFromBody : hostFromHeader);
     }
 
     @PostMapping(path = "/restore/{email}")

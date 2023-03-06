@@ -5,61 +5,29 @@
  */
 package com.example.signalapp;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.web.servlet.config.annotation.*;
 
-
 /**
- *
  * @author anton
  */
 @Configuration
 @EnableWebMvc
+@RequiredArgsConstructor
 public class MvcConfig implements WebMvcConfigurer {
-    
-    private static final String[] RESOURCES_FOLDERS = {"pages", "js", "html", "img", "css", "lib"};
-    private static final String[] FRONTEND_FOLDERS = {"200", "404", "_nuxt"};
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        
-        for (String folder : RESOURCES_FOLDERS) {
-            registry
-                .addResourceHandler("/" + folder + "/**")
-                .addResourceLocations("file:" + SignalApplication.RESOURCES_PATH + folder + "/");
-        }
-
-        for (String folder : FRONTEND_FOLDERS) {
-            registry
-                    .addResourceHandler("/" + folder + "/**")
-                    .addResourceLocations("file:" + SignalApplication.FRONTEND_PATH + folder + "/");
-        }
-
-        registry
-                .addResourceHandler("/")
-                .addResourceLocations("file:" + SignalApplication.FRONTEND_PATH + "index.html");
-
-        registry
-                .addResourceHandler("/favicon.svg")
-                .addResourceLocations("file:" + SignalApplication.FRONTEND_PATH + "favicon.svg");
-
-        registry
-                .addResourceHandler("/transformers.js")
-                .addResourceLocations("file:" + SignalApplication.FRONTEND_PATH + "transformers.js");
-    }
-
-    @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.mediaType("mjs", new MediaType("text","javascript"));
-    }
+    private final ApplicationProperties properties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOrigins("http://localhost:3000")
-                .allowCredentials(true)
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("*");
+        if (properties.isDebug()) {
+            registry.addMapping("/**")
+                    .allowedOrigins("http://localhost:3000")
+                    .allowCredentials(true)
+                    .allowedMethods("GET", "POST", "PUT", "DELETE")
+                    .allowedHeaders("*");
+        }
     }
 
 }
