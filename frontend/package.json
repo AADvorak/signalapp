@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "start": "nuxt start"
+  },
+  "devDependencies": {
+    "@mdi/font": "^6.9.96",
+    "@mdi/js": "^6.6.96",
+    "nuxt": "npm:nuxt3@latest",
+    "sass": "^1.51.0"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.4.1",
+    "highcharts": "^10.3.2",
+    "highcharts-vue": "^1.4.0",
+    "inline-worker": "^1.1.0",
+    "mitt": "^3.0.0",
+    "pinia": "^2.0.20",
+    "vue": "^3.2.33",
+    "vue-draggable-next": "^2.1.1",
+    "vuedraggable": "^2.24.3",
+    "vuetify": "^3.0.1"
+  }
+}

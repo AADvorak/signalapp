@@ -23,5 +23,15 @@
 hs_err_pid*
 /target/
 
+# Frontend
+*.iws
+*.iml
+*.ipr
+/frontend/.nuxt/
+/frontend/node_modules/
+/frontend/.output/
+
 # NetBeans
 nbactions.xml
+
+*/.idea/

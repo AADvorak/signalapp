@@ -1,0 +1,51 @@
+<h3>Generate</h3>
+<form class="needs-validation" novalidate>
+  <div class="form-group">
+    <label for="SignalGeneratorBegin">Signal begin (B)</label>
+    <input type="number" class="form-control" id="SignalGeneratorBegin" placeholder="Enter signal begin" value="0" required>
+    <div id="SignalGeneratorBeginValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+  <div class="form-group">
+    <label for="SignalGeneratorLength">Signal length (L)</label>
+    <input type="number" class="form-control" id="SignalGeneratorLength" placeholder="Enter signal length" value="0.1" required>
+    <div id="SignalGeneratorLengthValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+  <div class="form-group">
+    <label for="SignalGeneratorSampleRate">Signal sample rate (S)</label>
+    <input type="number" class="form-control" id="SignalGeneratorSampleRate" placeholder="Enter signal sample rate" value="3000" required>
+    <div id="SignalGeneratorSampleRateValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+  <div class="form-group">
+    <label for="SignalGeneratorFrequency">Signal frequency (F)</label>
+    <input type="number" class="form-control" id="SignalGeneratorFrequency" placeholder="Enter signal frequency" value="100" required>
+    <div id="SignalGeneratorFrequencyValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+  <div class="form-group">
+    <label for="SignalGeneratorAmplitude">Signal amplitude (A)</label>
+    <input type="number" class="form-control" id="SignalGeneratorAmplitude" placeholder="Enter signal amplitude" value="1" required>
+    <div id="SignalGeneratorAmplitudeValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+  <div class="form-group">
+    <label for="SignalGeneratorOffset">Signal offset (O)</label>
+    <input type="number" class="form-control" id="SignalGeneratorOffset" placeholder="Enter signal offset" value="0" required>
+    <div id="SignalGeneratorOffsetValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+  <div class="form-group">
+    <label for="SignalGeneratorForm">Signal form</label>
+    <select class="form-control" id="SignalGeneratorForm"></select>
+  </div>
+</form>
+<button id="SignalGeneratorSave" class="btn btn-primary">Generate</button>
+<hr/>
+<h3>Import from txt</h3>
+<form>
+  <div class="form-group">
+    <input type="file" accept=".txt" class="form-control-file" id="SignalGeneratorTxtFile">
+  </div>
+</form>
+<h3>Import from wav</h3>
+<form>
+  <div class="form-group">
+    <input type="file" accept=".wav" class="form-control-file" id="SignalGeneratorWavFile">
+  </div>
+</form>

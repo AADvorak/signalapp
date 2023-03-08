@@ -22,13 +22,13 @@ public class FileManager {
 
     public void writeModuleToFile(String module, String extension, String data) throws IOException {
         String moduleLowerCase = module.toLowerCase();
-        String moduleDir = SignalApplication.RESOURCES_PATH + MODULES_PATH + moduleLowerCase;
+        String moduleDir = SignalApplication.FRONTEND_OLD_PATH + MODULES_PATH + moduleLowerCase;
         createDirIfNotExists(moduleDir);
         writeStringToFile(data, moduleDir + "/" + moduleLowerCase + "." + extension);
     }
 
     public String readModuleFromFile(String module, String extension) throws IOException {
-        return readStringFromFile(SignalApplication.RESOURCES_PATH + MODULES_PATH +
+        return readStringFromFile(SignalApplication.FRONTEND_OLD_PATH + MODULES_PATH +
                 module + "/" + module + "." + extension);
     }
 

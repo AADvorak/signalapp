@@ -12,7 +12,6 @@ services:
       - signalapp-postgres
     volumes:
       - ../../:/signalapp
-      - ../../../signalappres/:/signalapp/signalappres
       - ../../../signalappdata/:/signalapp/signalappdata
     stdin_open: true
     tty: true
@@ -37,7 +36,7 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - ../../../signalapp-frontend/:/signalapp-frontend
+      - ../../frontend/:/frontend
     networks:
       signalapp-net:
 
@@ -51,7 +50,7 @@ services:
     volumes:
       - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
       - ../../nginx/mime.types:/etc/nginx/mime.types
-      - ../../../signalappres/:/usr/share/nginx/static
+      - ../../frontend-old/:/usr/share/nginx/static
     networks:
       signalapp-net:
 

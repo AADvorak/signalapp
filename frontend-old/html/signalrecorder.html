@@ -1,0 +1,20 @@
+<form class="needs-validation" novalidate>
+  <div class="form-group">
+    <label for="SignalRecorderSampleRate">Sample rate (Hz)</label>
+    <input type="number" class="form-control" id="SignalRecorderSampleRate" placeholder="Enter sample rate" value="48000" required>
+    <div id="SignalRecorderSampleRateValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+</form>
+<div id="SignalRecorderInfo"></div>
+<div id="SignalRecorderRecordStatus"></div>
+<div class="btn-group">
+  <button id="SignalRecorderRec" type="button" class="btn btn-danger" disabled>REC</button>
+  <button id="SignalRecorderPause" type="button" class="btn btn-warning" disabled>Pause</button>
+  <button id="SignalRecorderStop" type="button" class="btn btn-dark" disabled>Stop</button>
+</div>
+<div id="SignalRecorderRecorded"></div>
+<div class="btn-group">
+  <button id="SignalRecorderSave" type="button" class="btn btn-primary" disabled>Save</button>
+  <button id="SignalRecorderExportToWav" type="button" class="btn btn-primary" disabled>Export wav</button>
+  <button id="SignalRecorderClear" type="button" class="btn btn-secondary" disabled>Clear</button>
+</div>

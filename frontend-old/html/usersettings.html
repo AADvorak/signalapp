@@ -1,0 +1,38 @@
+<div id="UserSettingsConfirmDiv" hidden>
+  <div style="color: brown">Email is not confirmed</div>
+  <button id="UserSettingsConfirm" type="button" class="btn btn-warning">Confirm</button>
+</div>
+<div id="UserSettingsConfirmationSent" style="color: darkslateblue" hidden>
+  Confirmation message is sent, check your email
+</div>
+<div id="UserSettingsConfirmationSendError" style="color: brown" hidden>
+  Confirmation message send error
+</div>
+<form id="UserSettingsForm" class="needs-validation" novalidate>
+  <div class="form-group">
+    <label for="UserSettingsEmail">Email</label>
+    <input type="email" class="form-control" id="UserSettingsEmail" placeholder="Enter email" maxlength="100" required>
+    <div id="UserSettingsEmailValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+  <div class="form-group">
+    <label for="UserSettingsFirstName">First name</label>
+    <input type="text" class="form-control" id="UserSettingsFirstName" placeholder="Enter first name" maxlength="100">
+    <div id="UserSettingsFirstNameValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+  <div class="form-group">
+    <label for="UserSettingsLastName">Last name</label>
+    <input type="text" class="form-control" id="UserSettingsLastName" placeholder="Enter last name" maxlength="100">
+    <div id="UserSettingsLastNameValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+  <div class="form-group">
+    <label for="UserSettingsPatronymic">Patronymic</label>
+    <input type="text" class="form-control" id="UserSettingsPatronymic" placeholder="Enter patronymic" maxlength="100">
+    <div id="UserSettingsPatronymicValid" class="invalid-feedback" style="width: 100%;"></div>
+  </div>
+</form>
+<div class="btn-group">
+  <button id="UserSettingsSave" type="button" class="btn btn-primary">Save</button>
+  <button id="UserSettingsSignOut" type="button" class="btn btn-secondary">Sign out</button>
+</div>
+<button id="UserSettingsChangePassword" type="button" class="btn btn-secondary">Change password</button>
+<button id="UserSettingsDeleteAccount" type="button" class="btn btn-danger">Delete account</button>
