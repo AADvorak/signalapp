@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout name="default">
     <div class="d-flex align-center flex-column">
-      <v-card width="100%" min-width="400">
+      <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
           <div v-if="!emailConfirmed && !confirmEmailSent" class="mb-5">
             <p style="color: #CF6679">Email is not confirmed</p>
