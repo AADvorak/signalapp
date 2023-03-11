@@ -15,9 +15,9 @@ public class MailTransport {
 
     private final MailingSender mailingSender;
 
-    public void sendEmailConfirmation(String host, String code, String email) throws MessagingException {
+    public void sendEmailConfirmation(String origin, String code, String email) throws MessagingException {
         send(new MailingMessage(email, "SignalApp email confirmation",
-                "To confirm you email use the link http://" + host + "/api/users/confirm/" + code));
+                "To confirm you email use the link " + origin + "/api/users/confirm/" + code));
     }
 
     public void sendNewPassword(String newPassword, String email) throws MessagingException {

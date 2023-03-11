@@ -135,7 +135,7 @@ public class UserService extends ServiceBase {
     }
 
     @Transactional(rollbackFor = MessagingException.class)
-    public void makeUserEmailConfirmation(String token, String host) throws SignalAppUnauthorizedException,
+    public void makeUserEmailConfirmation(String token, String origin) throws SignalAppUnauthorizedException,
             MessagingException, SignalAppDataException {
         User user = getUserByToken(token);
         if (user.isEmailConfirmed()) {
@@ -146,7 +146,7 @@ public class UserService extends ServiceBase {
         userConfirm.setCode(String.valueOf(randomUUID()));
         userConfirm.setCreateTime(LocalDateTime.now());
         userConfirmRepository.save(userConfirm);
-        mailTransport.sendEmailConfirmation(host, userConfirm.getCode(), user.getEmail());
+        mailTransport.sendEmailConfirmation(origin, userConfirm.getCode(), user.getEmail());
     }
 
     @Transactional

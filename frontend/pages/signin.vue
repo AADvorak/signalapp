@@ -64,6 +64,9 @@ export default {
       return dataStore().getWaitingForAuthorization
     }
   },
+  mounted() {
+    this.form.email = dataStore().emailForPasswordRestore || ''
+  },
   methods: {
     async signInRequest() {
       this.clearValidation()

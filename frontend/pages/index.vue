@@ -1,15 +1,14 @@
 <template>
   <NuxtLayout name="default">
     <div class="d-flex align-center flex-column">
-      <v-card width="100%">
+      <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
           <h1>App description</h1>
-          <div>This web app models signal transformations.</div>
+          <div>This web app models signals and their transformations.</div>
           <div><b>App abilities:</b></div>
           <ul>
             <li>simple form signals generation,</li>
             <li>signal transformation,</li>
-            <li>signal adding,</li>
             <li>signal storage on server,</li>
             <li>signal export to / import from txt and wav files,</li>
             <li>signal recording / playing.</li>

@@ -24,7 +24,7 @@
                 :error-messages="validation.description"
             >
             </v-textarea>
-            <div class="d-flex">
+            <div class="d-flex flex-wrap">
               <select-transformer-dialog :bus="bus"/>
               <v-btn color="success" @click="saveSignal">
                 Save
@@ -118,6 +118,7 @@ export default {
         text: 'Error transforming signal: ' + error.message
       })
     })
+    window.scrollTo(0,0)
   },
   beforeUnmount() {
     this.bus.off('error')

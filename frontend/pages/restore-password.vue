@@ -11,7 +11,7 @@
                 :error-messages="validation.email"
                 required/>
             <div class="d-flex">
-              <v-btn color="primary" @click="restorePasswordRequest">
+              <v-btn color="primary" :loading="restorePasswordRequestSent" @click="restorePasswordRequest">
                 Restore password
               </v-btn>
             </div>
@@ -41,6 +41,7 @@ export default {
     validation: {
       email: [],
     },
+    restorePasswordRequestSent: false,
   }),
   mounted() {
     this.form.email = dataStore().emailForPasswordRestore || ''
@@ -48,16 +49,21 @@ export default {
   methods: {
     async restorePasswordRequest() {
       this.clearValidation()
-      const response = await ApiProvider.postJson('/api/users/restore/' + this.form.email, {})
-      if (response.ok) {
-        this.showMessage({
-          text: 'New password is sent by email',
-          onHide: () => useRouter().push('/signin')
-        })
-      } else if (response.status === 400) {
-        this.parseValidation(response.errors)
-      } else {
-        this.showErrorsFromResponse(response, 'Error sending new password')
+      this.restorePasswordRequestSent = true
+      try {
+        const response = await ApiProvider.postJson('/api/users/restore/' + this.form.email, {})
+        if (response.ok) {
+          this.showMessage({
+            text: 'New password is sent by email',
+            onHide: () => useRouter().push('/signin')
+          })
+        } else if (response.status === 400) {
+          this.parseValidation(response.errors)
+        } else {
+          this.showErrorsFromResponse(response, 'Error sending new password')
+        }
+      } finally {
+        this.restorePasswordRequestSent = false
       }
     }
   }

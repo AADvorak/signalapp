@@ -34,7 +34,7 @@
                 label="Patronymic"
                 :error="!!validation.patronymic.length"
                 :error-messages="validation.patronymic"/>
-            <div class="d-flex">
+            <div class="d-flex flex-wrap">
               <v-btn color="success" @click="save">
                 Save
               </v-btn>
@@ -140,15 +140,18 @@ export default {
     },
     async sendConfirmEmailRequest() {
       this.confirmEmailRequestSent = true
-      const response = await this.getApiProvider().post('/api/users/confirm', window.location.host)
-      this.confirmEmailRequestSent = false
-      if (response.ok) {
-        this.confirmEmailSent = true
-        this.showMessage({
-          text: `Confirm message is sent, check your email ${dataStore().userInfo.email}`
-        })
-      } else {
-        this.showErrorsFromResponse(response, 'Error sending email')
+      try {
+        const response = await this.getApiProvider().post('/api/users/confirm', window.location.origin)
+        if (response.ok) {
+          this.confirmEmailSent = true
+          this.showMessage({
+            text: `Confirm message is sent, check your email ${dataStore().userInfo.email}`
+          })
+        } else {
+          this.showErrorsFromResponse(response, 'Error sending email')
+        }
+      } finally {
+        this.confirmEmailRequestSent = false
       }
     }
   }

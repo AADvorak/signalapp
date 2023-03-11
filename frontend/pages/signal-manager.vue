@@ -43,7 +43,7 @@
               </th>
               <th class="text-left"></th>
               <th class="text-left"></th>
-              <th class="text-left"></th>
+              <th v-if="!isMobile" class="text-left"></th>
               <th class="text-left"></th>
             </tr>
             </thead>
@@ -67,7 +67,7 @@
                   {{ mdi.mdiFileImport }}
                 </v-icon>
               </td>
-              <td class="text-right">
+              <td v-if="!isMobile" class="text-right">
                 <v-icon @click.stop="playOrStopSignal(signal)">
                   {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
                 </v-icon>
@@ -87,7 +87,7 @@
           <p class="mt-5">
             Actions with selected signals
           </p>
-          <div class="d-flex">
+          <div class="d-flex flex-wrap">
             <select-transformer-dialog :bus="bus" :double="true" :disabled="!transformSignalsAvailable"/>
             <v-dialog
                 v-model="viewDialog"
@@ -149,6 +149,7 @@ import mitt from "mitt";
 import SelectTransformerDialog from "../components/select-transformer-dialog";
 import TransformerDoubleDialog from "../components/transformer-double-dialog";
 import SignalUtils from "../utils/signal-utils";
+import {useMobileDetection} from "vue3-mobile-detection";
 
 export default {
   name: "signal-manager",
@@ -187,7 +188,8 @@ export default {
       DESCRIPTION: 'description'
     },
     bus: new mitt(),
-    selectSignals: false
+    selectSignals: false,
+    isMobile: useMobileDetection().isMobile()
   }),
   computed: {
     sortingNameSign() {

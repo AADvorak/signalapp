@@ -1,36 +1,41 @@
 <template>
   <v-app :theme="theme">
     <v-app-bar elevation="1" app>
-      <v-app-bar-nav-icon class="ml-4" @click="showMainMenu = !showMainMenu">
-      </v-app-bar-nav-icon>
-      <v-img class="ml-4"
+      <template v-slot:prepend>
+        <v-app-bar-nav-icon @click="showOrHideMenu"/>
+      </template>
+      <v-img v-if="!isMobile"
+             class="ml-2"
              src="../oscilloscope-logo.png"
              max-width="80"
              min-width="80"
-             @click="toMainPage"
-      ></v-img>
-      <v-spacer></v-spacer>
+             @click="toMainPage"/>
+      <v-spacer v-if="!isMobile"/>
       <v-app-bar-title>{{ header }}</v-app-bar-title>
-      <v-spacer></v-spacer>
-      <v-btn color="primary">
-        {{ isSignedIn ? userButtonText : 'User' }}
-        <v-menu activator="parent">
-          <v-list>
-            <v-list-item v-if="isSignedIn" @click="signOut">
-              <v-list-item-title>Sign out</v-list-item-title>
-            </v-list-item>
-            <v-list-item v-if="isSignedIn" to="/user-settings">
-              <v-list-item-title>Settings</v-list-item-title>
-            </v-list-item>
-            <v-list-item v-if="!isSignedIn" to="/signin">
-              <v-list-item-title>Sign in</v-list-item-title>
-            </v-list-item>
-            <v-list-item v-if="!isSignedIn" to="/signup">
-              <v-list-item-title>Sign up</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </v-btn>
+      <v-spacer v-if="!isMobile"/>
+      <template v-slot:append>
+        <v-btn color="primary">
+          <v-icon v-if="isMobile">{{ mdiAccount }}</v-icon>
+          <div v-else>{{ isSignedIn ? userButtonText : 'User' }}</div>
+          <v-menu activator="parent">
+            <v-list>
+              <v-list-item v-if="isSignedIn" @click="signOut">
+                <v-list-item-title>Sign out</v-list-item-title>
+              </v-list-item>
+              <v-list-item v-if="isSignedIn" to="/user-settings">
+                <v-list-item-title>Settings</v-list-item-title>
+              </v-list-item>
+              <v-list-item v-if="!isSignedIn" to="/signin">
+                <v-list-item-title>Sign in</v-list-item-title>
+              </v-list-item>
+              <v-list-item v-if="!isSignedIn" to="/signup">
+                <v-list-item-title>Sign up</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-btn>
+      </template>
+
     </v-app-bar>
     <v-main>
       <v-container width="100%" style="padding: 12px; max-width: none;">
@@ -58,7 +63,7 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col style="padding: 4px" :cols="pageCols" :sm="pageColsSm" :md="pageCols" :lg="pageCols">
+          <v-col v-if="!isMobile || !showMainMenu" style="padding: 4px" :cols="pageCols" :sm="pageColsSm" :md="pageCols" :lg="pageCols">
             <slot/>
           </v-col>
         </v-row>
@@ -71,6 +76,8 @@
 
 import {dataStore} from "../stores/data-store";
 import ApiProvider from "../api/api-provider";
+import { useMobileDetection } from "vue3-mobile-detection";
+import {mdiAccount} from "@mdi/js";
 
 export default {
   data() {
@@ -78,8 +85,8 @@ export default {
       darkMode: dataStore().getDarkMode,
       header: '',
       showMainMenu: false,
-      mainMenuCols: 3,
-      mainMenuColsSm: 4
+      mdiAccount: mdiAccount,
+      isMobile: useMobileDetection().isMobile()
     }
   },
   computed: {
@@ -97,6 +104,12 @@ export default {
     },
     modulesForMenu() {
       return dataStore().getModulesForMenu
+    },
+    mainMenuCols() {
+      return this.isMobile ? 12 : 3
+    },
+    mainMenuColsSm() {
+      return this.isMobile ? 12 : 4
     },
     pageCols() {
       return this.showMainMenu ? 12 - this.mainMenuCols : 12
@@ -134,6 +147,10 @@ export default {
           break
         }
       }
+    },
+    showOrHideMenu() {
+      this.showMainMenu = !this.showMainMenu
+      window.scrollTo(0,0)
     }
   },
 }

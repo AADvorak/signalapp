@@ -48,11 +48,6 @@ export default {
     }
   }),
   computed: {
-    chartTitle() {
-      return this.signals.length > 1
-          ? `Selected ${this.signals.length} signals`
-          : StringUtils.restrictLength(this.signals[0].name, 50)
-    },
     bgColor() {
       return this.darkMode ? '#1F2227' : '#f1f1f1'
     },
@@ -104,7 +99,6 @@ export default {
       }
       this.chartOptions.xAxis.categories = categories
       this.chartOptions.series = series
-      this.chartOptions.title.text = this.chartTitle
     },
     makeChartStyles() {
       // todo try to do this in data
