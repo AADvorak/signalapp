@@ -149,7 +149,7 @@ import mitt from "mitt";
 import SelectTransformerDialog from "../components/select-transformer-dialog";
 import TransformerDoubleDialog from "../components/transformer-double-dialog";
 import SignalUtils from "../utils/signal-utils";
-import {useMobileDetection} from "vue3-mobile-detection";
+import DeviceUtils from "../utils/device-utils";
 
 export default {
   name: "signal-manager",
@@ -189,7 +189,7 @@ export default {
     },
     bus: new mitt(),
     selectSignals: false,
-    isMobile: useMobileDetection().isMobile()
+    isMobile: DeviceUtils.isMobile()
   }),
   computed: {
     sortingNameSign() {

@@ -76,8 +76,8 @@
 
 import {dataStore} from "../stores/data-store";
 import ApiProvider from "../api/api-provider";
-import { useMobileDetection } from "vue3-mobile-detection";
 import {mdiAccount} from "@mdi/js";
+import DeviceUtils from "../utils/device-utils";
 
 export default {
   data() {
@@ -86,7 +86,7 @@ export default {
       header: '',
       showMainMenu: false,
       mdiAccount: mdiAccount,
-      isMobile: useMobileDetection().isMobile()
+      isMobile: DeviceUtils.isMobile()
     }
   },
   computed: {
