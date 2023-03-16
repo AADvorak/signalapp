@@ -54,11 +54,11 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
         ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.GET,
                 new HttpEntity<>(headers), UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
-        EditUserDtoRequest editUserDtoRequest = new EditUserDtoRequest();
-        editUserDtoRequest.setEmail("1" + userDtoResponse.getEmail());
-        editUserDtoRequest.setFirstName(userDtoResponse.getFirstName() + "1");
-        editUserDtoRequest.setLastName(userDtoResponse.getLastName() + "1");
-        editUserDtoRequest.setPatronymic(userDtoResponse.getPatronymic() + "1");
+        EditUserDtoRequest editUserDtoRequest = new EditUserDtoRequest()
+                .setEmail("1" + userDtoResponse.getEmail())
+                .setFirstName(userDtoResponse.getFirstName() + "1")
+                .setLastName(userDtoResponse.getLastName() + "1")
+                .setPatronymic(userDtoResponse.getPatronymic() + "1");
         ResponseEntity<UserDtoResponse> response1 = template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.PUT,
                 new HttpEntity<>(editUserDtoRequest, headers), UserDtoResponse.class);
         UserDtoResponse userDtoResponse1 = Objects.requireNonNull(response1.getBody());
@@ -75,11 +75,11 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
         ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.GET,
                 new HttpEntity<>(headers), UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
-        EditUserDtoRequest editUserDtoRequest = new EditUserDtoRequest();
-        editUserDtoRequest.setEmail(email2);
-        editUserDtoRequest.setFirstName(userDtoResponse.getFirstName() + "1");
-        editUserDtoRequest.setLastName(userDtoResponse.getLastName() + "1");
-        editUserDtoRequest.setPatronymic(userDtoResponse.getPatronymic() + "1");
+        EditUserDtoRequest editUserDtoRequest = new EditUserDtoRequest()
+                .setEmail(email2)
+                .setFirstName(userDtoResponse.getFirstName() + "1")
+                .setLastName(userDtoResponse.getLastName() + "1")
+                .setPatronymic(userDtoResponse.getPatronymic() + "1");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.PUT,
                 new HttpEntity<>(editUserDtoRequest, headers), UserDtoResponse.class));
@@ -95,11 +95,11 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
         ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.GET,
                 new HttpEntity<>(headers), UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
-        EditUserDtoRequest editUserDtoRequest = new EditUserDtoRequest();
-        editUserDtoRequest.setEmail(email2);
-        editUserDtoRequest.setFirstName(userDtoResponse.getFirstName() + "1");
-        editUserDtoRequest.setLastName(userDtoResponse.getLastName() + "1");
-        editUserDtoRequest.setPatronymic(userDtoResponse.getPatronymic() + "1");
+        EditUserDtoRequest editUserDtoRequest = new EditUserDtoRequest()
+                .setEmail(email2)
+                .setFirstName(userDtoResponse.getFirstName() + "1")
+                .setLastName(userDtoResponse.getLastName() + "1")
+                .setPatronymic(userDtoResponse.getPatronymic() + "1");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.PUT,
                         new HttpEntity<>(editUserDtoRequest), UserDtoResponse.class));
@@ -108,9 +108,9 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testChangePasswordOk() {
-        ChangePasswordDtoRequest changePasswordDtoRequest = new ChangePasswordDtoRequest();
-        changePasswordDtoRequest.setOldPassword(password);
-        changePasswordDtoRequest.setPassword(password + "1");
+        ChangePasswordDtoRequest changePasswordDtoRequest = new ChangePasswordDtoRequest()
+                .setOldPassword(password)
+                .setPassword(password + "1");
         ResponseEntity<String> response = template.exchange(fullUrl(USERS_URL + ME_URL + PASSWORD_URL),
                 HttpMethod.PUT, new HttpEntity<>(changePasswordDtoRequest, login(email1)), String.class);
         assertEquals(200, response.getStatusCodeValue());
@@ -118,9 +118,9 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testChangePasswordUnauthorized() {
-        ChangePasswordDtoRequest changePasswordDtoRequest = new ChangePasswordDtoRequest();
-        changePasswordDtoRequest.setOldPassword(password);
-        changePasswordDtoRequest.setPassword(password + "1");
+        ChangePasswordDtoRequest changePasswordDtoRequest = new ChangePasswordDtoRequest()
+                .setOldPassword(password)
+                .setPassword(password + "1");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(USERS_URL + ME_URL + PASSWORD_URL),
                 HttpMethod.PUT, new HttpEntity<>(changePasswordDtoRequest), String.class));

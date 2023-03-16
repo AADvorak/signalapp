@@ -1,15 +1,15 @@
 package com.example.signalapp.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@Accessors(chain = true)
 public class SignalDtoResponse {
 
     private int id;

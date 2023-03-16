@@ -1,12 +1,12 @@
 package com.example.signalapp.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@Accessors(chain = true)
 public class UserDtoResponse {
 
     private int id;

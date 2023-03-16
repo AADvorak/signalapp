@@ -71,7 +71,9 @@ public class UserService extends ServiceBase {
         } catch (DataIntegrityViolationException ex) {
             throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_EXISTS);
         }
-        return new ResponseWithToken<>(UserMapper.INSTANCE.userToDto(user), generateAndSaveToken(user));
+        return new ResponseWithToken<UserDtoResponse>()
+                .setResponse(UserMapper.INSTANCE.userToDto(user))
+                .setToken(generateAndSaveToken(user));
     }
 
     public ResponseWithToken<UserDtoResponse> login(LoginDtoRequest request) throws SignalAppDataException {
@@ -82,7 +84,9 @@ public class UserService extends ServiceBase {
         if (!encoder.matches(request.getPassword(), user.getPassword())) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD);
         }
-        return new ResponseWithToken<>(UserMapper.INSTANCE.userToDto(user), generateAndSaveToken(user));
+        return new ResponseWithToken<UserDtoResponse>()
+                .setResponse(UserMapper.INSTANCE.userToDto(user))
+                .setToken(generateAndSaveToken(user));
     }
 
     @Transactional
@@ -108,10 +112,10 @@ public class UserService extends ServiceBase {
         if (!Objects.equals(user.getEmail(), request.getEmail())) {
             user.setEmailConfirmed(false);
         }
-        user.setEmail(request.getEmail());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setPatronymic(request.getPatronymic());
+        user.setEmail(request.getEmail())
+                .setFirstName(request.getFirstName())
+                .setLastName(request.getLastName())
+                .setPatronymic(request.getPatronymic());
         try {
             user = userRepository.save(user);
         } catch (DataIntegrityViolationException ex) {
@@ -141,10 +145,10 @@ public class UserService extends ServiceBase {
         if (user.isEmailConfirmed()) {
             throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_CONFIRMED);
         }
-        UserConfirm userConfirm = new UserConfirm();
-        userConfirm.setId(new UserPK(user));
-        userConfirm.setCode(String.valueOf(randomUUID()));
-        userConfirm.setCreateTime(LocalDateTime.now());
+        UserConfirm userConfirm = new UserConfirm()
+                .setId(new UserPK().setUser(user))
+                .setCode(String.valueOf(randomUUID()))
+                .setCreateTime(LocalDateTime.now());
         userConfirmRepository.save(userConfirm);
         mailTransport.sendEmailConfirmation(origin, userConfirm.getCode(), user.getEmail());
     }
@@ -173,14 +177,17 @@ public class UserService extends ServiceBase {
 
     private String generateAndSaveToken(User user) {
         String token = String.valueOf(randomUUID());
-        Optional<UserToken> optionalUserToken = userTokenRepository.findById(new UserPK(user));
+        UserPK userPK = new UserPK().setUser(user);
+        Optional<UserToken> optionalUserToken = userTokenRepository.findById(userPK);
         if (optionalUserToken.isPresent()) {
-            UserToken userToken = optionalUserToken.get();
-            userToken.setToken(token);
-            userToken.setLastActionTime(LocalDateTime.now());
-            userTokenRepository.save(userToken);
+            userTokenRepository.save(optionalUserToken.get()
+                    .setToken(token)
+                    .setLastActionTime(LocalDateTime.now()));
         } else {
-            userTokenRepository.save(new UserToken(new UserPK(user), token, LocalDateTime.now()));
+            userTokenRepository.save(new UserToken()
+                    .setId(userPK)
+                    .setToken(token)
+                    .setLastActionTime(LocalDateTime.now()));
         }
         return token;
     }

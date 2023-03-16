@@ -1,10 +1,12 @@
 package com.example.signalapp.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.Accessors;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@Accessors(chain = true)
 public class ResponseWithToken<T> {
 
     private T response;

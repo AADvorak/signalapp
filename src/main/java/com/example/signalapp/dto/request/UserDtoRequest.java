@@ -3,17 +3,17 @@ package com.example.signalapp.dto.request;
 import com.example.signalapp.service.UserService;
 import com.example.signalapp.validator.MaxLength;
 import com.example.signalapp.validator.MinLength;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@Accessors(chain = true)
 public class UserDtoRequest {
 
     @MaxLength

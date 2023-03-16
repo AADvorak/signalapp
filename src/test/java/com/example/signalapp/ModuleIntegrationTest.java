@@ -76,7 +76,7 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testPostNullModule() throws JsonProcessingException {
-        ModuleDtoRequest dto = new ModuleDtoRequest(null, "Name", "left", true, true);
+        ModuleDtoRequest dto = createModuleDtoRequest().setModule(null);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL), HttpMethod.POST, new HttpEntity<>(dto, login(email1)), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
@@ -87,7 +87,7 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testPostEmptyModule() throws JsonProcessingException {
-        ModuleDtoRequest dto = new ModuleDtoRequest("", "Name", "left", true, true);
+        ModuleDtoRequest dto = createModuleDtoRequest().setModule("");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL), HttpMethod.POST, new HttpEntity<>(dto, login(email1)), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
@@ -98,7 +98,7 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testPostModuleWithSpaces() throws JsonProcessingException {
-        ModuleDtoRequest dto = new ModuleDtoRequest("With spaces", "Name", "left", true, true);
+        ModuleDtoRequest dto = createModuleDtoRequest().setModule("With spaces");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL), HttpMethod.POST, new HttpEntity<>(dto, login(email1)), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
@@ -109,7 +109,7 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testPostEmptyName() throws JsonProcessingException {
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "", "left", true, true);
+        ModuleDtoRequest dto = createModuleDtoRequest().setName("");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL), HttpMethod.POST, new HttpEntity<>(dto, login(email1)), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
@@ -120,7 +120,7 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testPostInvalidContainer() throws JsonProcessingException {
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "Invalid", true, true);
+        ModuleDtoRequest dto = createModuleDtoRequest().setContainer("Invalid");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL), HttpMethod.POST, new HttpEntity<>(dto, login(email1)), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
@@ -131,16 +131,15 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testPostUnauthorized() {
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(MODULES_URL), dto, String.class));
+                () -> template.postForEntity(fullUrl(MODULES_URL), createModuleDtoRequest(), String.class));
         assertEquals(401, exc.getRawStatusCode());
     }
 
     @Test
     public void testPostExistingModule() throws JsonProcessingException {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
+        ModuleDtoRequest dto = createModuleDtoRequest();
         template.exchange(fullUrl(MODULES_URL), HttpMethod.POST, new HttpEntity<>(dto, headers), ModuleDtoResponse.class);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL), HttpMethod.POST, new HttpEntity<>(dto, headers), String.class));
@@ -152,7 +151,7 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testPostOk() {
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
+        ModuleDtoRequest dto = createModuleDtoRequest();
         ResponseEntity<ModuleDtoResponse> response = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
                 new HttpEntity<>(dto, login(email1)), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse = response.getBody();
@@ -168,17 +167,15 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testPutNullName() throws JsonProcessingException {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         ResponseEntity<ModuleDtoResponse> response = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
-                new HttpEntity<>(dto, headers), ModuleDtoResponse.class);
+                new HttpEntity<>(createModuleDtoRequest(), headers), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse = response.getBody();
         assert moduleDtoResponse != null;
         int id = moduleDtoResponse.getId();
-        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest();
-        editModuleDtoRequest.setName(null);
-        editModuleDtoRequest.setContainer("right");
-        editModuleDtoRequest.setForMenu(false);
-        editModuleDtoRequest.setTransformer(false);
+        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest()
+                .setContainer("right")
+                .setForMenu(false)
+                .setTransformer(false);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL) + "/" + id, HttpMethod.PUT,
                         new HttpEntity<>(editModuleDtoRequest, headers), ModuleDtoResponse.class));
@@ -191,17 +188,16 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testPutEmptyName() throws JsonProcessingException {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         ResponseEntity<ModuleDtoResponse> response = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
-                new HttpEntity<>(dto, headers), ModuleDtoResponse.class);
+                new HttpEntity<>(createModuleDtoRequest(), headers), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse = response.getBody();
         assert moduleDtoResponse != null;
         int id = moduleDtoResponse.getId();
-        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest();
-        editModuleDtoRequest.setName("");
-        editModuleDtoRequest.setContainer("right");
-        editModuleDtoRequest.setForMenu(false);
-        editModuleDtoRequest.setTransformer(false);
+        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest()
+                .setName("")
+                .setContainer("right")
+                .setForMenu(false)
+                .setTransformer(false);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL) + "/" + id, HttpMethod.PUT,
                         new HttpEntity<>(editModuleDtoRequest, headers), ModuleDtoResponse.class));
@@ -214,17 +210,16 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testPutInvalidContainer() throws JsonProcessingException {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         ResponseEntity<ModuleDtoResponse> response = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
-                new HttpEntity<>(dto, headers), ModuleDtoResponse.class);
+                new HttpEntity<>(createModuleDtoRequest(), headers), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse = response.getBody();
         assert moduleDtoResponse != null;
         int id = moduleDtoResponse.getId();
-        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest();
-        editModuleDtoRequest.setName("Name");
-        editModuleDtoRequest.setContainer("invalid");
-        editModuleDtoRequest.setForMenu(false);
-        editModuleDtoRequest.setTransformer(false);
+        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest()
+                .setName("Name")
+                .setContainer("invalid")
+                .setForMenu(false)
+                .setTransformer(false);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL) + "/" + id, HttpMethod.PUT,
                         new HttpEntity<>(editModuleDtoRequest, headers), ModuleDtoResponse.class));
@@ -237,17 +232,16 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testPutAnotherUser() {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         ResponseEntity<ModuleDtoResponse> response = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
-                new HttpEntity<>(dto, headers), ModuleDtoResponse.class);
+                new HttpEntity<>(createModuleDtoRequest(), headers), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse = response.getBody();
         assert moduleDtoResponse != null;
         int id = moduleDtoResponse.getId();
-        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest();
-        editModuleDtoRequest.setName("Name");
-        editModuleDtoRequest.setContainer("right");
-        editModuleDtoRequest.setForMenu(false);
-        editModuleDtoRequest.setTransformer(false);
+        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest()
+                .setName("Name")
+                .setContainer("right")
+                .setForMenu(false)
+                .setTransformer(false);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL) + "/" + id, HttpMethod.PUT,
                         new HttpEntity<>(editModuleDtoRequest, login(email2)), ModuleDtoResponse.class));
@@ -257,17 +251,16 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testPutUnauthorized() {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         ResponseEntity<ModuleDtoResponse> response = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
-                new HttpEntity<>(dto, headers), ModuleDtoResponse.class);
+                new HttpEntity<>(createModuleDtoRequest(), headers), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse = response.getBody();
         assert moduleDtoResponse != null;
         int id = moduleDtoResponse.getId();
-        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest();
-        editModuleDtoRequest.setName("Name");
-        editModuleDtoRequest.setContainer("right");
-        editModuleDtoRequest.setForMenu(false);
-        editModuleDtoRequest.setTransformer(false);
+        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest()
+                .setName("Name")
+                .setContainer("right")
+                .setForMenu(false)
+                .setTransformer(false);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.put(fullUrl(MODULES_URL) + "/" + id,
                         editModuleDtoRequest, ModuleDtoResponse.class));
@@ -277,17 +270,17 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testPutOk() {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
+        ModuleDtoRequest dto = createModuleDtoRequest();
         ResponseEntity<ModuleDtoResponse> response = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
                 new HttpEntity<>(dto, headers), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse = response.getBody();
         assert moduleDtoResponse != null;
         int id = moduleDtoResponse.getId();
-        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest();
-        editModuleDtoRequest.setName(dto.getName() + "1");
-        editModuleDtoRequest.setContainer("right");
-        editModuleDtoRequest.setForMenu(false);
-        editModuleDtoRequest.setTransformer(false);
+        EditModuleDtoRequest editModuleDtoRequest = new EditModuleDtoRequest()
+                .setName(dto.getName() + "1")
+                .setContainer("right")
+                .setForMenu(false)
+                .setTransformer(false);
         ResponseEntity<ModuleDtoResponse> response1 = template.exchange(fullUrl(MODULES_URL) + "/" + id,
                 HttpMethod.PUT, new HttpEntity<>(editModuleDtoRequest, headers), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse1 = response1.getBody();
@@ -303,9 +296,8 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testGet() {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         ResponseEntity<ModuleDtoResponse> response = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
-                new HttpEntity<>(dto, headers), ModuleDtoResponse.class);
+                new HttpEntity<>(createModuleDtoRequest(), headers), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse = response.getBody();
         ModuleDtoResponse moduleDtoResponse1 = Objects.requireNonNull(template.exchange(fullUrl(MODULES_URL), HttpMethod.GET,
                 new HttpEntity<>(headers), ModuleDtoResponse[].class).getBody())[0];
@@ -328,9 +320,8 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testDelete() {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         ModuleDtoResponse moduleDtoResponse = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
-                new HttpEntity<>(dto, headers), ModuleDtoResponse.class).getBody();
+                new HttpEntity<>(createModuleDtoRequest(), headers), ModuleDtoResponse.class).getBody();
         assert moduleDtoResponse != null;
         ResponseEntity<String> response = template.exchange(fullUrl(MODULES_URL) + "/" + moduleDtoResponse.getId(),
                 HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
@@ -340,9 +331,8 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testDeleteUnauthorized() {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         ModuleDtoResponse moduleDtoResponse = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
-                new HttpEntity<>(dto, headers), ModuleDtoResponse.class).getBody();
+                new HttpEntity<>(createModuleDtoRequest(), headers), ModuleDtoResponse.class).getBody();
         assert moduleDtoResponse != null;
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.delete(fullUrl(MODULES_URL) + "/" + moduleDtoResponse.getId()));
@@ -352,9 +342,8 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testDeleteByAnotherUser() {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("Module", "Name", "left", true, true);
         ModuleDtoResponse moduleDtoResponse = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
-                new HttpEntity<>(dto, headers), ModuleDtoResponse.class).getBody();
+                new HttpEntity<>(createModuleDtoRequest(), headers), ModuleDtoResponse.class).getBody();
         assert moduleDtoResponse != null;
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(MODULES_URL) + "/" + moduleDtoResponse.getId(),
@@ -373,7 +362,12 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
     @Test
     public void testUploadAndDownloadFiles() {
         HttpHeaders headers = login(email1);
-        ModuleDtoRequest dto = new ModuleDtoRequest("TestModule", "TestModule", "left", false, true);
+        ModuleDtoRequest dto = new ModuleDtoRequest()
+                .setModule("TestModule")
+                .setName("TestModule")
+                .setContainer("left")
+                .setForMenu(false)
+                .setTransformer(true);
         ResponseEntity<ModuleDtoResponse> response = template.exchange(fullUrl(MODULES_URL), HttpMethod.POST,
                 new HttpEntity<>(dto, headers), ModuleDtoResponse.class);
         ModuleDtoResponse moduleDtoResponse = response.getBody();
@@ -437,6 +431,15 @@ public class ModuleIntegrationTest extends IntegrationTestBase {
                 () -> assertEquals(401, excPutJsUnauthorized.getRawStatusCode()),
                 () -> assertEquals(404, excGetHtmlUnauthorized.getRawStatusCode()),
                 () -> assertEquals(404, excGetJsUnauthorized.getRawStatusCode()));
+    }
+
+    private ModuleDtoRequest createModuleDtoRequest() {
+        return new ModuleDtoRequest()
+                .setModule("Module")
+                .setName("Name")
+                .setContainer("left")
+                .setTransformer(true)
+                .setForMenu(true);
     }
 
 }

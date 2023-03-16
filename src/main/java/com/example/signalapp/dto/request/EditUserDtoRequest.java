@@ -1,16 +1,16 @@
 package com.example.signalapp.dto.request;
 
 import com.example.signalapp.validator.MaxLength;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@Accessors(chain = true)
 public class EditUserDtoRequest {
 
     @MaxLength

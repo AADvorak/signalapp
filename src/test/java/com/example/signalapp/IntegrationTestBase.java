@@ -42,23 +42,20 @@ public class IntegrationTestBase {
     }
 
     protected HttpHeaders login(String email) {
-        LoginDtoRequest loginDtoRequest = new LoginDtoRequest();
-        loginDtoRequest.setEmail(email);
-        loginDtoRequest.setPassword(password);
-        ResponseEntity<String> response = template.postForEntity(fullUrl(SESSIONS_URL), loginDtoRequest, String.class);
+        ResponseEntity<String> response = template.postForEntity(fullUrl(SESSIONS_URL),
+                new LoginDtoRequest().setEmail(email).setPassword(password), String.class);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cookie", Objects.requireNonNull(response.getHeaders().get("Set-Cookie")).get(0));
         return headers;
     }
 
     protected UserDtoRequest createUser(String email) {
-        UserDtoRequest userDtoRequest = new UserDtoRequest();
-        userDtoRequest.setEmail(email);
-        userDtoRequest.setFirstName("First");
-        userDtoRequest.setLastName("Last");
-        userDtoRequest.setPatronymic("Patronymic");
-        userDtoRequest.setPassword(password);
-        return userDtoRequest;
+        return new UserDtoRequest()
+                .setEmail(email)
+                .setFirstName("First")
+                .setLastName("Last")
+                .setPatronymic("Patronymic")
+                .setPassword(password);
     }
 
 }

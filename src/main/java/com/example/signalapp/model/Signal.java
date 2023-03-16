@@ -6,10 +6,8 @@
 package com.example.signalapp.model;
 
 import com.example.signalapp.dto.request.SignalDtoRequest;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,8 +19,8 @@ import javax.persistence.*;
  */
 @Getter
 @Setter
-@RequiredArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 @Entity
 public class Signal {
     

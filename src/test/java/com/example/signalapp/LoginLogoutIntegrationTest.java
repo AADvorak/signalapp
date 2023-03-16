@@ -30,21 +30,17 @@ public class LoginLogoutIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testLoginOk() {
-        LoginDtoRequest loginDtoRequest = new LoginDtoRequest();
-        loginDtoRequest.setEmail(email1);
-        loginDtoRequest.setPassword(password);
-        ResponseEntity<String> response = template.postForEntity(fullUrl(SESSIONS_URL), loginDtoRequest, String.class);
+        ResponseEntity<String> response = template.postForEntity(fullUrl(SESSIONS_URL),
+                new LoginDtoRequest().setEmail(email1).setPassword(password), String.class);
         assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
                 () -> assertNotNull(response.getHeaders().get("Set-Cookie")));
     }
 
     @Test
     public void testLoginEmptyEmail() throws JsonProcessingException {
-        LoginDtoRequest loginDtoRequest = new LoginDtoRequest();
-        loginDtoRequest.setEmail("");
-        loginDtoRequest.setPassword(password);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(SESSIONS_URL), loginDtoRequest, String.class));
+                () -> template.postForEntity(fullUrl(SESSIONS_URL),
+                        new LoginDtoRequest().setEmail("").setPassword(password), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
                 () -> assertEquals("NotEmpty", error.getCode()),
@@ -53,11 +49,9 @@ public class LoginLogoutIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testLoginEmptyPassword() throws JsonProcessingException {
-        LoginDtoRequest loginDtoRequest = new LoginDtoRequest();
-        loginDtoRequest.setEmail(email1);
-        loginDtoRequest.setPassword("");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(SESSIONS_URL), loginDtoRequest, String.class));
+                () -> template.postForEntity(fullUrl(SESSIONS_URL),
+                        new LoginDtoRequest().setEmail(email1).setPassword(""), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
                 () -> assertEquals("NotEmpty", error.getCode()),
@@ -66,11 +60,9 @@ public class LoginLogoutIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testLoginWrongEmail() throws JsonProcessingException {
-        LoginDtoRequest loginDtoRequest = new LoginDtoRequest();
-        loginDtoRequest.setEmail("wrong");
-        loginDtoRequest.setPassword(password);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(SESSIONS_URL), loginDtoRequest, String.class));
+                () -> template.postForEntity(fullUrl(SESSIONS_URL),
+                        new LoginDtoRequest().setEmail("wrong").setPassword(password), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
                 () -> assertEquals("WRONG_EMAIL_PASSWORD", error.getCode()));
@@ -78,11 +70,9 @@ public class LoginLogoutIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testLoginWrongPassword() throws JsonProcessingException {
-        LoginDtoRequest loginDtoRequest = new LoginDtoRequest();
-        loginDtoRequest.setEmail(email1);
-        loginDtoRequest.setPassword("wrong");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(SESSIONS_URL), loginDtoRequest, String.class));
+                () -> template.postForEntity(fullUrl(SESSIONS_URL),
+                        new LoginDtoRequest().setEmail(email1).setPassword("wrong"), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
                 () -> assertEquals("WRONG_EMAIL_PASSWORD", error.getCode()));

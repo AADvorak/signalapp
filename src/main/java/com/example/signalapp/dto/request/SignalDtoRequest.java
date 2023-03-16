@@ -3,7 +3,10 @@ package com.example.signalapp.dto.request;
 import com.example.signalapp.service.SignalService;
 import com.example.signalapp.validator.MaxLength;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -12,7 +15,10 @@ import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@Accessors(chain = true)
 public class SignalDtoRequest {
 
     @NotEmpty

@@ -1,15 +1,15 @@
 package com.example.signalapp.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@Accessors(chain = true)
 public class SignalWithDataDtoResponse extends SignalDtoResponse {
 
     private List<BigDecimal> data;

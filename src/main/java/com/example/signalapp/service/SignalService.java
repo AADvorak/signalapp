@@ -57,8 +57,10 @@ public class SignalService extends ServiceBase {
         Page<Signal> signalPage = filter != null && !filter.isEmpty()
                 ? signalRepository.findByUserIdAndFilter(userId, pageable, "%" + filter + "%")
                 : signalRepository.findByUserId(userId, pageable);
-        return new ResponseWithTotalCounts<>(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList(),
-                signalPage.getTotalElements(), signalPage.getTotalPages());
+        return new ResponseWithTotalCounts<SignalDtoResponse>()
+                .setData(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList())
+                .setPages(signalPage.getTotalPages())
+                .setElements(signalPage.getTotalElements());
     }
 
     @Transactional(rollbackFor = IOException.class)
@@ -68,18 +70,18 @@ public class SignalService extends ServiceBase {
         checkStoredByUserSignalsNumber(userId);
         Signal signal = signalRepository.save(new Signal(request, userId));
         writeSignalDataToWavFile(signal, request.getData());
-        return new IdDtoResponse(signal.getId());
+        return new IdDtoResponse().setId(signal.getId());
     }
 
     @Transactional(rollbackFor = IOException.class)
     public void update(String token, SignalDtoRequest request, int id) throws SignalAppUnauthorizedException,
             IOException, SignalAppNotFoundException {
-        Signal signal = getSignalByUserTokenAndId(token, id);
-        signal.setName(request.getName());
-        signal.setDescription(request.getDescription());
-        signal.setMaxAbsY(request.getMaxAbsY());
-        signal.setSampleRate(request.getSampleRate());
-        signal.setXMin(request.getXMin());
+        Signal signal = getSignalByUserTokenAndId(token, id)
+                .setName(request.getName())
+                .setDescription(request.getDescription())
+                .setMaxAbsY(request.getMaxAbsY())
+                .setSampleRate(request.getSampleRate())
+                .setXMin(request.getXMin());
         signalRepository.save(signal);
         writeSignalDataToWavFile(signal, request.getData());
     }
@@ -159,13 +161,13 @@ public class SignalService extends ServiceBase {
     private void makeAndSaveSignal(String fileName, double[] samples, AudioFormat format, User user) throws IOException {
         AudioFormat newFormat = new AudioFormat(format.getSampleRate(),
                 format.getSampleSizeInBits(), 1, true, format.isBigEndian());
-        Signal signal = new Signal();
-        signal.setName(fileName);
-        signal.setDescription("Imported from file " + fileName);
-        signal.setUserId(user.getId());
-        signal.setMaxAbsY(BigDecimal.ONE);
-        signal.setSampleRate(BigDecimal.valueOf(format.getSampleRate()));
-        signal.setXMin(BigDecimal.ZERO);
+        Signal signal = new Signal()
+                .setName(fileName)
+                .setDescription("Imported from file " + fileName)
+                .setUserId(user.getId())
+                .setMaxAbsY(BigDecimal.ONE)
+                .setSampleRate(BigDecimal.valueOf(format.getSampleRate()))
+                .setXMin(BigDecimal.ZERO);
         signal = signalRepository.save(signal);
         writeSamplesToWavFile(signal, samples, newFormat);
     }

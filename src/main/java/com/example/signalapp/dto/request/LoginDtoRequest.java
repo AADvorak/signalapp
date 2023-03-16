@@ -1,14 +1,14 @@
 package com.example.signalapp.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotEmpty;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@Accessors(chain = true)
 public class LoginDtoRequest {
 
     @NotEmpty

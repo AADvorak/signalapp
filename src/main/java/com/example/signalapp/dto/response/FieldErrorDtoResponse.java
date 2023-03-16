@@ -1,12 +1,12 @@
 package com.example.signalapp.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@Accessors(chain = true)
 public class FieldErrorDtoResponse {
 
     private String code;

@@ -61,11 +61,11 @@ public class ModuleService extends ServiceBase {
     public ModuleDtoResponse update(String token, EditModuleDtoRequest moduleDtoRequest, int id)
             throws SignalAppNotFoundException, SignalAppUnauthorizedException {
         Module module = moduleRepository.findByIdAndUserId(id, getUserByToken(token).getId())
-                .orElseThrow(SignalAppNotFoundException::new);
-        module.setName(moduleDtoRequest.getName());
-        module.setContainer(moduleDtoRequest.getContainer());
-        module.setForMenu(moduleDtoRequest.isForMenu());
-        module.setTransformer(moduleDtoRequest.isTransformer());
+                .orElseThrow(SignalAppNotFoundException::new)
+                .setName(moduleDtoRequest.getName())
+                .setContainer(moduleDtoRequest.getContainer())
+                .setForMenu(moduleDtoRequest.isForMenu())
+                .setTransformer(moduleDtoRequest.isTransformer());
         return ModuleMapper.INSTANCE.moduleToDto(moduleRepository.save(module));
     }
 

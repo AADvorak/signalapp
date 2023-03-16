@@ -5,11 +5,17 @@
  */
 package com.example.signalapp.dto.response;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@Accessors(chain = true)
 public class IdDtoResponse {
     
-    private final Integer id;
+    private Integer id;
     
 }

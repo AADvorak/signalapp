@@ -88,8 +88,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testRegisterNullPassword() throws JsonProcessingException {
-        UserDtoRequest userDtoRequest = createUser(email1);
-        userDtoRequest.setPassword(null);
+        UserDtoRequest userDtoRequest = createUser(email1).setPassword(null);
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
@@ -100,8 +99,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testRegisterEmptyPassword() throws JsonProcessingException {
-        UserDtoRequest userDtoRequest = createUser(email1);
-        userDtoRequest.setPassword("");
+        UserDtoRequest userDtoRequest = createUser(email1).setPassword("");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
@@ -112,8 +110,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testRegisterShortPassword() throws JsonProcessingException {
-        UserDtoRequest userDtoRequest = createUser(email1);
-        userDtoRequest.setPassword("0000");
+        UserDtoRequest userDtoRequest = createUser(email1).setPassword("0000");
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
@@ -124,8 +121,8 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testRegisterLongPassword() throws JsonProcessingException {
-        UserDtoRequest userDtoRequest = createUser(email1);
-        userDtoRequest.setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH + 1));
+        UserDtoRequest userDtoRequest = createUser(email1)
+                .setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH + 1));
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
@@ -136,8 +133,8 @@ public class RegisterUsersIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void testRegisterLongName() throws JsonProcessingException {
-        UserDtoRequest userDtoRequest = createUser(email1);
-        userDtoRequest.setFirstName(RandomStringUtils.randomAlphanumeric(applicationProperties.getMaxNameLength() + 1));
+        UserDtoRequest userDtoRequest = createUser(email1)
+                .setFirstName(RandomStringUtils.randomAlphanumeric(applicationProperties.getMaxNameLength() + 1));
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
