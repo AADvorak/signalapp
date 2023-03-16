@@ -211,7 +211,6 @@ export default {
         id: 0,
         name: `Generated ${this.form.form} signal`,
         description: `Generated ${this.form.form} signal with F = ${this.form.frequency} (${data.length} points)`,
-        maxAbsY: this.form.amplitude,
         sampleRate: this.form.sampleRate,
         xMin: this.form.begin,
         data
@@ -263,6 +262,7 @@ export default {
       }
     },
     saveSignalToHistoryAndOpen(signal) {
+      signal.maxAbsY = SignalUtils.calculateMaxAbsY(signal)
       SignalUtils.calculateSignalParams(signal)
       useRouter().push('/signal/' + dataStore().addSignalToHistory(signal))
     }

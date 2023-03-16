@@ -1,5 +1,4 @@
 import ApiProvider from "~/api/api-provider";
-import SignalUtils from "~/utils/signal-utils";
 
 const FileUtils = {
 
@@ -72,8 +71,7 @@ const FileUtils = {
       // todo check steps
       const sampleRate = 1 / (points[1].x - xMin)
       const data = points.map(point => point.y)
-      const maxAbsY = SignalUtils.calculateMaxAbsY({data})
-      return {xMin, sampleRate, data, maxAbsY}
+      return {xMin, sampleRate, data}
     } catch (e) {
       throw new Error('Wrong txt file format')
     }
