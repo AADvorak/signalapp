@@ -160,11 +160,7 @@ export default {
             }
           }
         } else {
-          for (let error of response.errors) {
-            this.showMessage({
-              text: 'Error saving signal: ' + error.message
-            })
-          }
+          this.showErrorsFromResponse(response, 'Error saving signal')
         }
       })
     },

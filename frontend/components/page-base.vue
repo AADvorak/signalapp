@@ -64,8 +64,10 @@ export default {
         return
       }
       let errorMsg = ''
-      for (let error of response.errors) {
-        error.message && (errorMsg += errorMsg ? ', ' + error.message : error.message)
+      if (Array.isArray(response.errors)) {
+        for (let error of response.errors) {
+          error.message && (errorMsg += errorMsg ? ', ' + error.message : error.message)
+        }
       }
       this.showMessage({
         text: text + (errorMsg ? ': ' + errorMsg : '')
