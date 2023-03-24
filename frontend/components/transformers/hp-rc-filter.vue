@@ -7,8 +7,7 @@
       label="Time constant"
       :error="!!validation.tau.length"
       :error-messages="validation.tau"
-      required
-  ></v-text-field>
+      required/>
 </template>
 
 <script>

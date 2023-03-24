@@ -9,8 +9,7 @@
                 label="Email"
                 :error="!!validation.email.length"
                 :error-messages="validation.email"
-                required
-            ></v-text-field>
+                required/>
             <v-text-field
                 v-model="form.password"
                 :append-icon="showPassword ? mdiEyeOff : mdiEye"
@@ -19,9 +18,7 @@
                 @click:append="showPassword = !showPassword"
                 :error="!!validation.password.length"
                 :error-messages="validation.password"
-                required
-            >
-            </v-text-field>
+                required/>
             <v-text-field
                 v-model="form.passwordRepeat"
                 :append-icon="showPassword ? mdiEyeOff : mdiEye"
@@ -30,30 +27,22 @@
                 @click:append="showPassword = !showPassword"
                 :error="!!validation.passwordRepeat.length"
                 :error-messages="validation.passwordRepeat"
-                required
-            >
-            </v-text-field>
+                required/>
             <v-text-field
                 v-model="form.firstName"
                 label="First name"
                 :error="!!validation.firstName.length"
-                :error-messages="validation.firstName"
-            >
-            </v-text-field>
+                :error-messages="validation.firstName"/>
             <v-text-field
                 v-model="form.lastName"
                 label="Last name"
                 :error="!!validation.lastName.length"
-                :error-messages="validation.lastName"
-            >
-            </v-text-field>
+                :error-messages="validation.lastName"/>
             <v-text-field
                 v-model="form.patronymic"
                 label="Patronymic"
                 :error="!!validation.patronymic.length"
-                :error-messages="validation.patronymic"
-            >
-            </v-text-field>
+                :error-messages="validation.patronymic"/>
             <div class="d-flex">
               <v-btn color="primary" @click="signUpRequest">
                 Sign up

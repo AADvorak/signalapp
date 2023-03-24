@@ -35,7 +35,6 @@
           </v-menu>
         </v-btn>
       </template>
-
     </v-app-bar>
     <v-main>
       <v-container width="100%" style="padding: 12px; max-width: none;">
@@ -58,8 +57,7 @@
             <v-card width="100%">
               <v-card-title>Page settings</v-card-title>
               <v-card-text>
-                <v-switch hide-details v-model="darkMode" :label="`Dark mode: ${darkModeStr}`">
-                </v-switch>
+                <v-switch hide-details v-model="darkMode" :label="`Dark mode: ${darkModeStr}`"/>
               </v-card-text>
             </v-card>
           </v-col>

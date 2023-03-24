@@ -7,8 +7,7 @@
       label="Coefficient"
       :error="!!validation.coefficient.length"
       :error-messages="validation.coefficient"
-      required
-  ></v-text-field>
+      required/>
   <v-text-field
       v-model="form.maxOutput"
       type="number"
@@ -17,8 +16,7 @@
       label="Max output amplitude"
       :error="!!validation.maxOutput.length"
       :error-messages="validation.maxOutput"
-      required
-  ></v-text-field>
+      required/>
 </template>
 
 <script>

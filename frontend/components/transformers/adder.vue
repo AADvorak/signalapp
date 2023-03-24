@@ -6,8 +6,7 @@
       label="Signal 1 coefficient"
       :error="!!validation.coefficient1.length"
       :error-messages="validation.coefficient1"
-      required
-  ></v-text-field>
+      required/>
   <v-text-field
       v-model="form.coefficient2"
       type="number"
@@ -15,8 +14,7 @@
       label="Signal 2 coefficient"
       :error="!!validation.coefficient2.length"
       :error-messages="validation.coefficient2"
-      required
-  ></v-text-field>
+      required/>
 </template>
 
 <script>

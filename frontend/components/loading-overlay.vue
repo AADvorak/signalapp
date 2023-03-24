@@ -5,8 +5,7 @@
   >
     <v-progress-circular
         indeterminate
-        size="64"
-    ></v-progress-circular>
+        size="64"/>
   </v-overlay>
 </template>
 

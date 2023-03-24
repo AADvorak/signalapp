@@ -16,8 +16,7 @@
                 <v-text-field
                     v-model="signal1.name"
                     :label="selectedTransformer.signal1 || 'Signal 1'"
-                    readonly
-                ></v-text-field>
+                    readonly/>
               </v-col>
               <v-col :cols="2">
                 <v-btn
@@ -33,11 +32,10 @@
                 <v-text-field
                     v-model="signal2.name"
                     :label="selectedTransformer.signal2 || 'Signal 2'"
-                    readonly
-                ></v-text-field>
+                    readonly/>
               </v-col>
             </v-row>
-            <component v-bind:is="selectedTransformer.module" :signal1="signal1" :signal2="signal2" :bus="bus"></component>
+            <component v-bind:is="selectedTransformer.module" :signal1="signal1" :signal2="signal2" :bus="bus"/>
           </div>
           <div class="d-flex">
             <v-btn :disabled="processing" color="primary" class="mr-4" @click="ok">

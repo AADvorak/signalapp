@@ -3,8 +3,7 @@
     <div class="d-flex">
       <v-text-field
           v-model="search"
-          label="Search"
-      ></v-text-field>
+          label="Search"/>
     </div>
   </v-form>
 </template>

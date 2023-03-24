@@ -7,8 +7,7 @@
       label="Coefficient"
       :error="!!validation.coefficient.length"
       :error-messages="validation.coefficient"
-      required
-  ></v-text-field>
+      required/>
   <v-text-field
       v-model="form.maxPositiveOutput"
       type="number"
@@ -17,8 +16,7 @@
       label="Max positive output amplitude"
       :error="!!validation.maxPositiveOutput.length"
       :error-messages="validation.maxPositiveOutput"
-      required
-  ></v-text-field>
+      required/>
   <v-text-field
       v-model="form.maxNegativeOutput"
       type="number"
@@ -27,8 +25,7 @@
       label="Max negative output amplitude"
       :error="!!validation.maxNegativeOutput.length"
       :error-messages="validation.maxNegativeOutput"
-      required
-  ></v-text-field>
+      required/>
 </template>
 
 <script>

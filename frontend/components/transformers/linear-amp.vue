@@ -7,8 +7,7 @@
       label="Coefficient"
       :error="!!validation.coefficient.length"
       :error-messages="validation.coefficient"
-      required
-  ></v-text-field>
+      required/>
 </template>
 
 <script>

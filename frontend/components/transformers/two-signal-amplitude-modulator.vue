@@ -8,8 +8,7 @@
       label="Modulation depth"
       :error="!!validation.depth.length"
       :error-messages="validation.depth"
-      required
-  ></v-text-field>
+      required/>
 </template>
 
 <script>

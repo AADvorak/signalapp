@@ -16,7 +16,7 @@
     <v-card width="100%">
       <v-toolbar>
         <v-toolbar-title>Select transformer</v-toolbar-title>
-        <v-spacer></v-spacer>
+        <v-spacer/>
         <v-btn
             icon
             @click="dialog = false"
@@ -32,15 +32,13 @@
                   v-model="form.types"
                   :items="types"
                   label="Filter by types"
-                  multiple
-              ></v-combobox>
+                  multiple/>
             </v-col>
             <v-col>
               <v-text-field
                   v-model="form.filter"
                   label="Search"
-                  autofocus
-              ></v-text-field>
+                  autofocus/>
             </v-col>
           </v-row>
         </v-form>

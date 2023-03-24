@@ -7,8 +7,7 @@
       label="Frequency"
       :error="!!validation.frequency.length"
       :error-messages="validation.frequency"
-      required
-  ></v-text-field>
+      required/>
   <v-text-field
       v-model="form.damping"
       type="number"
@@ -17,8 +16,7 @@
       label="Damping"
       :error="!!validation.damping.length"
       :error-messages="validation.damping"
-      required
-  ></v-text-field>
+      required/>
 </template>
 
 <script>

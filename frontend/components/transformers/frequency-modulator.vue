@@ -7,8 +7,7 @@
       label="Carrier frequency"
       :error="!!validation.frequency.length"
       :error-messages="validation.frequency"
-      required
-  ></v-text-field>
+      required/>
   <v-text-field
       v-model="form.amplitude"
       type="number"
@@ -17,8 +16,7 @@
       label="Carrier amplitude"
       :error="!!validation.amplitude.length"
       :error-messages="validation.amplitude"
-      required
-  ></v-text-field>
+      required/>
   <v-text-field
       v-model="form.deviation"
       type="number"
@@ -27,8 +25,7 @@
       label="Frequency deviation"
       :error="!!validation.deviation.length"
       :error-messages="validation.deviation"
-      required
-  ></v-text-field>
+      required/>
 </template>
 
 <script>

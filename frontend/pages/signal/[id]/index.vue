@@ -4,7 +4,7 @@
       <v-card width="100%">
         <v-card-text>
           <div class="mb-5">
-            <chart-drawer :signals="signal.params ? [signal] : []"></chart-drawer>
+            <chart-drawer :signals="signal.params ? [signal] : []"/>
           </div>
           <div v-if="signalParamsText" class="mb-5">
             {{ signalParamsText }}
@@ -15,15 +15,12 @@
                 label="Name"
                 :error="!!validation.name.length"
                 :error-messages="validation.name"
-                required
-            ></v-text-field>
+                required/>
             <v-textarea
                 v-model="signal.description"
                 label="Description"
                 :error="!!validation.description.length"
-                :error-messages="validation.description"
-            >
-            </v-textarea>
+                :error-messages="validation.description"/>
             <div class="d-flex flex-wrap">
               <select-transformer-dialog :bus="bus"/>
               <v-btn color="success" @click="saveSignal">
@@ -44,8 +41,8 @@
       </v-card>
     </div>
     <transformer-dialog :bus="bus" :signal="signal"/>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"></message>
-    <loading-overlay :show="loadingOverlay"></loading-overlay>
+    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
+    <loading-overlay :show="loadingOverlay"/>
   </NuxtLayout>
 </template>
 

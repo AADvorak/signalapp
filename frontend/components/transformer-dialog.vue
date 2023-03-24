@@ -11,7 +11,7 @@
         <v-form>
           <div :hidden="processing">
             <div class="mb-5">Transform signal with {{ selectedTransformer.name }}?</div>
-            <component v-bind:is="selectedTransformer.module" :signal="signal" :bus="bus"></component>
+            <component v-bind:is="selectedTransformer.module" :signal="signal" :bus="bus"/>
           </div>
           <div class="d-flex">
           <v-btn :disabled="processing" color="primary" class="mr-4" @click="ok">

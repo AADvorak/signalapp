@@ -14,8 +14,7 @@
                 label="Signal begin (B)"
                 :error="!!validation.begin.length"
                 :error-messages="validation.begin"
-                required
-            ></v-text-field>
+                required/>
             <v-text-field
                 v-model="form.length"
                 type="number"
@@ -24,8 +23,7 @@
                 label="Signal length (L)"
                 :error="!!validation.length.length"
                 :error-messages="validation.length"
-                required
-            ></v-text-field>
+                required/>
             <v-text-field
                 v-model="form.sampleRate"
                 type="number"
@@ -34,8 +32,7 @@
                 label="Signal sample rate (S)"
                 :error="!!validation.sampleRate.length"
                 :error-messages="validation.sampleRate"
-                required
-            ></v-text-field>
+                required/>
             <v-text-field
                 v-model="form.frequency"
                 type="number"
@@ -44,8 +41,7 @@
                 label="Signal frequency (F)"
                 :error="!!validation.frequency.length"
                 :error-messages="validation.frequency"
-                required
-            ></v-text-field>
+                required/>
             <v-text-field
                 v-model="form.amplitude"
                 type="number"
@@ -54,8 +50,7 @@
                 label="Signal amplitude (A)"
                 :error="!!validation.amplitude.length"
                 :error-messages="validation.amplitude"
-                required
-            ></v-text-field>
+                required/>
             <v-text-field
                 v-model="form.offset"
                 type="number"
@@ -63,13 +58,11 @@
                 label="Signal offset (O)"
                 :error="!!validation.offset.length"
                 :error-messages="validation.offset"
-                required
-            ></v-text-field>
+                required/>
             <v-autocomplete
                 v-model="form.form"
                 :items="signalForms"
-                label="Signal form"
-            ></v-autocomplete>
+                label="Signal form"/>
             <div class="d-flex">
               <v-btn color="primary" @click="generateAndOpenSignal">
                 Generate
@@ -84,12 +77,11 @@
           <v-file-input
               v-model="file"
               accept=".txt,.wav"
-              label="From txt or wav file"
-          ></v-file-input>
+              label="From txt or wav file"/>
         </v-card-text>
       </v-card>
     </div>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"></message>
+    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
   </NuxtLayout>
 </template>
 

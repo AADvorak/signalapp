@@ -12,8 +12,7 @@
                 label="Sample rate (Hz)"
                 :error="!!validation.sampleRate.length"
                 :error-messages="validation.sampleRate"
-                required
-            ></v-text-field>
+                required/>
           </v-form>
           <div>{{ info }}</div>
           <div>{{ recordStatus }}</div>
@@ -39,7 +38,7 @@
         </v-card-text>
       </v-card>
     </div>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"></message>
+    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
   </NuxtLayout>
 </template>
 

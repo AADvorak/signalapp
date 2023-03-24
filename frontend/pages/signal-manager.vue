@@ -16,8 +16,7 @@
                     type="number"
                     step="1"
                     label="Page size"
-                    required
-                ></v-text-field>
+                    required/>
               </v-col>
               <v-col>
                 <search-field
@@ -82,8 +81,7 @@
           </v-table>
           <v-pagination
               v-model="page"
-              :length="pages"
-          ></v-pagination>
+              :length="pages"/>
           <p class="mt-5">
             Actions with selected signals
           </p>
@@ -115,7 +113,7 @@
                   </v-btn>
                 </v-toolbar>
                 <v-card-text>
-                  <chart-drawer :signals="viewDialog && selectedSignalsDataLoaded ? selectedSignals : []"></chart-drawer>
+                  <chart-drawer :signals="viewDialog && selectedSignalsDataLoaded ? selectedSignals : []"/>
                 </v-card-text>
               </v-card>
             </v-dialog>
@@ -129,8 +127,7 @@
     </div>
     <transformer-double-dialog :bus="bus" :signals="transformSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals : []"/>
     <confirm-dialog :opened="confirm.opened" :text="confirm.text" ok-color="error"
-                    @ok="confirm.ok" @cancel="confirm.cancel">
-    </confirm-dialog>
+                    @ok="confirm.ok" @cancel="confirm.cancel"/>
   </NuxtLayout>
 </template>
 
