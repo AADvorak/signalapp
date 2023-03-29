@@ -59,6 +59,14 @@ export default {
         this.loadingOverlay = false
       }
     },
+    async loadWithFlag(loadFunction, flagName) {
+      this[flagName] = true
+      try {
+        await loadFunction()
+      } finally {
+        this[flagName] = false
+      }
+    },
     showErrorsFromResponse(response, text = 'Error') {
       if (response.status === 401) {
         return

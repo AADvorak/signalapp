@@ -26,7 +26,7 @@
             Stop
           </v-btn>
           <div>{{ recordedInfo }}</div>
-          <v-btn color="success" :disabled="!recordedAudio" @click="saveRecorded">
+          <v-btn color="success" :disabled="!recordedAudio" :loading="saveRequestSent" @click="saveRecorded">
             Save
           </v-btn>
           <v-btn color="secondary" :disabled="!recordedAudio" @click="exportRecordedToWav">
@@ -72,6 +72,7 @@ export default {
     recorder: undefined,
     input: undefined,
     audioContext: undefined,
+    saveRequestSent: false
   }),
   computed: {
     recordedAudio() {
@@ -146,13 +147,15 @@ export default {
       this.recordStatus = this.RECORD_STATUSES.READY
     },
     async saveRecorded() {
-      let response = await this.getApiProvider().post('/api/signals/wav/' + this.recordedAudio.fileName,
-          await this.recordedAudio.blob.arrayBuffer(), 'audio/wave')
-      if (response && response.ok) {
-        useRouter().push('/signal-manager')
-      } else {
-        this.showErrorsFromResponse(response, 'Error saving record')
-      }
+      await this.loadWithFlag(async () => {
+        const response = await this.getApiProvider().post('/api/signals/wav/' + this.recordedAudio.fileName,
+            await this.recordedAudio.blob.arrayBuffer(), 'audio/wave')
+        if (response.ok) {
+          useRouter().push('/signal-manager')
+        } else {
+          this.showErrorsFromResponse(response, 'Error saving record')
+        }
+      }, 'saveRequestSent')
     },
     exportRecordedToWav() {
       FileUtils.saveBlobToWavFile(this.recordedAudio)

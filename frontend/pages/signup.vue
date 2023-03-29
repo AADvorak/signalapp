@@ -44,7 +44,7 @@
                 :error="!!validation.patronymic.length"
                 :error-messages="validation.patronymic"/>
             <div class="d-flex">
-              <v-btn color="primary" @click="signUpRequest">
+              <v-btn color="primary" :loading="signUpRequestSent" @click="signUpRequest">
                 Sign up
               </v-btn>
               <v-btn color="secondary" @click="signIn">
@@ -63,8 +63,10 @@ import formValidation from "../mixins/form-validation";
 import {mdiEye, mdiEyeOff} from "@mdi/js";
 import ApiProvider from "../api/api-provider";
 import {dataStore} from "../stores/data-store";
+import PageBase from "../components/page-base";
 
 export default {
+  extends: PageBase,
   mixins: [formValidation],
   data: () => ({
     mdiEye,
@@ -86,6 +88,7 @@ export default {
       lastName: [],
       patronymic: [],
     },
+    signUpRequestSent: false
   }),
   methods: {
     async signUpRequest() {
@@ -96,17 +99,19 @@ export default {
         this.validation.passwordRepeat.push(msg)
         return
       }
-      let response = await ApiProvider.postJson('/api/users/', this.form)
-      if (!response.ok) {
-        if (response.status === 400) {
+      await this.loadWithFlag(async () => {
+        let response = await ApiProvider.postJson('/api/users/', this.form)
+        if (response.ok) {
+          dataStore().setUserInfo(response.data)
+          let waitingForAuthorization = dataStore().getWaitingForAuthorization
+          useRouter().push(waitingForAuthorization ? waitingForAuthorization : '/')
+          waitingForAuthorization && dataStore().clearWaitingForAuthorization()
+        } else if (response.status === 400) {
           this.parseValidation(response.errors)
+        } else {
+          this.showErrorsFromResponse(response, 'Sign up error')
         }
-      } else {
-        dataStore().setUserInfo(response.data)
-        let waitingForAuthorization = dataStore().getWaitingForAuthorization
-        useRouter().push(waitingForAuthorization ? waitingForAuthorization : '/')
-        waitingForAuthorization && dataStore().clearWaitingForAuthorization()
-      }
+      }, 'signUpRequestSent')
     },
     signIn() {
       useRouter().push('/signin')

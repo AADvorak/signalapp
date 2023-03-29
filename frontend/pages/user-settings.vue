@@ -35,7 +35,7 @@
                 :error="!!validation.patronymic.length"
                 :error-messages="validation.patronymic"/>
             <div class="d-flex flex-wrap">
-              <v-btn color="success" @click="save">
+              <v-btn color="success" :loading="saveRequestSent" @click="save">
                 Save
               </v-btn>
               <v-btn color="secondary" to="/change-password">
@@ -53,6 +53,7 @@
     <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
     <confirm-dialog :opened="confirm.opened" :text="confirm.text" ok-color="error"
                     @ok="confirm.ok" @cancel="confirm.cancel"/>
+    <loading-overlay :show="loadingOverlay"/>
   </NuxtLayout>
 </template>
 
@@ -83,6 +84,7 @@ export default {
     emailConfirmed: true,
     confirmEmailSent: false,
     confirmEmailRequestSent: false,
+    saveRequestSent: false
   }),
   mounted() {
     this.reloadUserInfo()
@@ -111,15 +113,19 @@ export default {
     },
     async save() {
       this.clearValidation()
-      const response = await this.getApiProvider().putJson('/api/users/me/', this.form)
-      if (response.ok) {
-        dataStore().setUserInfo(response.data)
-        this.showMessage({
-          text: 'User info saved'
-        })
-      } else if (response.status === 400) {
-        this.parseValidation(response.errors)
-      }
+      await this.loadWithFlag(async () => {
+        const response = await this.getApiProvider().putJson('/api/users/me/', this.form)
+        if (response.ok) {
+          dataStore().setUserInfo(response.data)
+          this.showMessage({
+            text: 'User info saved'
+          })
+        } else if (response.status === 400) {
+          this.parseValidation(response.errors)
+        } else {
+          this.showErrorsFromResponse(response, 'Error saving data')
+        }
+      }, 'saveRequestSent')
     },
     askConfirmDeleteAccount() {
       this.askConfirm({
@@ -139,8 +145,7 @@ export default {
       }
     },
     async sendConfirmEmailRequest() {
-      this.confirmEmailRequestSent = true
-      try {
+      await this.loadWithFlag(async () => {
         const response = await this.getApiProvider().post('/api/users/confirm', window.location.origin)
         if (response.ok) {
           this.confirmEmailSent = true
@@ -150,9 +155,7 @@ export default {
         } else {
           this.showErrorsFromResponse(response, 'Error sending email')
         }
-      } finally {
-        this.confirmEmailRequestSent = false
-      }
+      }, 'confirmEmailRequestSent')
     }
   }
 }

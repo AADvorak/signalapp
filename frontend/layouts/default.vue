@@ -153,3 +153,9 @@ export default {
   },
 }
 </script>
+
+<style>
+.v-toolbar-title__placeholder {
+  text-align: center;
+}
+</style>

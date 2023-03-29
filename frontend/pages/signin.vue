@@ -21,7 +21,7 @@
                 :error-messages="validation.password"
                 required/>
             <div class="d-flex">
-              <v-btn color="primary" @click="signInRequest">
+              <v-btn color="primary" :loading="signInRequestSent" @click="signInRequest">
                 Sign in
               </v-btn>
               <v-btn color="secondary" to="/signup">
@@ -43,8 +43,10 @@ import {mdiEye, mdiEyeOff} from "@mdi/js";
 import ApiProvider from "../api/api-provider";
 import {dataStore} from "../stores/data-store";
 import formValidation from "../mixins/form-validation"
+import PageBase from "../components/page-base";
 
 export default {
+  extends: PageBase,
   mixins: [formValidation],
   data: () => ({
     mdiEye,
@@ -58,6 +60,7 @@ export default {
       email: [],
       password: []
     },
+    signInRequestSent: false
   }),
   computed: {
     waitingForAuthorization() {
@@ -70,14 +73,18 @@ export default {
   methods: {
     async signInRequest() {
       this.clearValidation()
-      let response = await ApiProvider.postJson('/api/sessions/', this.form)
-      if (response.ok) {
-        dataStore().setUserInfo(response.data)
-        useRouter().push(this.waitingForAuthorization ? this.waitingForAuthorization : '/')
-        this.waitingForAuthorization && dataStore().clearWaitingForAuthorization()
-      } else if (response.status === 400) {
-        this.parseValidation(response.errors)
-      }
+      await this.loadWithFlag(async () => {
+        const response = await ApiProvider.postJson('/api/sessions/', this.form)
+        if (response.ok) {
+          dataStore().setUserInfo(response.data)
+          useRouter().push(this.waitingForAuthorization ? this.waitingForAuthorization : '/')
+          this.waitingForAuthorization && dataStore().clearWaitingForAuthorization()
+        } else if (response.status === 400) {
+          this.parseValidation(response.errors)
+        } else {
+          this.showErrorsFromResponse(response, 'Sign in error')
+        }
+      }, 'signInRequestSent')
     },
     restorePassword() {
       dataStore().emailForPasswordRestore = this.form.email

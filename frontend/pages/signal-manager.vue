@@ -3,28 +3,30 @@
     <div class="d-flex align-center flex-column">
       <v-card width="100%">
         <v-card-text>
-          <p>
-            <span>Total: {{ pages }} pages, </span>
-            <span>{{ elements }} entries</span>
-          </p>
-          <v-form>
-            <v-row>
-              <v-col>
-                <v-text-field
-                    v-model="size"
-                    :rules="sizeRules"
-                    type="number"
-                    step="1"
-                    label="Page size"
-                    required/>
-              </v-col>
-              <v-col>
-                <search-field
-                    :init-search-value="filter"
-                    @search="search => this.setFilter(search)"/>
-              </v-col>
-            </v-row>
-          </v-form>
+          <fixed-width-wrapper>
+            <p>
+              <span>Total: {{ pages }} pages, </span>
+              <span>{{ elements }} entries</span>
+            </p>
+            <v-form>
+              <v-row>
+                <v-col>
+                  <v-text-field
+                      v-model="size"
+                      :rules="sizeRules"
+                      type="number"
+                      step="1"
+                      label="Page size"
+                      required/>
+                </v-col>
+                <v-col>
+                  <search-field
+                      :init-search-value="filter"
+                      @search="search => this.setFilter(search)"/>
+                </v-col>
+              </v-row>
+            </v-form>
+          </fixed-width-wrapper>
           <v-table>
             <thead>
             <tr>
@@ -79,55 +81,59 @@
             </tr>
             </tbody>
           </v-table>
-          <v-pagination
-              v-model="page"
-              :length="pages"/>
-          <p class="mt-5">
-            Actions with selected signals
-          </p>
-          <div class="d-flex flex-wrap">
-            <select-transformer-dialog :bus="bus" :double="true" :disabled="!transformSignalsAvailable"/>
-            <v-dialog
-                v-model="viewDialog"
-                max-width="1200px"
-                max-height="800px"
-            >
-              <template v-slot:activator="{ props }">
-                <v-btn
-                    :disabled="!viewSignalsAvailable"
-                    color="secondary"
-                    v-bind="props"
-                >
-                  View
-                </v-btn>
-              </template>
-              <v-card width="100%">
-                <v-toolbar>
-                  <v-toolbar-title>View signals</v-toolbar-title>
-                  <v-spacer></v-spacer>
+          <fixed-width-wrapper>
+            <v-pagination
+                v-model="page"
+                :length="pages"/>
+            <div class="d-flex justify-center flex-wrap">
+              <p class="mt-5">
+                Actions with selected signals
+              </p>
+            </div>
+            <div class="d-flex justify-center flex-wrap">
+              <select-transformer-dialog :bus="bus" :double="true" :disabled="!transformSignalsAvailable"/>
+              <v-dialog
+                  v-model="viewDialog"
+                  max-height="800px"
+              >
+                <template v-slot:activator="{ props }">
                   <v-btn
-                      icon
-                      @click="viewDialog = false"
+                      :disabled="!viewSignalsAvailable"
+                      color="secondary"
+                      v-bind="props"
                   >
-                    <v-icon>{{ mdi.mdiClose }}</v-icon>
+                    View
                   </v-btn>
-                </v-toolbar>
-                <v-card-text>
-                  <chart-drawer :signals="viewDialog && selectedSignalsDataLoaded ? selectedSignals : []"/>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-            <v-btn :disabled="!selectedSignals.length" color="error" @click="askConfirmDeleteSelectedSignals">
-              Delete
-              <v-icon>{{ mdi.mdiDelete }}</v-icon>
-            </v-btn>
-          </div>
+                </template>
+                <v-card width="100%">
+                  <v-toolbar>
+                    <v-toolbar-title>View signals</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        icon
+                        @click="viewDialog = false"
+                    >
+                      <v-icon>{{ mdi.mdiClose }}</v-icon>
+                    </v-btn>
+                  </v-toolbar>
+                  <v-card-text>
+                    <chart-drawer :signals="viewDialog && selectedSignalsDataLoaded ? selectedSignals : []"/>
+                  </v-card-text>
+                </v-card>
+              </v-dialog>
+              <v-btn :disabled="!selectedSignals.length" color="error" @click="askConfirmDeleteSelectedSignals">
+                Delete
+                <v-icon>{{ mdi.mdiDelete }}</v-icon>
+              </v-btn>
+            </div>
+          </fixed-width-wrapper>
         </v-card-text>
       </v-card>
     </div>
     <transformer-double-dialog :bus="bus" :signals="transformSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals : []"/>
     <confirm-dialog :opened="confirm.opened" :text="confirm.text" ok-color="error"
                     @ok="confirm.ok" @cancel="confirm.cancel"/>
+    <loading-overlay :show="loadingOverlay"/>
   </NuxtLayout>
 </template>
 
@@ -147,14 +153,17 @@ import SelectTransformerDialog from "../components/select-transformer-dialog";
 import TransformerDoubleDialog from "../components/transformer-double-dialog";
 import SignalUtils from "../utils/signal-utils";
 import DeviceUtils from "../utils/device-utils";
+import FixedWidthWrapper from "../components/fixed-width-wrapper";
 
 export default {
   name: "signal-manager",
-  components: {ChartDrawer, SelectTransformerDialog, TransformerDoubleDialog},
+  components: {
+    ChartDrawer, SelectTransformerDialog,
+    TransformerDoubleDialog, FixedWidthWrapper
+  },
   extends: PageBase,
   data: () => ({
     viewDialog: false,
-    loadingSignals: false,
     signals: [],
     filter: '',
     elements: 0,
@@ -262,21 +271,19 @@ export default {
   },
   methods: {
     async loadSignals() {
-      if (this.loadingSignals) {
+      if (this.loadingOverlay) {
         return
       }
-      this.loadingSignals = true
-      try {
-        let url = `/api/signals${this.makeUrlParams(true)}`
-        let response = await this.getApiProvider().get(url)
+      await this.loadWithOverlay(async () => {
+        const response = await this.getApiProvider().get(`/api/signals${this.makeUrlParams(true)}`)
         if (response.ok) {
           this.signals = response.data.data
           this.elements = response.data.elements
           this.pages = response.data.pages
+        } else {
+          this.showErrorsFromResponse(response, 'Error loading signals')
         }
-      } finally {
-        this.loadingSignals = false
-      }
+      })
     },
     async loadSignalData(signal) {
       if (signal.data) {

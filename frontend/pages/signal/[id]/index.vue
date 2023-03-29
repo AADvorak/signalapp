@@ -6,37 +6,39 @@
           <div class="mb-5">
             <chart-drawer :signals="signal.params ? [signal] : []"/>
           </div>
-          <div v-if="signalParamsText" class="mb-5">
-            {{ signalParamsText }}
-          </div>
-          <v-form @submit.prevent="saveSignal">
-            <v-text-field
-                v-model="signal.name"
-                label="Name"
-                :error="!!validation.name.length"
-                :error-messages="validation.name"
-                required/>
-            <v-textarea
-                v-model="signal.description"
-                label="Description"
-                :error="!!validation.description.length"
-                :error-messages="validation.description"/>
-            <div class="d-flex flex-wrap">
-              <select-transformer-dialog :bus="bus"/>
-              <v-btn color="success" @click="saveSignal">
-                Save
-              </v-btn>
-              <v-btn color="success" v-if="signal.id" @click="saveSignalAsNew">
-                Save as new
-              </v-btn>
-              <v-btn color="secondary" @click="exportSignalToTxt">
-                Export txt
-              </v-btn>
-              <v-btn color="secondary" v-if="!signalIsStoredLocally" @click="exportSignalToWav">
-                Export wav
-              </v-btn>
+          <fixed-width-wrapper>
+            <div v-if="signalParamsText" class="mb-5">
+              {{ signalParamsText }}
             </div>
-          </v-form>
+            <v-form @submit.prevent="saveSignal">
+              <v-text-field
+                  v-model="signal.name"
+                  label="Name"
+                  :error="!!validation.name.length"
+                  :error-messages="validation.name"
+                  required/>
+              <v-textarea
+                  v-model="signal.description"
+                  label="Description"
+                  :error="!!validation.description.length"
+                  :error-messages="validation.description"/>
+              <div class="d-flex flex-wrap">
+                <select-transformer-dialog :bus="bus"/>
+                <v-btn color="success" @click="saveSignal">
+                  Save
+                </v-btn>
+                <v-btn color="success" v-if="signal.id" @click="saveSignalAsNew">
+                  Save as new
+                </v-btn>
+                <v-btn color="secondary" @click="exportSignalToTxt">
+                  Export txt
+                </v-btn>
+                <v-btn color="secondary" v-if="!signalIsStoredLocally" @click="exportSignalToWav">
+                  Export wav
+                </v-btn>
+              </div>
+            </v-form>
+          </fixed-width-wrapper>
         </v-card-text>
       </v-card>
     </div>
@@ -56,12 +58,14 @@ import PageBase from "../../../components/page-base";
 import FileUtils from "../../../utils/file-utils";
 import SelectTransformerDialog from "../../../components/select-transformer-dialog";
 import SignalUtils from "../../../utils/signal-utils";
+import FixedWidthWrapper from "../../../components/fixed-width-wrapper";
 
 export default {
   name: "index",
   components: {
     SelectTransformerDialog,
-    TransformerDialog, ChartDrawer
+    TransformerDialog, ChartDrawer,
+    FixedWidthWrapper
   },
   extends: PageBase,
   mixins: [formValidation],

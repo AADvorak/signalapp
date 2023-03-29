@@ -49,8 +49,7 @@ export default {
   methods: {
     async restorePasswordRequest() {
       this.clearValidation()
-      this.restorePasswordRequestSent = true
-      try {
+      await this.loadWithFlag(async () => {
         const response = await ApiProvider.postJson('/api/users/restore/' + this.form.email, {})
         if (response.ok) {
           this.showMessage({
@@ -62,9 +61,7 @@ export default {
         } else {
           this.showErrorsFromResponse(response, 'Error sending new password')
         }
-      } finally {
-        this.restorePasswordRequestSent = false
-      }
+      }, 'restorePasswordRequestSent')
     }
   }
 }

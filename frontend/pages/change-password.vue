@@ -32,7 +32,7 @@
                 :error-messages="validation.passwordRepeat"
                 required/>
             <div class="d-flex">
-              <v-btn color="primary" @click="changePasswordRequest">
+              <v-btn color="primary" :loading="changePasswordRequestSent" @click="changePasswordRequest">
                 Change
               </v-btn>
             </div>
@@ -67,6 +67,7 @@ export default {
       password: [],
       passwordRepeat: [],
     },
+    changePasswordRequestSent: false
   }),
   methods: {
     async changePasswordRequest() {
@@ -77,21 +78,23 @@ export default {
         this.validation.passwordRepeat.push(msg)
         return
       }
-      const response = await this.getApiProvider().putJson('/api/users/me/password', this.form)
-      if (response.ok) {
-        this.showMessage({
-          text: 'Password changed successfully'
-        })
-        this.form = {
-          oldPassword: '',
-          password: '',
-          passwordRepeat: '',
+      await this.loadWithFlag(async () => {
+        const response = await this.getApiProvider().putJson('/api/users/me/password', this.form)
+        if (response.ok) {
+          this.showMessage({
+            text: 'Password changed successfully'
+          })
+          this.form = {
+            oldPassword: '',
+            password: '',
+            passwordRepeat: '',
+          }
+        } else if (response.status === 400) {
+          this.parseValidation(response.errors)
+        } else {
+          this.showErrorsFromResponse(response, 'Error changing password')
         }
-      } else if (response.status === 400) {
-        this.parseValidation(response.errors)
-      } else {
-        this.showErrorsFromResponse(response, 'Error changing password')
-      }
+      }, 'changePasswordRequestSent')
     }
   }
 }
