@@ -9,6 +9,7 @@
              src="../oscilloscope-logo.png"
              max-width="80"
              min-width="80"
+             style="cursor: pointer;"
              @click="toMainPage"/>
       <v-spacer v-if="!isMobile"/>
       <v-app-bar-title>{{ header }}</v-app-bar-title>
@@ -41,9 +42,15 @@
         <v-row>
           <v-col style="padding: 4px" v-if="showMainMenu" :cols="mainMenuCols" :sm="mainMenuColsSm" :md="mainMenuCols" :lg="mainMenuCols">
             <v-card width="100%">
-              <v-card-title>Modules</v-card-title>
+              <v-card-title>Navigation</v-card-title>
               <v-card-text>
                 <v-list>
+                  <v-list-item @click="toMainPage">
+                    <v-list-item-title>
+                      <v-icon>{{ mdiHome }}</v-icon>
+                      Start page
+                    </v-list-item-title>
+                  </v-list-item>
                   <v-list-item
                       v-for="item in modulesForMenu"
                       :key="item.module"
@@ -55,7 +62,7 @@
               </v-card-text>
             </v-card>
             <v-card width="100%">
-              <v-card-title>Page settings</v-card-title>
+              <v-card-title>Settings</v-card-title>
               <v-card-text>
                 <v-switch hide-details v-model="darkMode" :label="`Dark mode: ${darkModeStr}`"/>
               </v-card-text>
@@ -74,16 +81,16 @@
 
 import {dataStore} from "../stores/data-store";
 import ApiProvider from "../api/api-provider";
-import {mdiAccount} from "@mdi/js";
+import {mdiAccount, mdiHome} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
 
 export default {
   data() {
     return {
+      mdiAccount, mdiHome,
       darkMode: dataStore().getDarkMode,
       header: '',
       showMainMenu: false,
-      mdiAccount: mdiAccount,
       isMobile: DeviceUtils.isMobile()
     }
   },
@@ -157,5 +164,8 @@ export default {
 <style>
 .v-toolbar-title__placeholder {
   text-align: center;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
