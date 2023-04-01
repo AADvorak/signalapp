@@ -1,10 +1,9 @@
 <template>
-  <v-form @submit.prevent="emitSearch">
-    <div class="d-flex">
-      <v-text-field
-          v-model="search"
-          label="Search"/>
-    </div>
+  <v-form>
+    <v-text-field
+        v-model="search"
+        v-on:keyup="onUpdate"
+        label="Search"/>
   </v-form>
 </template>
 
@@ -18,7 +17,8 @@ export default {
   emits: ['search'],
   data() {
     return {
-      search: ''
+      search: '',
+      updateCount: 0
     }
   },
   watch: {
@@ -27,6 +27,17 @@ export default {
     }
   },
   methods: {
+    onUpdate() {
+      this.updateCount++
+      this.waitToFinishUserInput(this.updateCount)
+    },
+    waitToFinishUserInput(updateCount) {
+      setTimeout(() => {
+        if (updateCount === this.updateCount) {
+          this.emitSearch()
+        }
+      }, 600)
+    },
     emitSearch() {
       this.$emit('search', this.search)
     }

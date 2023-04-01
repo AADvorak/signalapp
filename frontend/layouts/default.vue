@@ -56,7 +56,10 @@
                       :key="item.module"
                       @click="toPage('/' + item.module.toLowerCase())"
                   >
-                    <v-list-item-title>{{ item.name }}</v-list-item-title>
+                    <v-list-item-title>
+                      <v-icon>{{ getModuleIcon(item) }}</v-icon>
+                      {{ item.name }}
+                    </v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-card-text>
@@ -81,13 +84,18 @@
 
 import {dataStore} from "../stores/data-store";
 import ApiProvider from "../api/api-provider";
-import {mdiAccount, mdiHome} from "@mdi/js";
+import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
 
 export default {
   data() {
     return {
       mdiAccount, mdiHome,
+      moduleIcons: {
+        microphone: mdiMicrophone,
+        sineWave: mdiSineWave,
+        server: mdiServer
+      },
       darkMode: dataStore().getDarkMode,
       header: '',
       showMainMenu: false,
@@ -156,6 +164,9 @@ export default {
     showOrHideMenu() {
       this.showMainMenu = !this.showMainMenu
       window.scrollTo(0,0)
+    },
+    getModuleIcon(module) {
+      return this.moduleIcons[module.icon] || mdiCog
     }
   },
 }

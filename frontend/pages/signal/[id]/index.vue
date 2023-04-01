@@ -119,7 +119,6 @@ export default {
         text: 'Error transforming signal: ' + error.message
       })
     })
-    window.scrollTo(0,0)
   },
   beforeUnmount() {
     this.bus.off('error')

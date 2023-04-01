@@ -234,7 +234,7 @@ export default {
       this.loadSignals()
     },
     size(newValue) {
-      if (!newValue || newValue < 5 || newValue > 25) {
+      if (this.wrongPageSize(newValue)) {
         return
       }
       this.setUrlParams()
@@ -270,8 +270,11 @@ export default {
     this.bus.off('transformerSelected')
   },
   methods: {
+    wrongPageSize(value) {
+      return !value || value < 5 || value > 25
+    },
     async loadSignals() {
-      if (this.loadingOverlay) {
+      if (this.loadingOverlay || this.wrongPageSize(this.size)) {
         return
       }
       await this.loadWithOverlay(async () => {

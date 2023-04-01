@@ -6,13 +6,14 @@ export const dataStore = defineStore('dataStore', {
     return {
       userInfo: undefined,
       modules: [
-        {module: 'signal-generator', name: 'Signal generator', forMenu: true},
-        {module: 'signal-recorder', name: 'Signal recorder', forMenu: true},
-        {module: 'signal-manager', name: 'Signal manager', forMenu: true},
+        {module: 'signal-generator', name: 'Signal generator', forMenu: true, icon: 'sineWave'},
+        {module: 'signal-recorder', name: 'Signal recorder', forMenu: true, icon: 'microphone'},
+        {module: 'signal-manager', name: 'Signal manager', forMenu: true, icon: 'server'},
         {module: 'signin', name: 'Sign in', forMenu: false},
         {module: 'signup', name: 'Sign up', forMenu: false},
         {module: 'user-settings', name: 'User settings', forMenu: false},
         {module: 'change-password', name: 'Change password', forMenu: false},
+        {module: 'restore-password', name: 'Restore password', forMenu: false},
         {module: 'signal', name: 'Signal', forMenu: false},
         {module: 'index', name: 'Start page', forMenu: false},
           // transformers
