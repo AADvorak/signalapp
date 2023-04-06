@@ -18,7 +18,6 @@ export default {
   data() {
     return {
       search: '',
-      updateCount: 0
     }
   },
   watch: {
@@ -28,12 +27,11 @@ export default {
   },
   methods: {
     onUpdate() {
-      this.updateCount++
-      this.waitToFinishUserInput(this.updateCount)
+      this.waitToFinishUserInput(this.search)
     },
-    waitToFinishUserInput(updateCount) {
+    waitToFinishUserInput(search) {
       setTimeout(() => {
-        if (updateCount === this.updateCount) {
+        if (search === this.search) {
           this.emitSearch()
         }
       }, 600)
