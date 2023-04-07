@@ -27,7 +27,11 @@
               </v-row>
             </v-form>
           </fixed-width-wrapper>
-          <v-table>
+          <fixed-width-wrapper v-if="signalsEmpty">
+            <h3>You have no stored signals. <a href="/signal-generator">Generate</a> or
+              <a href="/signal-recorder">record</a> new signals to start working.</h3>
+          </fixed-width-wrapper>
+          <v-table v-else>
             <thead>
             <tr>
               <th class="text-left">
@@ -165,6 +169,7 @@ export default {
   data: () => ({
     viewDialog: false,
     signals: [],
+    signalsEmpty: false,
     filter: '',
     elements: 0,
     pages: 0,
@@ -283,6 +288,7 @@ export default {
           this.signals = response.data.data
           this.elements = response.data.elements
           this.pages = response.data.pages
+          this.signalsEmpty = this.elements === 0
         } else {
           this.showErrorsFromResponse(response, 'Error loading signals')
         }

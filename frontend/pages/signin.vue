@@ -20,7 +20,7 @@
                 :error="!!validation.password.length"
                 :error-messages="validation.password"
                 required/>
-            <div class="d-flex">
+            <div class="d-flex flex-wrap">
               <v-btn color="primary" :loading="signInRequestSent" @click="signInRequest">
                 Sign in
               </v-btn>
