@@ -8,7 +8,7 @@
                 v-model="form.oldPassword"
                 :append-icon="showPassword ? mdiEyeOff : mdiEye"
                 :type="showPassword ? 'text' : 'password'"
-                label="Old password"
+                :label="_t('oldPassword')"
                 @click:append="showPassword = !showPassword"
                 :error="!!validation.oldPassword.length"
                 :error-messages="validation.oldPassword"
@@ -17,7 +17,7 @@
                 v-model="form.password"
                 :append-icon="showPassword ? mdiEyeOff : mdiEye"
                 :type="showPassword ? 'text' : 'password'"
-                label="Password"
+                :label="_tc('fields.password')"
                 @click:append="showPassword = !showPassword"
                 :error="!!validation.password.length"
                 :error-messages="validation.password"
@@ -26,14 +26,14 @@
                 v-model="form.passwordRepeat"
                 :append-icon="showPassword ? mdiEyeOff : mdiEye"
                 :type="showPassword ? 'text' : 'password'"
-                label="Password repeat"
+                :label="_tc('fields.passwordRepeat')"
                 @click:append="showPassword = !showPassword"
                 :error="!!validation.passwordRepeat.length"
                 :error-messages="validation.passwordRepeat"
                 required/>
             <div class="d-flex">
-              <v-btn color="primary" :loading="changePasswordRequestSent" @click="changePasswordRequest">
-                Change
+              <v-btn color="success" :loading="changePasswordRequestSent" @click="changePasswordRequest">
+                {{ _tc('buttons.changePassword') }}
               </v-btn>
             </div>
           </v-form>
@@ -73,7 +73,7 @@ export default {
     async changePasswordRequest() {
       this.clearValidation()
       if (this.form.passwordRepeat !== this.form.password) {
-        const msg = 'Must be the same'
+        const msg = this._tc('validation.same')
         this.validation.password.push(msg)
         this.validation.passwordRepeat.push(msg)
         return
@@ -82,7 +82,7 @@ export default {
         const response = await this.getApiProvider().putJson('/api/users/me/password', this.form)
         if (response.ok) {
           this.showMessage({
-            text: 'Password changed successfully'
+            text: this._t('passwordChangeSuccess')
           })
           this.form = {
             oldPassword: '',
@@ -92,7 +92,7 @@ export default {
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
         } else {
-          this.showErrorsFromResponse(response, 'Error changing password')
+          this.showErrorsFromResponse(response, this._t('passwordChangeError'))
         }
       }, 'changePasswordRequestSent')
     }

@@ -61,7 +61,7 @@ import SignalUtils from "../../../utils/signal-utils";
 import FixedWidthWrapper from "../../../components/fixed-width-wrapper";
 
 export default {
-  name: "signal-editor",
+  name: "signal",
   components: {
     SelectTransformerDialog,
     TransformerDialog, ChartDrawer,

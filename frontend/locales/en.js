@@ -1,3 +1,5 @@
+import {dataStore} from "~/stores/data-store";
+
 const en = {
 	language: 'Language',
 	name: 'English',
@@ -10,7 +12,11 @@ const en = {
 			transform: 'Transform',
 			exportWav: 'Export wav',
 			exportTxt: 'Export txt',
-			working: 'Working...'
+			working: 'Working...',
+			changePassword: 'Change password',
+			signIn: 'Sign in',
+			signUp: 'Sign up',
+			signOut: 'Sign out'
 		},
 		validation: {
 			required: 'This field is required',
@@ -19,7 +25,8 @@ const en = {
 			greaterThan: 'Must be greater than {minValue}',
 			number: 'Must be a number',
 			notGreaterThan: 'Must be not greater than {maxValue}',
-			between: 'Must be between {minValue} and {maxValue}'
+			between: 'Must be between {minValue} and {maxValue}',
+			same: 'Must have the same value'
 		},
 		messages: {
 			fileSaveError: 'Error while saving file',
@@ -31,6 +38,12 @@ const en = {
 			name: 'Name',
 			description: 'Description',
 			type: 'Type',
+			email: 'Email',
+			password: 'Password',
+			passwordRepeat: 'Password repeat',
+			firstName: 'First name',
+			lastName: 'Last name',
+			patronymic: 'Patronymic'
 		},
 		search: 'Search'
 	},
@@ -45,9 +58,30 @@ const en = {
 		filterByTypes: 'Filter by types',
 	},
 	'default': {
-		
+		settings: 'Settings',
+		user: 'User',
+		navigation: 'Navigation',
+		startPage: 'Start page',
+		on: 'on',
+		off: 'off',
+		darkMode: 'Dark mode: {darkModeState}'
 	},
-	'signal-editor': {
+	'change-password': {
+		name: 'Change password',
+		oldPassword: 'Old password',
+		passwordChangeSuccess: 'Password changed successfully',
+		passwordChangeError: 'Error while changing password',
+	},
+	'email-confirm-error': {
+		name: 'Email confirm error',
+		goToUserSettings: 'Go to user settings'
+	},
+	'restore-password': {
+		name: 'Restore password',
+		newPasswordSentByEmail: 'New password is sent by email',
+		passwordSendError: 'Error while sending new password',
+	},
+	'signal': {
 		name: 'Signal editor',
 		saveAsNew: 'Save as new',
 		sampleRate: 'Sample rate = {sampleRate}'
@@ -108,6 +142,29 @@ const en = {
 		nothingRecorded: 'Nothing is recorded',
 		audioFormat: 'Format: 1 channel, pcm, {sampleRate} Hz',
 		fileName: 'Recorded {dateTime}.wav',
+	},
+	'signin': {
+		name: 'Sign in',
+		signInToContinue: 'Please sign in to continue',
+		forgotPassword: 'Forgot password',
+		signInError: 'Error while sign in'
+	},
+	'signup': {
+		name: 'Sign up',
+		signUpError: 'Error while sign up'
+	},
+	'user-settings': {
+		name: 'User settings',
+		emailNotConfirmed: 'Email is not confirmed',
+		emailConfirmed: 'Email is confirmed',
+		confirm: 'Confirm',
+		deleteAccount: 'Delete account',
+		saveSuccess: 'User info saved',
+		saveError: 'Error while saving user info',
+		deleteConfirm: 'Are you sure to delete your account? All your data will be removed immediately with no possibility of recover.',
+		deleteError: 'Error while deleting account',
+		sendEmailError: 'Error while sending email',
+		confirmSentCheckEmail: 'Confirm message is sent, check your email {email}'
 	},
 	transformerNames: {
 		LinearAmp: 'Linear amplifier',

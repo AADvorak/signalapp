@@ -28,8 +28,10 @@
         <v-form>
           <v-row>
             <v-col>
-              <v-combobox
+              <v-select
                   v-model="form.types"
+                  item-title="name"
+                  item-value="code"
                   :items="types"
                   :label="_t('filterByTypes')"
                   multiple/>
@@ -51,8 +53,8 @@
           </thead>
           <tbody>
           <tr v-for="transformer in filteredTransformers" @click="select(transformer)">
-            <td>{{ _tr(transformer.module) }}</td>
-            <td>{{ _trt(transformer.type) }}</td>
+            <td style="cursor: pointer;">{{ _tr(transformer.code) }}</td>
+            <td style="cursor: pointer;">{{ _trt(transformer.type) }}</td>
           </tr>
           </tbody>
         </v-table>
@@ -97,10 +99,10 @@ export default {
       return this.transformers.filter(transformer => {
         let matchType = true, matchFilter = true
         if (this.form.filter.length) {
-          matchFilter = this._tr(transformer.module).toLowerCase().includes(this.form.filter.toLowerCase())
+          matchFilter = this._tr(transformer.code).toLowerCase().includes(this.form.filter.toLowerCase())
         }
         if (this.form.types.length) {
-          matchType = this.form.types.includes(this._trt(transformer.type))
+          matchType = this.form.types.includes(transformer.type)
         }
         return matchFilter && matchType
       })
@@ -108,7 +110,7 @@ export default {
     types() {
       return this.transformers.map(t => t.type)
           .filter((value, index, self) => self.indexOf(value) === index)
-          .map(type => this._trt(type))
+          .map(code => ({code, name: this._trt(code)}))
     }
   },
   watch: {

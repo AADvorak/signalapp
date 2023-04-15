@@ -59,8 +59,10 @@
                 :error="!!validation.offset.length"
                 :error-messages="validation.offset"
                 required/>
-            <v-autocomplete
+            <v-select
                 v-model="form.form"
+                item-title="name"
+                item-value="code"
                 :items="signalForms"
                 :label="_t('form')"/>
             <div class="d-flex">
@@ -161,8 +163,8 @@ export default {
   computed: {
     signalForms() {
       let forms = []
-      for (let form in this.SIGNAL_FORMS) {
-        forms.push(form)
+      for (let code in this.SIGNAL_FORMS) {
+        forms.push({code, name: this._t('forms.' + code)})
       }
       return forms
     }
@@ -196,10 +198,11 @@ export default {
       for (let x = this.form.begin; x < this.form.begin + this.form.length; x += step) {
         data.push(this.SIGNAL_FORMS[this.form.form]({x, ...this.form}))
       }
+      const form = this._t('forms.' + this.form.form)
       this.saveSignalToHistoryAndOpen({
         id: 0,
-        name: this._t('signalName', {form: this.form.form}),
-        description: this._t('description', {form: this.form.form, frequency: this.form.frequency, length: data.length}),
+        name: this._t('signalName', {form}),
+        description: this._t('description', {form, frequency: this.form.frequency, length: data.length}),
         sampleRate: this.form.sampleRate,
         xMin: this.form.begin,
         data

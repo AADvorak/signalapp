@@ -4,45 +4,45 @@
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
           <div v-if="!emailConfirmed && !confirmEmailSent" class="mb-5">
-            <p style="color: #CF6679">Email is not confirmed</p>
+            <p style="color: #CF6679">{{ _t('emailNotConfirmed') }}</p>
             <v-btn color="primary" :loading="confirmEmailRequestSent" @click="sendConfirmEmailRequest">
-              Confirm
+              {{ _t('confirm') }}
             </v-btn>
           </div>
           <div v-if="emailConfirmed" class="mb-5">
-            <p style="color: #4CAF50">Email is confirmed</p>
+            <p style="color: #4CAF50">{{ _t('emailConfirmed') }}</p>
           </div>
           <v-form>
             <v-text-field
                 v-model="form.email"
-                label="Email"
+                :label="_tc('fields.email')"
                 :error="!!validation.email.length"
                 :error-messages="validation.email"
                 required/>
             <v-text-field
                 v-model="form.firstName"
-                label="First name"
+                :label="_tc('fields.firstName')"
                 :error="!!validation.firstName.length"
                 :error-messages="validation.firstName"/>
             <v-text-field
                 v-model="form.lastName"
-                label="Last name"
+                :label="_tc('fields.lastName')"
                 :error="!!validation.lastName.length"
                 :error-messages="validation.lastName"/>
             <v-text-field
                 v-model="form.patronymic"
-                label="Patronymic"
+                :label="_tc('fields.patronymic')"
                 :error="!!validation.patronymic.length"
                 :error-messages="validation.patronymic"/>
             <div class="d-flex flex-wrap">
               <v-btn color="success" :loading="saveRequestSent" @click="save">
-                Save
+                {{ _tc('buttons.save') }}
               </v-btn>
               <v-btn color="secondary" to="/change-password">
-                Change password
+                {{ _tc('buttons.changePassword') }}
               </v-btn>
               <v-btn color="error" @click="askConfirmDeleteAccount">
-                Delete account
+                {{ _t('deleteAccount') }}
                 <v-icon>{{ mdiDelete }}</v-icon>
               </v-btn>
             </div>
@@ -118,18 +118,18 @@ export default {
         if (response.ok) {
           dataStore().setUserInfo(response.data)
           this.showMessage({
-            text: 'User info saved'
+            text: this._t('saveSuccess')
           })
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
         } else {
-          this.showErrorsFromResponse(response, 'Error saving data')
+          this.showErrorsFromResponse(response, this._t('saveError'))
         }
       }, 'saveRequestSent')
     },
     askConfirmDeleteAccount() {
       this.askConfirm({
-        text: 'Are you sure to delete your account? All your data will be removed immediately with no possibility of recover.',
+        text: this._t('deleteConfirm'),
         ok: () => {
           this.deleteAccount()
         }
@@ -141,7 +141,7 @@ export default {
         dataStore().clearUserInfo()
         useRouter().push('/')
       } else {
-        this.showErrorsFromResponse(response, 'Error deleting account')
+        this.showErrorsFromResponse(response, this._t('deleteError'))
       }
     },
     async sendConfirmEmailRequest() {
@@ -150,10 +150,10 @@ export default {
         if (response.ok) {
           this.confirmEmailSent = true
           this.showMessage({
-            text: `Confirm message is sent, check your email ${dataStore().userInfo.email}`
+            text: this._t('confirmSentCheckEmail', {email: dataStore().userInfo.email})
           })
         } else {
-          this.showErrorsFromResponse(response, 'Error sending email')
+          this.showErrorsFromResponse(response, this._t('sendEmailError'))
         }
       }, 'confirmEmailRequestSent')
     }

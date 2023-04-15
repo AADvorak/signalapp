@@ -6,7 +6,7 @@
           <v-form @submit.prevent="signUpRequest">
             <v-text-field
                 v-model="form.email"
-                label="Email"
+                :label="_tc('fields.email')"
                 :error="!!validation.email.length"
                 :error-messages="validation.email"
                 required/>
@@ -14,7 +14,7 @@
                 v-model="form.password"
                 :append-icon="showPassword ? mdiEyeOff : mdiEye"
                 :type="showPassword ? 'text' : 'password'"
-                label="Password"
+                :label="_tc('fields.password')"
                 @click:append="showPassword = !showPassword"
                 :error="!!validation.password.length"
                 :error-messages="validation.password"
@@ -23,32 +23,32 @@
                 v-model="form.passwordRepeat"
                 :append-icon="showPassword ? mdiEyeOff : mdiEye"
                 :type="showPassword ? 'text' : 'password'"
-                label="Password repeat"
+                :label="_tc('fields.passwordRepeat')"
                 @click:append="showPassword = !showPassword"
                 :error="!!validation.passwordRepeat.length"
                 :error-messages="validation.passwordRepeat"
                 required/>
             <v-text-field
                 v-model="form.firstName"
-                label="First name"
+                :label="_tc('fields.firstName')"
                 :error="!!validation.firstName.length"
                 :error-messages="validation.firstName"/>
             <v-text-field
                 v-model="form.lastName"
-                label="Last name"
+                :label="_tc('fields.lastName')"
                 :error="!!validation.lastName.length"
                 :error-messages="validation.lastName"/>
             <v-text-field
                 v-model="form.patronymic"
-                label="Patronymic"
+                :label="_tc('fields.patronymic')"
                 :error="!!validation.patronymic.length"
                 :error-messages="validation.patronymic"/>
             <div class="d-flex">
-              <v-btn color="primary" :loading="signUpRequestSent" @click="signUpRequest">
-                Sign up
+              <v-btn color="success" :loading="signUpRequestSent" @click="signUpRequest">
+                {{ _tc('buttons.signUp') }}
               </v-btn>
               <v-btn color="secondary" @click="signIn">
-                Sign in
+                {{ _tc('buttons.signIn') }}
               </v-btn>
             </div>
           </v-form>
@@ -66,6 +66,7 @@ import {dataStore} from "../stores/data-store";
 import PageBase from "../components/page-base";
 
 export default {
+  name: 'signup',
   extends: PageBase,
   mixins: [formValidation],
   data: () => ({
@@ -94,7 +95,7 @@ export default {
     async signUpRequest() {
       this.clearValidation()
       if (this.form.passwordRepeat !== this.form.password) {
-        const msg = 'Must be the same'
+        const msg = this._tc('validation.same')
         this.validation.password.push(msg)
         this.validation.passwordRepeat.push(msg)
         return
@@ -109,7 +110,7 @@ export default {
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
         } else {
-          this.showErrorsFromResponse(response, 'Sign up error')
+          this.showErrorsFromResponse(response, this._t('signUpError'))
         }
       }, 'signUpRequestSent')
     },

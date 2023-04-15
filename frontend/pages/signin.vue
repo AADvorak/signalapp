@@ -3,11 +3,11 @@
     <div class="d-flex align-center flex-column">
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
-          <p v-if="waitingForAuthorization" class="mb-5">Please sign in to continue</p>
+          <p v-if="waitingForAuthorization" class="mb-5">{{ _t('signInToContinue') }}</p>
           <v-form @submit.prevent="signInRequest">
             <v-text-field
                 v-model="form.email"
-                label="Email"
+                :label="_tc('fields.email')"
                 :error="!!validation.email.length"
                 :error-messages="validation.email"
                 required/>
@@ -15,20 +15,20 @@
                 v-model="form.password"
                 :append-icon="showPassword ? mdiEyeOff : mdiEye"
                 :type="showPassword ? 'text' : 'password'"
-                label="Password"
+                :label="_tc('fields.password')"
                 @click:append="showPassword = !showPassword"
                 :error="!!validation.password.length"
                 :error-messages="validation.password"
                 required/>
             <div class="d-flex flex-wrap">
-              <v-btn color="primary" :loading="signInRequestSent" @click="signInRequest">
-                Sign in
+              <v-btn color="success" :loading="signInRequestSent" @click="signInRequest">
+                {{ _tc('buttons.signIn') }}
               </v-btn>
               <v-btn color="secondary" to="/signup">
-                Sign up
+                {{ _tc('buttons.signUp') }}
               </v-btn>
               <v-btn color="secondary" @click="restorePassword">
-                Forgot password
+                {{ _t('forgotPassword') }}
               </v-btn>
             </div>
           </v-form>
@@ -46,6 +46,7 @@ import formValidation from "../mixins/form-validation"
 import PageBase from "../components/page-base";
 
 export default {
+  name: 'signin',
   extends: PageBase,
   mixins: [formValidation],
   data: () => ({
@@ -82,7 +83,7 @@ export default {
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
         } else {
-          this.showErrorsFromResponse(response, 'Sign in error')
+          this.showErrorsFromResponse(response, this._t('signInError'))
         }
       }, 'signInRequestSent')
     },

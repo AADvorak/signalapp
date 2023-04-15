@@ -5,7 +5,7 @@
   >
     <v-card width="100%">
       <v-toolbar>
-        <v-toolbar-title>{{ _tr(selectedTransformer.module) }}</v-toolbar-title>
+        <v-toolbar-title>{{ _tr(selectedTransformer.code) }}</v-toolbar-title>
       </v-toolbar>
       <v-card-text>
         <v-form>
@@ -35,7 +35,7 @@
                     readonly/>
               </v-col>
             </v-row>
-            <component v-bind:is="selectedTransformer.module" :signal1="signal1" :signal2="signal2" :bus="bus"/>
+            <component v-bind:is="selectedTransformer.code" :signal1="signal1" :signal2="signal2" :bus="bus"/>
           </div>
           <div class="d-flex">
             <v-btn :disabled="processing" color="primary" class="mr-4" @click="ok">

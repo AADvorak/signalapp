@@ -10,7 +10,11 @@ const ru = {
 			transform: 'Преобразовать',
 			exportWav: 'Экспортировать wav',
 			exportTxt: 'Экспортировать txt',
-			working: 'Вычисление...'
+			working: 'Вычисление...',
+			changePassword: 'Изменить пароль',
+			signIn: 'Войти',
+			signUp: 'Зарегистрироваться',
+			signOut: 'Выйти'
 		},
 		validation: {
 			required: 'Поле обязательно к заполнению',
@@ -19,7 +23,8 @@ const ru = {
 			greaterThan: 'Значение должно быть больше {minValue}',
 			number: 'Требуется числовое значение',
 			notGreaterThan: 'Значение должно быть не больше {maxValue}',
-			between: 'Значение должно быть в диапазоне от {minValue} до {maxValue}'
+			between: 'Значение должно быть в диапазоне от {minValue} до {maxValue}',
+			same: 'Должны иметь одинаковое значение'
 		},
 		messages: {
 			fileSaveError: 'Ошибка при сохранении файла',
@@ -31,6 +36,12 @@ const ru = {
 			name: 'Имя',
 			description: 'Описание',
 			type: 'Тип',
+			email: 'Email',
+			password: 'Пароль',
+			passwordRepeat: 'Повтор пароля',
+			firstName: 'Имя',
+			lastName: 'Фамилия',
+			patronymic: 'Отчество'
 		},
 		search: 'Поиск',
 	},
@@ -45,9 +56,30 @@ const ru = {
 		filterByTypes: 'Фильтр по типу'
 	},
 	'default': {
-		
+		settings: 'Настройки',
+		user: 'Пользователь',
+		navigation: 'Навигация',
+		startPage: 'Стартовая страница',
+		on: 'вкл',
+		off: 'выкл',
+		darkMode: 'Темный режим: {darkModeState}'
 	},
-	'signal-editor': {
+	'change-password': {
+		name: 'Изменение пароля',
+		oldPassword: 'Старый пароль',
+		passwordChangeSuccess: 'Пароль успешно изменен',
+		passwordChangeError: 'Ошибка при изменении пароля',
+	},
+	'email-confirm-error': {
+		name: 'Ошибка подтверждения эл. почты',
+		goToUserSettings: 'Перейти в настройки пользователя'
+	},
+	'restore-password': {
+		name: 'Восстановление пароля',
+		newPasswordSentByEmail: 'Новый пароль отправлен на эл почту',
+		passwordSendError: 'Ошибка при отправке нового пароля',
+	},
+	'signal': {
 		name: 'Сигнал',
 		saveAsNew: 'Сохранить как новый',
 		sampleRate: 'Частота дискретизации = {sampleRate}'
@@ -108,6 +140,29 @@ const ru = {
 		nothingRecorded: 'Запись отсутствует',
 		audioFormat: 'Формат: 1 канал, pcm, {sampleRate} Гц',
 		fileName: 'Записано {dateTime}.wav',
+	},
+	'signin': {
+		name: 'Вход',
+		signInToContinue: 'Пожалуйста, войдите для продолжения',
+		forgotPassword: 'Не помню пароль',
+		signInError: 'Ошибка при входе'
+	},
+	'signup': {
+		name: 'Регистрация',
+		signUpError: 'Ошибка при регистрации'
+	},
+	'user-settings': {
+		name: 'Настройки пользователя',
+		emailNotConfirmed: 'Эл. почта не подтверждена',
+		emailConfirmed: 'Эл. почта подтверждена',
+		confirm: 'Подтвердить',
+		deleteAccount: 'Удалить аккаунт',
+		saveSuccess: 'Данные пользователя сохранены',
+		saveError: 'Ошибка при сохранении данных пользователя',
+		deleteConfirm: 'Вы точно хотите удалить аккаунт? Все ваши данные будут немедленно удалены без возможности восстановления.',
+		deleteError: 'Ошибка при удалении аккаунта',
+		sendEmailError: 'Ошибка при отправке письма',
+		confirmSentCheckEmail: 'Письмо с ссылкой для подтвержения отправлено на {email}'
 	},
 	transformerNames: {
 		LinearAmp: 'Линейный усилитель',

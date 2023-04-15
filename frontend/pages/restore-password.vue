@@ -6,13 +6,13 @@
           <v-form @submit.prevent="restorePasswordRequest">
             <v-text-field
                 v-model="form.email"
-                label="Email"
+                :label="_tc('fields.email')"
                 :error="!!validation.email.length"
                 :error-messages="validation.email"
                 required/>
             <div class="d-flex">
               <v-btn color="primary" :loading="restorePasswordRequestSent" @click="restorePasswordRequest">
-                Restore password
+                {{ _t('name') }}
               </v-btn>
             </div>
           </v-form>
@@ -53,13 +53,13 @@ export default {
         const response = await ApiProvider.postJson('/api/users/restore/' + this.form.email, {})
         if (response.ok) {
           this.showMessage({
-            text: 'New password is sent by email',
+            text: this._t('newPasswordSentByEmail'),
             onHide: () => useRouter().push('/signin')
           })
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
         } else {
-          this.showErrorsFromResponse(response, 'Error sending new password')
+          this.showErrorsFromResponse(response, this._t('passwordSendError'))
         }
       }, 'restorePasswordRequestSent')
     }

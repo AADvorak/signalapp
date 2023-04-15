@@ -17,20 +17,20 @@
       <template v-slot:append>
         <v-btn color="primary">
           <v-icon v-if="isMobile">{{ mdiAccount }}</v-icon>
-          <div v-else>{{ isSignedIn ? userButtonText : 'User' }}</div>
+          <div v-else>{{ isSignedIn ? userButtonText : _t('user') }}</div>
           <v-menu activator="parent">
             <v-list>
               <v-list-item v-if="isSignedIn" @click="signOut">
-                <v-list-item-title>Sign out</v-list-item-title>
+                <v-list-item-title>{{ _tc('buttons.signOut') }}</v-list-item-title>
               </v-list-item>
               <v-list-item v-if="isSignedIn" to="/user-settings">
-                <v-list-item-title>Settings</v-list-item-title>
+                <v-list-item-title>{{ _t('settings') }}</v-list-item-title>
               </v-list-item>
               <v-list-item v-if="!isSignedIn" to="/signin">
-                <v-list-item-title>Sign in</v-list-item-title>
+                <v-list-item-title>{{ _tc('buttons.signIn') }}</v-list-item-title>
               </v-list-item>
               <v-list-item v-if="!isSignedIn" to="/signup">
-                <v-list-item-title>Sign up</v-list-item-title>
+                <v-list-item-title>{{ _tc('buttons.signUp') }}</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -42,36 +42,38 @@
         <v-row>
           <v-col style="padding: 4px" v-if="showMainMenu" :cols="mainMenuCols" :sm="mainMenuColsSm" :md="mainMenuCols" :lg="mainMenuCols">
             <v-card width="100%">
-              <v-card-title>Navigation</v-card-title>
+              <v-card-title>{{ _t('navigation') }}</v-card-title>
               <v-card-text>
                 <v-list>
                   <v-list-item @click="toMainPage">
                     <v-list-item-title>
                       <v-icon>{{ mdiHome }}</v-icon>
-                      Start page
+                      {{ _t('startPage') }}
                     </v-list-item-title>
                   </v-list-item>
                   <v-list-item
-                      v-for="item in modulesForMenu"
-                      :key="item.module"
-                      @click="toPage('/' + item.module.toLowerCase())"
+                      v-for="module in modulesForMenu"
+                      :key="module.code"
+                      @click="toPage('/' + module.code.toLowerCase())"
                   >
                     <v-list-item-title>
-                      <v-icon>{{ getModuleIcon(item) }}</v-icon>
-                      {{ item.name }}
+                      <v-icon>{{ getModuleIcon(module) }}</v-icon>
+                      {{ $t(`${module.code}.name`) }}
                     </v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-card-text>
             </v-card>
             <v-card width="100%">
-              <v-card-title>Settings</v-card-title>
+              <v-card-title>{{ _t('settings') }}</v-card-title>
               <v-card-text>
-                <v-switch hide-details v-model="darkMode" :label="`Dark mode: ${darkModeStr}`"/>
+                <v-switch hide-details v-model="darkMode" :label="_t('darkMode', {darkModeState})"/>
                 <v-form>
-                  <v-autocomplete
+                  <v-select
                       v-model="$i18n.locale"
-                      :items="locales"
+                      item-title="name"
+                      item-value="code"
+                      :items="localeItems"
                       :label="$t('language')"/>
                 </v-form>
               </v-card-text>
@@ -92,9 +94,13 @@ import {dataStore} from "../stores/data-store";
 import ApiProvider from "../api/api-provider";
 import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
-import i18n from "../plugins/i18n";
+import en from '../locales/en'
+import ru from '../locales/ru'
+import ComponentBase from "../components/component-base";
 
 export default {
+  name: 'default',
+  extends: ComponentBase,
   data() {
     return {
       mdiAccount, mdiHome,
@@ -106,15 +112,16 @@ export default {
       darkMode: dataStore().getDarkMode,
       header: '',
       showMainMenu: false,
-      isMobile: DeviceUtils.isMobile()
+      isMobile: DeviceUtils.isMobile(),
+      locales: {en, ru}
     }
   },
   computed: {
     theme() {
       return this.darkMode ? 'dark' : 'light'
     },
-    darkModeStr() {
-      return this.darkMode ? 'on' : 'off'
+    darkModeState() {
+      return this._t(this.darkMode ? 'on' : 'off')
     },
     userButtonText() {
       return dataStore().userRepresentingString
@@ -137,8 +144,12 @@ export default {
     pageColsSm() {
       return this.showMainMenu ? 12 - this.mainMenuColsSm : 12
     },
-    locales() {
-      return ['en', 'ru']
+    localeItems() {
+      let items = []
+      for (const code in this.locales) {
+        items.push({code, name: this.locales[code].name})
+      }
+      return items
     }
   },
   watch: {
@@ -147,6 +158,7 @@ export default {
     },
     '$i18n.locale'(newValue) {
       dataStore().setLocale(newValue)
+      this.setHeaderByRoute()
     }
   },
   mounted() {
@@ -168,9 +180,13 @@ export default {
     },
     setHeaderByRoute() {
       let routeName = useRoute().name
+      if (routeName === 'index') {
+        this.header = this._t('startPage')
+        return
+      }
       for (let module of dataStore().getAllModules) {
-        if (routeName.startsWith(module.module.toLowerCase())) {
-          this.header = module.name
+        if (routeName.startsWith(module.code.toLowerCase())) {
+          this.header = this.$t(`${module.code}.name`)
           break
         }
       }
@@ -205,7 +221,7 @@ export default {
     },
     trySetLocaleFromLanguage(language) {
       const locale = this.localeFromLanguage(language)
-      if (this.locales.includes(locale)) {
+      if (this.locales.hasOwnProperty(locale)) {
         this.$i18n.locale = locale
         return true
       }

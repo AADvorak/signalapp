@@ -60,7 +60,7 @@ export default {
       this.progress = 0
     },
     makeTransformWithQuestion(key) {
-      return this._tc('messages.' + key, {transformerName: this._tr('with' + this.selectedTransformer.module)})
+      return this._tc('messages.' + key, {transformerName: this._tr('with' + this.selectedTransformer.code)})
     }
   },
 }
