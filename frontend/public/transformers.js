@@ -156,7 +156,7 @@ const Common = {
     }
     let grid = []
     let x = xMin
-    Counter.init(Math.floor((xMax - xMin) / step), 'Preparing signals')
+    Counter.init(Math.floor((xMax - xMin) / step), 'preparingSignals')
     while (x <= xMax) {
       grid.push(x)
       x += step
@@ -189,7 +189,7 @@ const Common = {
 
   calculateMaxAbsY(signal) {
     let maxAbsY = 0
-    Counter.init(signal.data.length, 'Calculating max abs value')
+    Counter.init(signal.data.length, 'calculatingMaxAbsValue')
     for (let point of signal.data) {
       const absY = Math.abs(point)
       if (maxAbsY < absY) {
@@ -240,7 +240,6 @@ const TransformFunctions = {
    */
 
   linearAmp(signal, params) {
-    signal.description += `\nTransformed by linear amplifier with coefficient = ${params.coefficient}`
     Counter.init(signal.data.length)
     for (let i = 0; i < signal.data.length; i++) {
       signal.data[i] *= params.coefficient
@@ -250,7 +249,6 @@ const TransformFunctions = {
   },
 
   piecewiseLinearSymmetricSaturationAmp(signal, params) {
-    signal.description += `\nTransformed by piecewise linear symmetric amplifier with saturation with coefficient = ${params.coefficient} and max output value = ${params.maxOutput}`
     Counter.init(signal.data.length)
     const maxOutputToCoefficient = params.maxOutput / params.coefficient
     for (let i = 0; i < signal.data.length; i++) {
@@ -267,7 +265,6 @@ const TransformFunctions = {
   },
 
   piecewiseLinearAsymmetricSaturationAmp(signal, params) {
-    signal.description += `\nTransformed by piecewise linear asymmetric amplifier with saturation with coefficient = ${params.coefficient}, max positive output value = ${params.maxPositiveOutput}, max negative output value = ${params.maxNegativeOutput}`
     Counter.init(signal.data.length)
     const maxPositiveOutputToCoefficient = params.maxPositiveOutput / params.coefficient
     const maxNegativeOutputToCoefficient = params.maxNegativeOutput / params.coefficient
@@ -286,7 +283,6 @@ const TransformFunctions = {
 
   inverter(signal) {
     Counter.init(signal.data.length)
-    signal.description += `\nTransformed by inverter`
     for (let i = 0; i < signal.data.length; i++) {
       signal.data[i] = -signal.data[i]
       Counter.increase()
@@ -299,8 +295,7 @@ const TransformFunctions = {
    */
 
   amplitudeModulator(signal, params) {
-    signal.description += `\nTransformed by amplitude modulator with frequency = ${params.frequency}, amplitude = ${params.amplitude}, depth = ${params.depth}`
-    Counter.init(signal.data.length, 'Estimating')
+    Counter.init(signal.data.length, 'estimating')
     for (let i = 0; i < signal.data.length; i++) {
       const x = signal.xMin + signal.params.step * i
       signal.data[i] = params.amplitude * (1 + params.depth * signal.data[i] / signal.maxAbsY) * Math.sin(2 * Math.PI * params.frequency * x)
@@ -310,9 +305,8 @@ const TransformFunctions = {
   },
 
   frequencyModulator(signal, params) {
-    signal.description += `\nTransformed by frequency modulator with frequency = ${params.frequency}, amplitude = ${params.amplitude} deviation = ${params.deviation}`
-    const integrated = Common.integrate(signal.data, signal.params.step, 'Preparing signal')
-    Counter.init(signal.data.length, 'Estimating')
+    const integrated = Common.integrate(signal.data, signal.params.step, 'preparingSignal')
+    Counter.init(signal.data.length, 'estimating')
     for (let i = 0; i < signal.data.length; i++) {
       const x = signal.xMin + signal.params.step * i
       signal.data[i] = params.amplitude * Math.sin((2 * Math.PI * x + params.deviation * integrated[i]) * params.frequency)
@@ -329,7 +323,6 @@ const TransformFunctions = {
     const equations = [
       (input, variables, params) => (1 / params.tau) * (input - variables[0])
     ]
-    signal.description += `\nTransformed by low-pass RC filter with time constant = ${params.tau}`
     signal.data = Common.solveDifEq({
       inData: signal.data,
       step: signal.params.step,
@@ -345,8 +338,7 @@ const TransformFunctions = {
     const equations = [
       (input, variables, params) => input - variables[0] / params.tau
     ]
-    const inData = Common.differentiate(signal.data, signal.params.step, 'Preparing signal')
-    signal.description += `\nTransformed by high-pass RC filter with time constant = ${params.tau}`
+    const inData = Common.differentiate(signal.data, signal.params.step, 'preparingSignal')
     signal.data = Common.solveDifEq({
       inData,
       step: signal.params.step,
@@ -368,7 +360,6 @@ const TransformFunctions = {
       (input, variables, params) => input - 2 * params.damping * variables[1] -
           Math.pow(2 * Math.PI * params.frequency, 2) * variables[0]
     ]
-    signal.description += `\nTransformed by linear oscillator with frequency = ${params.frequency}, damping = ${params.damping}`
     signal.data = Common.solveDifEq({
       inData: signal.data,
       step: signal.params.step,
@@ -385,13 +376,11 @@ const TransformFunctions = {
    */
 
   integrator(signal) {
-    signal.description += `\nTransformed by integrator`
     signal.data = Common.integrate(signal.data, signal.params.step)
     return signal
   },
 
   differentiator(signal) {
-    signal.description += `\nTransformed by differentiator`
     signal.data = Common.differentiate(signal.data, signal.params.step)
     return signal
   },
@@ -439,14 +428,12 @@ const TransformFunctions = {
       return output
     }
     let N = getPowOfTwoLength(signal.data.length)
-    signal.description += '\nTransformed by spectrum analyser'
     signal.data = transformDCT(signal.data, N)
     signal.sampleRate =  2 * N / signal.sampleRate
     return signal
   },
 
   selfCorrelator(signal) {
-    signal.description += `\nTransformed by self correlator`
     Common.calculateSignalParams(signal)
     let {data, xMin} = Common.estimateCorrelationFunction(signal, signal)
     signal.data = data
@@ -459,14 +446,12 @@ const DoubleTransformFunctions = {
 
   adder(signal1, signal2, params) {
     let output = {
-      name: 'Adder output signal',
-      description: `Sum of ${signal1.name} with coefficient ${params.coefficient1} and ${signal2.name} with coefficient ${params.coefficient2}`,
       sampleRate: signal1.sampleRate,
       data: []
     }
     let commonGrid = Common.makeCommonSignalsValueGrid([signal1, signal2])
     output.xMin = commonGrid[0]
-    Counter.init(commonGrid.length, 'Estimating')
+    Counter.init(commonGrid.length, 'estimating')
     for (let x of commonGrid) {
       output.data.push(params.coefficient1 * Common.getSignalValue(signal1, x)
           + params.coefficient2 * Common.getSignalValue(signal2, x))
@@ -477,8 +462,6 @@ const DoubleTransformFunctions = {
 
   correlator(signal1, signal2) {
     return {
-      name: 'Correlator output signal',
-      description: `Correlation of ${signal1.name} and ${signal2.name}`,
       sampleRate: signal1.sampleRate,
       ...Common.estimateCorrelationFunction(signal1, signal2)
     }
@@ -486,14 +469,12 @@ const DoubleTransformFunctions = {
 
   twoSignalAmplitudeModulator(signal1, signal2, params) {
     let output = {
-      name: 'Modulator output signal',
-      description: `${signal1.name} with amplitude modulated by ${signal2.name} with depth ${params.depth}`,
       sampleRate: signal1.sampleRate,
       data: []
     }
     let commonGrid = Common.makeCommonSignalsValueGrid([signal1, signal2])
     output.xMin = commonGrid[0]
-    Counter.init(commonGrid.length, 'Estimating')
+    Counter.init(commonGrid.length, 'estimating')
     for (let x of commonGrid) {
       output.data.push(Common.getSignalValue(signal1, x) * (1 + params.depth * Common.getSignalValue(signal2, x) / signal2.maxAbsY))
       Counter.increase()

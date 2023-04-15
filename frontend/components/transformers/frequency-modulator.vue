@@ -4,7 +4,7 @@
       type="number"
       step="10"
       min="0"
-      label="Carrier frequency"
+      :label="_trp('frequency')"
       :error="!!validation.frequency.length"
       :error-messages="validation.frequency"
       required/>
@@ -13,7 +13,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Carrier amplitude"
+      :label="_trp('amplitude')"
       :error="!!validation.amplitude.length"
       :error-messages="validation.amplitude"
       required/>
@@ -22,7 +22,7 @@
       type="number"
       step="1"
       min="0"
-      label="Frequency deviation"
+      :label="_trp('deviation')"
       :error="!!validation.deviation.length"
       :error-messages="validation.deviation"
       required/>

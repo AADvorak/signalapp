@@ -3,9 +3,11 @@ import formValidation from "../../mixins/form-validation";
 import {dataStore} from "../../stores/data-store";
 import formValuesSaving from "../../mixins/form-values-saving";
 import formNumberValues from "../../mixins/form-number-values";
+import ComponentBase from "../component-base";
 
 export default {
   name: "TransformerBase",
+  extends: ComponentBase,
   mixins: [formValidation, formValuesSaving, formNumberValues],
   props: {
     signal: Object,
@@ -13,7 +15,8 @@ export default {
   },
   data: () => ({
     worker: null,
-    transformFunctionName: ''
+    transformFunctionName: '',
+    form: {}
   }),
   mounted() {
     this.initWorker()
@@ -30,6 +33,12 @@ export default {
     this.bus.off('cancel')
   },
   methods: {
+    _trp(key, params) {
+      return this.$t(`transformerParams.${this.$options.name}.${key}`, params)
+    },
+    _ton(key) {
+      return this.$t(`operationNames.${key}`)
+    },
     doTransform() {
       if (this.form) {
         this.clearValidation()
@@ -53,6 +62,19 @@ export default {
         params: JSON.stringify(this.form || {})
       }
     },
+    changeSignalNameAndDescription(signal) {
+      signal.description += '\n' + this.makeTransformedWithText() + ' ' + this.makeParamsText()
+    },
+    makeTransformedWithText() {
+      return this._tc('messages.transformed') + ' ' + this._tr('with' + this.$options.name)
+    },
+    makeParamsText() {
+      let paramsDescription = ''
+      for (const key in this.form) {
+        paramsDescription += (paramsDescription && ', ') + `${this._trp(key).toLowerCase()} = ${this.form[key]}`
+      }
+      return paramsDescription && `(${paramsDescription})`
+    },
     addSignalToHistoryAndOpen(signal) {
       let signalKey = dataStore().addSignalToHistory(signal)
       useRouter().push('/signal/' + signalKey)
@@ -61,14 +83,15 @@ export default {
       return this.signal
     },
     validateFunction() {
+      return true
     },
     validatePositiveNumber(key) {
       let value = this.form[key]
       let invalidMsg = ''
       if (isNaN(value)) {
-        invalidMsg = 'Should be a number'
+        invalidMsg = this._tc('validation.number')
       } else if (value < 0) {
-        invalidMsg = 'Must have positive value'
+        invalidMsg = this._tc('validation.positive')
       }
       if (invalidMsg) {
         this.validation[key].push(invalidMsg)
@@ -79,12 +102,14 @@ export default {
       this.worker = new Worker('/transformers.js')
       this.worker.onmessage = e => {
         if (e.data.signal) {
-          this.addSignalToHistoryAndOpen(JSON.parse(e.data.signal))
+          let signal = JSON.parse(e.data.signal)
+          this.changeSignalNameAndDescription(signal)
+          this.addSignalToHistoryAndOpen(signal)
         }
         if (e.data.progress) {
           this.bus.emit('progress', {
             progress: e.data.progress,
-            operation: e.data.operation,
+            operation: e.data.operation ? this._ton(e.data.operation) : '',
           })
         }
         if (e.data.error) {

@@ -5,20 +5,20 @@
   >
     <v-card width="100%">
       <v-toolbar>
-        <v-toolbar-title>{{ selectedTransformer.name }}</v-toolbar-title>
+        <v-toolbar-title>{{ _tr(selectedTransformer.module) }}</v-toolbar-title>
       </v-toolbar>
       <v-card-text>
         <v-form>
           <div :hidden="processing">
-            <div class="mb-5">Transform signal with {{ selectedTransformer.name }}?</div>
+            <div class="mb-5">{{ makeTransformWithQuestion('transformSignalWith') }}?</div>
             <component v-bind:is="selectedTransformer.module" :signal="signal" :bus="bus"/>
           </div>
           <div class="d-flex">
           <v-btn :disabled="processing" color="primary" class="mr-4" @click="ok">
-            {{ processing ? 'Working...' : 'OK' }}
+            {{ okButtonText }}
           </v-btn>
           <v-btn @click="cancel">
-            Cancel
+            {{ _tc('buttons.cancel') }}
           </v-btn>
           </div>
         </v-form>

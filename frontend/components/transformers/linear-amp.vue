@@ -4,7 +4,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Coefficient"
+      :label="_trp('coefficient')"
       :error="!!validation.coefficient.length"
       :error-messages="validation.coefficient"
       required/>

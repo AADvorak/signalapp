@@ -3,9 +3,11 @@ import ApiProvider from "../api/api-provider";
 import ConfirmDialog from "./confirm-dialog";
 import Message from "./message";
 import LoadingOverlay from "./loading-overlay";
+import ComponentBase from "./component-base"
 
 export default {
   name: "page-base",
+  extends: ComponentBase,
   components: {ConfirmDialog, Message, LoadingOverlay},
   data: () => ({
     message: {

@@ -3,7 +3,7 @@
     <div class="d-flex align-center flex-column">
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-title>
-          Generate
+          {{ _t('generate') }}
         </v-card-title>
         <v-card-text>
           <v-form @submit.prevent="generateAndOpenSignal">
@@ -11,7 +11,7 @@
                 v-model="form.begin"
                 type="number"
                 step="0.01"
-                label="Signal begin (B)"
+                :label="_t('begin') + ' (B)'"
                 :error="!!validation.begin.length"
                 :error-messages="validation.begin"
                 required/>
@@ -20,7 +20,7 @@
                 type="number"
                 step="0.1"
                 min="0"
-                label="Signal length (L)"
+                :label="_t('length') + ' (L)'"
                 :error="!!validation.length.length"
                 :error-messages="validation.length"
                 required/>
@@ -29,7 +29,7 @@
                 type="number"
                 step="100"
                 min="0"
-                label="Signal sample rate (S)"
+                :label="_t('sampleRate') + ' (S)'"
                 :error="!!validation.sampleRate.length"
                 :error-messages="validation.sampleRate"
                 required/>
@@ -38,7 +38,7 @@
                 type="number"
                 step="10"
                 min="0"
-                label="Signal frequency (F)"
+                :label="_t('frequency') + ' (F)'"
                 :error="!!validation.frequency.length"
                 :error-messages="validation.frequency"
                 required/>
@@ -47,7 +47,7 @@
                 type="number"
                 step="1"
                 min="0"
-                label="Signal amplitude (A)"
+                :label="_t('amplitude') + ' (A)'"
                 :error="!!validation.amplitude.length"
                 :error-messages="validation.amplitude"
                 required/>
@@ -55,29 +55,29 @@
                 v-model="form.offset"
                 type="number"
                 step="1"
-                label="Signal offset (O)"
+                :label="_t('offset') + ' (O)'"
                 :error="!!validation.offset.length"
                 :error-messages="validation.offset"
                 required/>
             <v-autocomplete
                 v-model="form.form"
                 :items="signalForms"
-                label="Signal form"/>
+                :label="_t('form')"/>
             <div class="d-flex">
               <v-btn color="primary" @click="generateAndOpenSignal">
-                Generate
+                {{ _t('generate') }}
               </v-btn>
             </div>
           </v-form>
         </v-card-text>
         <v-card-title>
-          Import
+          {{ _t('import') }}
         </v-card-title>
         <v-card-text>
           <v-file-input
               v-model="file"
               accept=".txt,.wav"
-              label="From txt or wav file"/>
+              :label="_t('fromTxtOrWavFile')"/>
         </v-card-text>
       </v-card>
     </div>
@@ -134,30 +134,27 @@ export default {
         return offset + amplitude * (Math.random() * 2 - 1)
       }
     },
-    VALIDATION_MSG: {
-      greaterThanZero: 'Must be greater than zero',
-      number: 'Must be a number',
-    },
     VALIDATION_FUNCTIONS: {
       length(values, ctx) {
-        if (values.length <= 0) return ctx.VALIDATION_MSG.greaterThanZero
+        if (values.length <= 0) return ctx._tc('validation.greaterThanZero')
         let pointsNumber = values.length * values.sampleRate
-        if (!ctx.VALIDATION_FUNCTIONS.sampleRate(values) && (pointsNumber < 2 || pointsNumber > 512000)) {
-          return 'Number of signal points (S * L) must be in range from 2 to 512000. Now it is ' + Math.floor(pointsNumber)
+        if (!ctx.VALIDATION_FUNCTIONS.sampleRate(values, ctx) && (pointsNumber < 2 || pointsNumber > 512000)) {
+          return ctx._t('wrongPointsNumber', {pointsNumber: Math.floor(pointsNumber)})
         }
       },
       sampleRate(values, ctx) {
-        if (values.sampleRate <= 0) return ctx.VALIDATION_MSG.greaterThanZero
-        if (values.sampleRate > 48000) return 'Must be not greater than 48000'
+        const maxValue = 48000
+        if (values.sampleRate <= 0) return ctx._tc('validation.greaterThanZero')
+        if (values.sampleRate > maxValue) return ctx._t('notGreaterThan', {maxValue})
       },
       frequency(values, ctx) {
-        if (values.frequency <= 0) return ctx.VALIDATION_MSG.greaterThanZero
-        if (!ctx.VALIDATION_FUNCTIONS.sampleRate(values) && 2 * values.frequency > values.sampleRate) {
-          return 'Must be less than a half of sample rate'
+        if (values.frequency <= 0) return ctx._tc('validation.greaterThanZero')
+        if (!ctx.VALIDATION_FUNCTIONS.sampleRate(values, ctx) && 2 * values.frequency > values.sampleRate) {
+          return ctx._t('lessThanHalfSampleRate')
         }
       },
       amplitude(values, ctx) {
-        if (values.amplitude < 0) return ctx.VALIDATION_MSG.greaterThanZero
+        if (values.amplitude < 0) return ctx._tc('validation.greaterThanZero')
       },
     }
   }),
@@ -201,8 +198,8 @@ export default {
       }
       this.saveSignalToHistoryAndOpen({
         id: 0,
-        name: `Generated ${this.form.form} signal`,
-        description: `Generated ${this.form.form} signal with F = ${this.form.frequency} (${data.length} points)`,
+        name: this._t('signalName', {form: this.form.form}),
+        description: this._t('description', {form: this.form.form, frequency: this.form.frequency, length: data.length}),
         sampleRate: this.form.sampleRate,
         xMin: this.form.begin,
         data
@@ -215,7 +212,7 @@ export default {
           let value = this.form[fieldName]
           let validationMsg = ''
           if (isNaN(value)) {
-            validationMsg = this.VALIDATION_MSG.number
+            validationMsg = this._tc('validation.mustBeNumber')
           } else {
             let validationFunction = this.VALIDATION_FUNCTIONS[fieldName]
             if (validationFunction) {
@@ -234,7 +231,7 @@ export default {
       try {
         let signal = await FileUtils.readSignalFromTxtFile(file)
         signal.name = file.name
-        signal.description = `Imported from file ${file.name}`
+        signal.description = this._t('importedFromFile', {name: file.name})
         this.saveSignalToHistoryAndOpen(signal)
       } catch (e) {
         this.showMessage({
@@ -249,7 +246,7 @@ export default {
       if (response && response.ok) {
         useRouter().push('/signal-manager')
       } else {
-        this.showErrorsFromResponse(response, 'Error uploading file')
+        this.showErrorsFromResponse(response, this._tc('message.fileSaveError'))
         // todo clear file input
       }
     },

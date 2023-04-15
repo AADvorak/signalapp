@@ -4,7 +4,7 @@
       type="number"
       step="10"
       min="0"
-      label="Carrier frequency"
+      :label="_trp('frequency')"
       :error="!!validation.frequency.length"
       :error-messages="validation.frequency"
       required/>
@@ -13,7 +13,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Carrier amplitude"
+      :label="_trp('amplitude')"
       :error="!!validation.amplitude.length"
       :error-messages="validation.amplitude"
       required/>
@@ -23,7 +23,7 @@
       step="0.1"
       min="0"
       max="1"
-      label="Modulation depth"
+      :label="_trp('depth')"
       :error="!!validation.depth.length"
       :error-messages="validation.depth"
       required/>
@@ -55,7 +55,7 @@ export default {
         validated.push(this.validatePositiveNumber(key))
       }
       if (this.form.depth > 1) {
-        this.validation.depth.push('Should be not more than 1')
+        this.validation.depth.push(this._tc('validation.notGreaterThan', {maxValue: 1}))
         validated.push(false)
       }
       return !validated.includes(false)

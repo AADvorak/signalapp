@@ -16,6 +16,13 @@ export default {
         signal2: JSON.stringify(this.signal2),
         params: JSON.stringify(this.form || {})
       }
+    },
+    changeSignalNameAndDescription(signal) {
+      signal.name = this.makeTransformedWithText()
+      signal.description = this.makeResultSignalDescription()
+    },
+    makeResultSignalDescription() {
+      return this._trp('description', {name1: this.signal1.name, name2: this.signal2.name, ...this.form})
     }
   }
 }

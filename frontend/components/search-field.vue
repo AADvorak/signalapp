@@ -3,14 +3,17 @@
     <v-text-field
         v-model="search"
         v-on:keyup="onUpdate"
-        label="Search"/>
+        :label="_tc('search')"/>
   </v-form>
 </template>
 
 <script>
 // todo review this component
+import ComponentBase from "./component-base";
+
 export default {
   name: "search-field",
+  extends: ComponentBase,
   props: {
     initSearchValue: String
   },

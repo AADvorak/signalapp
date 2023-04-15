@@ -4,7 +4,7 @@
       type="number"
       step="1"
       min="0"
-      label="Frequency"
+      :label="_trp('frequency')"
       :error="!!validation.frequency.length"
       :error-messages="validation.frequency"
       required/>
@@ -13,7 +13,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Damping"
+      :label="_trp('damping')"
       :error="!!validation.damping.length"
       :error-messages="validation.damping"
       required/>

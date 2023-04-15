@@ -9,32 +9,36 @@
                 type="number"
                 step="100"
                 min="0"
-                label="Sample rate (Hz)"
+                :label="_t('sampleRateHz')"
                 :error="!!validation.sampleRate.length"
                 :error-messages="validation.sampleRate"
                 required/>
           </v-form>
           <div>{{ info }}</div>
-          <div>{{ recordStatus }}</div>
-          <v-btn color="error" :disabled="recordStatus !== RECORD_STATUSES.READY" @click="startRecord">
-            REC
-          </v-btn>
-          <v-btn color="warning" :disabled="recordStatus === RECORD_STATUSES.READY" @click="pauseOrContinueRecord">
-            Pause
-          </v-btn>
-          <v-btn color="gray" :disabled="recordStatus === RECORD_STATUSES.READY" @click="stopRecord">
-            Stop
-          </v-btn>
+          <div>{{ _t('recordStatuses.' + recordStatus) }}</div>
+          <div class="d-flex flex-wrap">
+            <v-btn color="error" :disabled="recordStatus !== RECORD_STATUSES.READY" @click="startRecord">
+              {{ _t('rec') }}
+            </v-btn>
+            <v-btn color="warning" :disabled="recordStatus === RECORD_STATUSES.READY" @click="pauseOrContinueRecord">
+              {{ _t('pause') }}
+            </v-btn>
+            <v-btn color="gray" :disabled="recordStatus === RECORD_STATUSES.READY" @click="stopRecord">
+              {{ _t('stop') }}
+            </v-btn>
+          </div>
           <div>{{ recordedInfo }}</div>
-          <v-btn color="success" :disabled="!recordedAudio" :loading="saveRequestSent" @click="saveRecorded">
-            Save
-          </v-btn>
-          <v-btn color="secondary" :disabled="!recordedAudio" @click="exportRecordedToWav">
-            Export wav
-          </v-btn>
-          <v-btn color="gray" :disabled="!recordedAudio" @click="clearRecorded">
-            Clear
-          </v-btn>
+          <div class="d-flex flex-wrap">
+            <v-btn color="success" :disabled="!recordedAudio" :loading="saveRequestSent" @click="saveRecorded">
+              {{ _tc('buttons.save') }}
+            </v-btn>
+            <v-btn color="secondary" :disabled="!recordedAudio" @click="exportRecordedToWav">
+              {{ _tc('buttons.exportWav') }}
+            </v-btn>
+            <v-btn color="gray" :disabled="!recordedAudio" @click="clearRecorded">
+              {{ _t('clear') }}
+            </v-btn>
+          </div>
         </v-card-text>
       </v-card>
     </div>
@@ -62,9 +66,9 @@ export default {
       sampleRate: []
     },
     RECORD_STATUSES: {
-      READY: 'Ready to start record',
-      RECORDING: 'Recording...',
-      PAUSED: 'Recording paused',
+      READY: 'ready',
+      RECORDING: 'recording',
+      PAUSED: 'paused',
     },
     recordStatus: '',
     info: '',
@@ -80,7 +84,7 @@ export default {
     },
     recordedInfo() {
       if (!this.recordedAudio) {
-        return 'Nothing is recorded'
+        return this._t('nothingRecorded')
       }
       return this.recordedAudio.fileName
     }
@@ -91,8 +95,9 @@ export default {
   },
   methods: {
     validateForm() {
-      if (!this.form.sampleRate || this.form.sampleRate < 3000 || this.form.sampleRate > 48000) {
-        this.validation.sampleRate.push('Must be between 3000 and 48000')
+      const minValue = 3000, maxValue = 48000
+      if (!this.form.sampleRate || this.form.sampleRate < minValue || this.form.sampleRate > maxValue) {
+        this.validation.sampleRate.push(this._tc('validation.between', {minValue, maxValue}))
         return false
       }
       return true
@@ -108,7 +113,7 @@ export default {
         this.audioContext = new AudioContext({
           sampleRate: this.form.sampleRate
         })
-        this.info = 'Format: 1 channel pcm @ ' + this.audioContext.sampleRate / 1000 + 'kHz'
+        this.info = this._t('audioFormat', {sampleRate: this.audioContext.sampleRate})
         this.gumStream = stream
         this.input = this.audioContext.createMediaStreamSource(stream)
         this.rec = new Recorder(this.input,{numChannels:1})
@@ -140,7 +145,7 @@ export default {
       this.rec.exportWAV(blob => {
         let date = new Date()
         dataStore().setRecordedAudio({
-          fileName: `Recorded ${date.toLocaleDateString()} ${date.toLocaleTimeString()}.wav`,
+          fileName: this._t('fileName', {dateTime: `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`}),
           blob
         })
       })
@@ -153,7 +158,7 @@ export default {
         if (response.ok) {
           useRouter().push('/signal-manager')
         } else {
-          this.showErrorsFromResponse(response, 'Error saving record')
+          this.showErrorsFromResponse(response, this._tc('messages.fileSaveError'))
         }
       }, 'saveRequestSent')
     },

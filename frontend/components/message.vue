@@ -5,14 +5,14 @@
       max-width="600px"
   >
     <v-card width="100%">
-      <v-card-title>Message</v-card-title>
+      <v-card-title>{{ _t('title') }}</v-card-title>
       <v-card-text>
         <div class="d-flex">
           {{ text }}
         </div>
         <div class="d-flex mt-4">
           <v-btn @click="hide">
-            OK
+            {{ _tc('buttons.ok') }}
           </v-btn>
         </div>
       </v-card-text>
@@ -21,8 +21,11 @@
 </template>
 
 <script>
+import ComponentBase from "./component-base";
+
 export default {
   name: "message",
+  extends: ComponentBase,
   props: {
     opened: Boolean,
     text: String

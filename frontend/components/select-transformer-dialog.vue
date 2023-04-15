@@ -10,12 +10,12 @@
           v-bind="props"
           :disabled="disabled"
       >
-        Transform
+        {{ _tc('buttons.transform') }}
       </v-btn>
     </template>
     <v-card width="100%">
       <v-toolbar>
-        <v-toolbar-title>Select transformer</v-toolbar-title>
+        <v-toolbar-title>{{ _t('title') }}</v-toolbar-title>
         <v-spacer/>
         <v-btn
             icon
@@ -31,13 +31,13 @@
               <v-combobox
                   v-model="form.types"
                   :items="types"
-                  label="Filter by types"
+                  :label="_t('filterByTypes')"
                   multiple/>
             </v-col>
             <v-col>
               <v-text-field
                   v-model="form.filter"
-                  label="Search"
+                  :label="_tc('search')"
                   autofocus/>
             </v-col>
           </v-row>
@@ -45,14 +45,14 @@
         <v-table fixed-header height="300px">
           <thead>
           <tr>
-            <th>Name</th>
-            <th>Type</th>
+            <th>{{ _tc('fields.name') }}</th>
+            <th>{{ _tc('fields.type') }}</th>
           </tr>
           </thead>
           <tbody>
           <tr v-for="transformer in filteredTransformers" @click="select(transformer)">
-            <td>{{ transformer.name }}</td>
-            <td>{{ transformer.type }}</td>
+            <td>{{ _tr(transformer.module) }}</td>
+            <td>{{ _trt(transformer.type) }}</td>
           </tr>
           </tbody>
         </v-table>
@@ -65,9 +65,11 @@
 import {dataStore} from "../stores/data-store";
 import formValuesSaving from "../mixins/form-values-saving";
 import {mdiClose} from "@mdi/js";
+import ComponentBase from "./component-base";
 
 export default {
   name: "select-transformer-dialog",
+  extends: ComponentBase,
   mixins: [formValuesSaving],
   props: {
     bus: Object,
@@ -95,16 +97,18 @@ export default {
       return this.transformers.filter(transformer => {
         let matchType = true, matchFilter = true
         if (this.form.filter.length) {
-          matchFilter = transformer.name.toLowerCase().includes(this.form.filter.toLowerCase())
+          matchFilter = this._tr(transformer.module).toLowerCase().includes(this.form.filter.toLowerCase())
         }
         if (this.form.types.length) {
-          matchType = this.form.types.includes(transformer.type)
+          matchType = this.form.types.includes(this._trt(transformer.type))
         }
         return matchFilter && matchType
       })
     },
     types() {
-      return this.transformers.map(t => t.type).filter((value, index, self) => self.indexOf(value) === index)
+      return this.transformers.map(t => t.type)
+          .filter((value, index, self) => self.indexOf(value) === index)
+          .map(type => this._trt(type))
     }
   },
   watch: {

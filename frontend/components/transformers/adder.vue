@@ -3,7 +3,7 @@
       v-model="form.coefficient1"
       type="number"
       step="0.1"
-      label="Signal 1 coefficient"
+      :label="_trp('coefficient1')"
       :error="!!validation.coefficient1.length"
       :error-messages="validation.coefficient1"
       required/>
@@ -11,7 +11,7 @@
       v-model="form.coefficient2"
       type="number"
       step="0.1"
-      label="Signal 2 coefficient"
+      :label="_trp('coefficient2')"
       :error="!!validation.coefficient2.length"
       :error-messages="validation.coefficient2"
       required/>
@@ -33,11 +33,6 @@ export default {
       coefficient1: [],
       coefficient2: [],
     },
-  }),
-  methods: {
-    validateFunction() {
-      return true
-    },
-  }
+  })
 }
 </script>

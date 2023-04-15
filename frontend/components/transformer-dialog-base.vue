@@ -1,6 +1,9 @@
 <script>
+import ComponentBase from "./component-base";
+
 export default {
   name: "transformer-dialog-base",
+  extends: ComponentBase,
   props: {
     bus: Object
   },
@@ -15,6 +18,9 @@ export default {
     progressBarText() {
       const progress = Math.ceil(this.progress) + '%'
       return this.operation ? this.operation + ': ' + progress : progress
+    },
+    okButtonText() {
+      return this._tc('buttons.' + (this.processing ? 'working' : 'ok'))
     }
   },
   watch: {
@@ -52,6 +58,9 @@ export default {
       this.dialog = true
       this.processing = false
       this.progress = 0
+    },
+    makeTransformWithQuestion(key) {
+      return this._tc('messages.' + key, {transformerName: this._tr('with' + this.selectedTransformer.module)})
     }
   },
 }

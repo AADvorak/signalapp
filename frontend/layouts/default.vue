@@ -68,6 +68,12 @@
               <v-card-title>Settings</v-card-title>
               <v-card-text>
                 <v-switch hide-details v-model="darkMode" :label="`Dark mode: ${darkModeStr}`"/>
+                <v-form>
+                  <v-autocomplete
+                      v-model="$i18n.locale"
+                      :items="locales"
+                      :label="$t('language')"/>
+                </v-form>
               </v-card-text>
             </v-card>
           </v-col>
@@ -86,6 +92,7 @@ import {dataStore} from "../stores/data-store";
 import ApiProvider from "../api/api-provider";
 import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
+import i18n from "../plugins/i18n";
 
 export default {
   data() {
@@ -129,16 +136,23 @@ export default {
     },
     pageColsSm() {
       return this.showMainMenu ? 12 - this.mainMenuColsSm : 12
+    },
+    locales() {
+      return ['en', 'ru']
     }
   },
   watch: {
     darkMode(newValue) {
       dataStore().setDarkMode(newValue)
+    },
+    '$i18n.locale'(newValue) {
+      dataStore().setLocale(newValue)
     }
   },
   mounted() {
     dataStore().loadUserInfo()
     this.setHeaderByRoute()
+    this.detectLocale()
   },
   methods: {
     async signOut() {
@@ -167,6 +181,38 @@ export default {
     },
     getModuleIcon(module) {
       return this.moduleIcons[module.icon] || mdiCog
+    },
+    detectLocale() {
+      if (dataStore().locale) {
+        this.$i18n.locale = dataStore().locale
+        return
+      }
+      if (navigator) {
+        if (navigator.language) {
+          if (this.trySetLocaleFromLanguage(navigator.language)) {
+            return
+          }
+        }
+        if (navigator.languages) {
+          for (const language of navigator.languages) {
+            if (this.trySetLocaleFromLanguage(language)) {
+              return
+            }
+          }
+        }
+      }
+      this.$i18n.locale = dataStore().defaultLocale
+    },
+    trySetLocaleFromLanguage(language) {
+      const locale = this.localeFromLanguage(language)
+      if (this.locales.includes(locale)) {
+        this.$i18n.locale = locale
+        return true
+      }
+      return false
+    },
+    localeFromLanguage(language) {
+      return language.split('-')[0]
     }
   },
 }

@@ -4,7 +4,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Coefficient"
+      :label="_trp('coefficient')"
       :error="!!validation.coefficient.length"
       :error-messages="validation.coefficient"
       required/>
@@ -13,7 +13,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Max positive output amplitude"
+      :label="_trp('maxPositiveOutput')"
       :error="!!validation.maxPositiveOutput.length"
       :error-messages="validation.maxPositiveOutput"
       required/>
@@ -22,7 +22,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Max negative output amplitude"
+      :label="_trp('maxNegativeOutput')"
       :error="!!validation.maxNegativeOutput.length"
       :error-messages="validation.maxNegativeOutput"
       required/>

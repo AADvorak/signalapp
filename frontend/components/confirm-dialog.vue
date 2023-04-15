@@ -5,17 +5,17 @@
       max-width="600px"
   >
     <v-card width="100%">
-      <v-card-title>Confirmation</v-card-title>
+      <v-card-title>{{ _t('title') }}</v-card-title>
       <v-card-text>
         <div class="d-flex mb-4">
           {{ text }}
         </div>
         <div class="d-flex">
           <v-btn :color="okColor" class="mr-4" @click="ok">
-            OK
+            {{ _tc('buttons.ok') }}
           </v-btn>
           <v-btn @click="cancel">
-            Cancel
+            {{ _tc('buttons.cancel') }}
           </v-btn>
         </div>
       </v-card-text>
@@ -24,8 +24,11 @@
 </template>
 
 <script>
+import ComponentBase from "./component-base";
+
 export default {
   name: "confirm-dialog",
+  extends: ComponentBase,
   props: {
     opened: Boolean,
     text: String,

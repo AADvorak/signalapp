@@ -5,18 +5,18 @@
         <v-card-text>
           <fixed-width-wrapper>
             <p>
-              <span>Total: {{ pages }} pages, </span>
-              <span>{{ elements }} entries</span>
+              {{ _t('total', {pages, elements}) }}
             </p>
             <v-form>
               <v-row>
                 <v-col>
                   <v-text-field
                       v-model="size"
-                      :rules="sizeRules"
                       type="number"
                       step="1"
-                      label="Page size"
+                      :error="!!validation.size.length"
+                      :error-messages="validation.size"
+                      :label="_t('pageSize')"
                       required/>
                 </v-col>
                 <v-col>
@@ -28,8 +28,8 @@
             </v-form>
           </fixed-width-wrapper>
           <fixed-width-wrapper v-if="signalsEmpty">
-            <h3>You have no stored signals. <a href="/signal-generator">Generate</a> or
-              <a href="/signal-recorder">record</a> new signals to start working.</h3>
+            <h3>{{ _t('youHaveNoStoredSignals') }}. <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
+              <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
           </fixed-width-wrapper>
           <v-table v-else>
             <thead>
@@ -41,10 +41,10 @@
                 </div>
               </th>
               <th @click="setSortingName" class="text-left">
-                Name {{sortingNameSign}}
+                {{ _tc('fields.name') }} {{sortingNameSign}}
               </th>
               <th @click="setSortingDescription" class="text-left">
-                Description {{sortingDescriptionSign}}
+                {{ _tc('fields.description') }} {{sortingDescriptionSign}}
               </th>
               <th class="text-left"></th>
               <th class="text-left"></th>
@@ -91,7 +91,7 @@
                 :length="pages"/>
             <div class="d-flex justify-center flex-wrap">
               <p class="mt-5">
-                Actions with selected signals
+                {{ _t('actionsWithSelectedSignals') }}
               </p>
             </div>
             <div class="d-flex justify-center flex-wrap">
@@ -106,12 +106,12 @@
                       color="secondary"
                       v-bind="props"
                   >
-                    View
+                    {{ _t('view') }}
                   </v-btn>
                 </template>
                 <v-card width="100%">
                   <v-toolbar>
-                    <v-toolbar-title>View signals</v-toolbar-title>
+                    <v-toolbar-title>{{ _t('viewSignals') }}</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn
                         icon
@@ -126,7 +126,7 @@
                 </v-card>
               </v-dialog>
               <v-btn :disabled="!selectedSignals.length" color="error" @click="askConfirmDeleteSelectedSignals">
-                Delete
+                {{ _tc('buttons.delete') }}
                 <v-icon>{{ mdi.mdiDelete }}</v-icon>
               </v-btn>
             </div>
@@ -186,10 +186,9 @@ export default {
       mdiClose,
       mdiFileEdit
     },
-    sizeRules: [
-      v => !!v || 'This field is required',
-      v => ( v && v <= 25 && v >= 5 ) || 'Size should be between 5 and 25'
-    ],
+    validation: {
+      size: []
+    },
     SORT_DIRS: {
       DESC: 'desc',
       ASC: 'asc'
@@ -239,7 +238,7 @@ export default {
       this.loadSignals()
     },
     size(newValue) {
-      if (this.wrongPageSize(newValue)) {
+      if (!this.validatePageSize(newValue)) {
         return
       }
       this.setUrlParams()
@@ -275,11 +274,18 @@ export default {
     this.bus.off('transformerSelected')
   },
   methods: {
-    wrongPageSize(value) {
-      return !value || value < 5 || value > 25
+    validatePageSize(value) {
+      const minValue = 5, maxValue = 25
+      this.validation.size = []
+      if (!value) {
+        this.validation.size.push(this._tc('validation.required'))
+      } else if (value < minValue || value > maxValue) {
+        this.validation.size.push(this._tc('validation.between', {minValue, maxValue}))
+      }
+      return !this.validation.size.length
     },
     async loadSignals() {
-      if (this.loadingOverlay || this.wrongPageSize(this.size)) {
+      if (this.loadingOverlay || !this.validatePageSize(this.size)) {
         return
       }
       await this.loadWithOverlay(async () => {
@@ -290,7 +296,7 @@ export default {
           this.pages = response.data.pages
           this.signalsEmpty = this.elements === 0
         } else {
-          this.showErrorsFromResponse(response, 'Error loading signals')
+          this.showErrorsFromResponse(response, this._t('loadSignalsError'))
         }
       })
     },
@@ -401,7 +407,7 @@ export default {
     },
     askConfirmDeleteSignal(signal) {
       this.askConfirm({
-        text: `Are you sure to delete ${signal.name}?`,
+        text: this._t('confirmDeleteSignal', {name: signal.name}),
         ok: () => {
           this.deleteSignal(signal)
         }
@@ -415,7 +421,7 @@ export default {
     },
     askConfirmDeleteSelectedSignals() {
       this.askConfirm({
-        text: `Are you sure to delete selected ${this.selectedSignals.length} signals?`,
+        text: this._t('confirmDeleteSignals', {length: this.selectedSignals.length}),
         ok: () => {
           this.deleteSelectedSignals()
         }

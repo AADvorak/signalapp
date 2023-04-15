@@ -13,28 +13,28 @@
             <v-form @submit.prevent="saveSignal">
               <v-text-field
                   v-model="signal.name"
-                  label="Name"
+                  :label="_tc('fields.name')"
                   :error="!!validation.name.length"
                   :error-messages="validation.name"
                   required/>
               <v-textarea
                   v-model="signal.description"
-                  label="Description"
+                  :label="_tc('fields.description')"
                   :error="!!validation.description.length"
                   :error-messages="validation.description"/>
               <div class="d-flex flex-wrap">
                 <select-transformer-dialog :bus="bus"/>
                 <v-btn color="success" @click="saveSignal">
-                  Save
+                  {{ _tc('buttons.save') }}
                 </v-btn>
                 <v-btn color="success" v-if="signal.id" @click="saveSignalAsNew">
-                  Save as new
+                  {{ _t('saveAsNew') }}
                 </v-btn>
                 <v-btn color="secondary" @click="exportSignalToTxt">
-                  Export txt
+                  {{ _tc('buttons.exportTxt') }}
                 </v-btn>
                 <v-btn color="secondary" v-if="!signalIsStoredLocally" @click="exportSignalToWav">
-                  Export wav
+                  {{ _tc('buttons.exportWav') }}
                 </v-btn>
               </div>
             </v-form>
@@ -61,7 +61,7 @@ import SignalUtils from "../../../utils/signal-utils";
 import FixedWidthWrapper from "../../../components/fixed-width-wrapper";
 
 export default {
-  name: "index",
+  name: "signal-editor",
   components: {
     SelectTransformerDialog,
     TransformerDialog, ChartDrawer,
@@ -92,7 +92,7 @@ export default {
       if (!this.signal.sampleRate) {
         return ''
       }
-      return `Sample rate = ${this.signal.sampleRate}`
+      return this._t('sampleRate', {sampleRate: this.signal.sampleRate})
     }
   },
   mounted() {

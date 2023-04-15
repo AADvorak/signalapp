@@ -4,7 +4,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Time constant"
+      :label="_trp('tau')"
       :error="!!validation.tau.length"
       :error-messages="validation.tau"
       required/>

@@ -18,34 +18,36 @@ export const dataStore = defineStore('dataStore', {
         {module: 'index', name: 'Start page', forMenu: false},
           // transformers
           // amplifiers
-        {module: 'LinearAmp', name: 'Linear amplifier', forMenu: false, transformer: true, type: 'Amplifier'},
-        {module: 'PiecewiseLinearSymmetricSaturationAmp', name: 'Piecewise linear symmetric amplifier with saturation', forMenu: false, transformer: true, type: 'Amplifier'},
-        {module: 'PiecewiseLinearAsymmetricSaturationAmp', name: 'Piecewise linear asymmetric amplifier with saturation', forMenu: false, transformer: true, type: 'Amplifier'},
-        {module: 'Inverter', name: 'Inverter', forMenu: false, transformer: true, type: 'Amplifier'},
+        {module: 'LinearAmp', name: 'Linear amplifier', forMenu: false, transformer: true, type: 'amplifier'},
+        {module: 'PiecewiseLinearSymmetricSaturationAmp', name: 'Piecewise linear symmetric amplifier with saturation', forMenu: false, transformer: true, type: 'amplifier'},
+        {module: 'PiecewiseLinearAsymmetricSaturationAmp', name: 'Piecewise linear asymmetric amplifier with saturation', forMenu: false, transformer: true, type: 'amplifier'},
+        {module: 'Inverter', name: 'Inverter', forMenu: false, transformer: true, type: 'amplifier'},
           // modulators
-        {module: 'AmplitudeModulator', name: 'Amplitude modulator', forMenu: false, transformer: true, type: 'Modulator'},
-        {module: 'FrequencyModulator', name: 'Frequency modulator', forMenu: false, transformer: true, type: 'Modulator'},
+        {module: 'AmplitudeModulator', name: 'Amplitude modulator', forMenu: false, transformer: true, type: 'modulator'},
+        {module: 'FrequencyModulator', name: 'Frequency modulator', forMenu: false, transformer: true, type: 'modulator'},
           // filters
-        {module: 'LpRcFilter', name: 'Low-pass RC filter', forMenu: false, transformer: true, type: 'Filter'},
-        {module: 'HpRcFilter', name: 'High-pass RC filter', forMenu: false, transformer: true, type: 'Filter'},
+        {module: 'LpRcFilter', name: 'Low-pass RC filter', forMenu: false, transformer: true, type: 'filter'},
+        {module: 'HpRcFilter', name: 'High-pass RC filter', forMenu: false, transformer: true, type: 'filter'},
           // oscillator chains
-        {module: 'LinearOscillator', name: 'Linear oscillator', forMenu: false, transformer: true, type: 'Oscillator'},
+        {module: 'LinearOscillator', name: 'Linear oscillator', forMenu: false, transformer: true, type: 'oscillator'},
           // math
-        {module: 'Integrator', name: 'Integrator', forMenu: false, transformer: true, type: 'Math'},
-        {module: 'Differentiator', name: 'Differentiator', forMenu: false, transformer: true, type: 'Math'},
-        {module: 'SpectrumAnalyser', name: 'Spectrum analyser', forMenu: false, transformer: true, type: 'Math'},
-        {module: 'SelfCorrelator', name: 'Self correlator', forMenu: false, transformer: true, type: 'Math'},
+        {module: 'Integrator', name: 'Integrator', forMenu: false, transformer: true, type: 'math'},
+        {module: 'Differentiator', name: 'Differentiator', forMenu: false, transformer: true, type: 'math'},
+        {module: 'SpectrumAnalyser', name: 'Spectrum analyser', forMenu: false, transformer: true, type: 'math'},
+        {module: 'SelfCorrelator', name: 'Self correlator', forMenu: false, transformer: true, type: 'math'},
           // double transformers
-        {module: 'Adder', name: 'Adder', forMenu: false, doubleTransformer: true, type: 'Amplifier'},
-        {module: 'Correlator', name: 'Correlator', forMenu: false, doubleTransformer: true, type: 'Math'},
+        {module: 'Adder', name: 'Adder', forMenu: false, doubleTransformer: true, type: 'amplifier'},
+        {module: 'Correlator', name: 'Correlator', forMenu: false, doubleTransformer: true, type: 'math'},
         {module: 'TwoSignalAmplitudeModulator', name: 'Two signal amplitude modulator', forMenu: false,
-          doubleTransformer: true, type: 'Modulator', signal1: 'Carrier', signal2: 'Modulator'},
+          doubleTransformer: true, type: 'modulator', signal1: 'carrierSignal', signal2: 'modulatingSignal'},
       ],
       waitingForAuthorization: null,
       signalHistory: {},
       recordedAudio: null,
       darkMode: localStorage.getItem('darkMode') === 'true',
       emailForPasswordRestore: null,
+      defaultLocale: 'en',
+      locale: localStorage.getItem('locale')
     }
   },
   getters: {
@@ -139,6 +141,10 @@ export const dataStore = defineStore('dataStore', {
     setDarkMode(darkMode) {
       this.darkMode = darkMode
       localStorage.setItem('darkMode', darkMode)
+    },
+    setLocale(locale) {
+      this.locale = locale
+      localStorage.setItem('locale', locale)
     }
   },
 })

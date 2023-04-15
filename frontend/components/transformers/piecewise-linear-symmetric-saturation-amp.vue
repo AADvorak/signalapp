@@ -4,7 +4,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Coefficient"
+      :label="_trp('coefficient')"
       :error="!!validation.coefficient.length"
       :error-messages="validation.coefficient"
       required/>
@@ -13,7 +13,7 @@
       type="number"
       step="0.1"
       min="0"
-      label="Max output amplitude"
+      :label="_trp('maxOutput')"
       :error="!!validation.maxOutput.length"
       :error-messages="validation.maxOutput"
       required/>
