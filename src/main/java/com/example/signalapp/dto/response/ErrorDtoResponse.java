@@ -13,4 +13,6 @@ public class ErrorDtoResponse {
 
     private String message;
 
+    private Object params;
+
 }

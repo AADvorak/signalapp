@@ -6,7 +6,11 @@ import lombok.Getter;
 public class SignalAppConflictException extends SignalAppException {
 
     public SignalAppConflictException(SignalAppErrorCode errorCode) {
-        super(errorCode);
+        super(errorCode, null);
+    }
+
+    public SignalAppConflictException(SignalAppErrorCode errorCode, Object params) {
+        super(errorCode, params);
     }
 
 }

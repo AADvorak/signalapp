@@ -118,7 +118,8 @@ public class SignalService extends ServiceBase {
     public void importWav(String token, String fileName, byte[] data)
             throws SignalAppUnauthorizedException, UnsupportedAudioFileException, IOException, SignalAppException {
         if (data.length > 2 * MAX_SIGNAL_LENGTH) {
-            throw new SignalAppException(SignalAppErrorCode.TOO_LONG_FILE);
+            throw new SignalAppException(SignalAppErrorCode.TOO_LONG_FILE,
+                    new MaxSizeExceptionParams(2 * SignalService.MAX_SIGNAL_LENGTH));
         }
         User user = getUserByToken(token);
         checkStoredByUserSignalsNumber(user.getId());
@@ -198,7 +199,8 @@ public class SignalService extends ServiceBase {
 
     private void checkStoredByUserSignalsNumber(int userId) throws SignalAppConflictException {
         if (signalRepository.countByUserId(userId) >= MAX_USER_STORED_SIGNALS_NUMBER) {
-            throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_SIGNALS_STORED);
+            throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_SIGNALS_STORED,
+                    new MaxNumberExceptionParams(SignalService.MAX_USER_STORED_SIGNALS_NUMBER));
         }
     }
 

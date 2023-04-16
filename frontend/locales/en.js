@@ -84,7 +84,11 @@ const en = {
 	'signal': {
 		name: 'Signal editor',
 		saveAsNew: 'Save as new',
-		sampleRate: 'Sample rate = {sampleRate}'
+		sampleRate: 'Sample rate = {sampleRate}',
+		transformSignalError: 'Error while transforming signal',
+		signalDataSaveError: 'Error while saving signal data',
+		signalSaveError: 'Error while saving signal',
+		signalNotFound: 'Signal is not found'
 	},
 	'signal-generator': {
 		name: 'Signal generator',
@@ -263,6 +267,21 @@ const en = {
 		preparingSignals: 'Preparing signals',
 		estimating: 'Estimating',
 		calculatingMaxAbsValue: 'Calculating max abs value',
+	},
+	serverMessages: {
+		SIGNAL_DOES_NOT_EXIST: 'Signal does not exist',
+		EMAIL_ALREADY_EXISTS: 'Email already exists',
+		EMAIL_ALREADY_CONFIRMED: 'Email is already confirmed',
+		WRONG_EMAIL_PASSWORD: 'Wrong email and password pair',
+		WRONG_EMAIL: 'Email does not exist or is not confirmed',
+		WRONG_OLD_PASSWORD: 'Wrong old password',
+		TOO_LONG_FILE: 'Too long file. Max size is {maxSize} bytes.',
+		TOO_MANY_SIGNALS_STORED: 'Too many signals are stored. Max number is {maxNumber} signals.',
+		NotEmpty: 'This field is required',
+		MinLength: 'Min length violation',
+		Size: 'Size violation',
+		MaxLength: 'Max length violation',
+		Email: 'Must be in the format of email'
 	}
 }
 

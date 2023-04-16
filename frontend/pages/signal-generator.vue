@@ -249,7 +249,7 @@ export default {
       if (response && response.ok) {
         useRouter().push('/signal-manager')
       } else {
-        this.showErrorsFromResponse(response, this._tc('message.fileSaveError'))
+        this.showErrorsFromResponse(response, this._tc('messages.fileSaveError'))
         // todo clear file input
       }
     },

@@ -134,7 +134,10 @@ public class GlobalErrorHandler {
     @ExceptionHandler(SignalAppConflictException.class)
     public List<ErrorDtoResponse> handleSignalAppConflictException(SignalAppConflictException e) {
         List<ErrorDtoResponse> errors = new ArrayList<>();
-        errors.add(new ErrorDtoResponse().setCode("SIGNAL_APP_ERROR").setMessage(e.getErrorCode().getDescription()));
+        errors.add(new ErrorDtoResponse()
+                .setCode(e.getErrorCode().name())
+                .setMessage(e.getErrorCode().getDescription())
+                .setParams(e.getParams()));
         return errors;
     }
 
@@ -142,7 +145,10 @@ public class GlobalErrorHandler {
     @ExceptionHandler(SignalAppException.class)
     public List<ErrorDtoResponse> handleSignalAppException(SignalAppException e) {
         List<ErrorDtoResponse> errors = new ArrayList<>();
-        errors.add(new ErrorDtoResponse().setCode("SIGNAL_APP_ERROR").setMessage(e.getErrorCode().getDescription()));
+        errors.add(new ErrorDtoResponse()
+                .setCode(e.getErrorCode().name())
+                .setMessage(e.getErrorCode().getDescription())
+                .setParams(e.getParams()));
         return errors;
     }
 

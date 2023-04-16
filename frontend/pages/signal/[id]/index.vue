@@ -116,7 +116,7 @@ export default {
     }
     this.bus.on('error', error => {
       this.showMessage({
-        text: 'Error transforming signal: ' + error.message
+        text: `${this._t('transformSignalError')}: ${error.message}`
       })
     })
   },
@@ -155,18 +155,18 @@ export default {
           for (let error of response.errors) {
             if (error.field === 'data') {
               this.showMessage({
-                text: 'Error saving signal data: ' + error.message
+                text: `${this._t('signalDataSaveError')}: ${this.getLocalizedErrorMessage(error)}`
               })
             }
           }
         } else {
-          this.showErrorsFromResponse(response, 'Error saving signal')
+          this.showErrorsFromResponse(response, this._t('signalSaveError'))
         }
       })
     },
     signalNotFound() {
       this.showMessage({
-        text: 'Signal is not found',
+        text: this._t('signalNotFound'),
         onHide: () => {
           useRouter().push('/signal-manager')
         }

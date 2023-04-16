@@ -79,13 +79,16 @@ export default {
       let errorMsg = ''
       if (Array.isArray(response.errors)) {
         for (let error of response.errors) {
-          error.message && (errorMsg += errorMsg ? ', ' + error.message : error.message)
+          error.code && (errorMsg += (errorMsg && ', ') + this.getLocalizedErrorMessage(error))
         }
       }
       this.showMessage({
         text: text + (errorMsg ? ': ' + errorMsg : '')
       })
-    }
+    },
+    getLocalizedErrorMessage(error) {
+      return this._tsm(error.code, error.params)
+    },
   },
 }
 </script>

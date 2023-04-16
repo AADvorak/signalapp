@@ -2,7 +2,7 @@ export default {
   methods: {
     parseValidation(errors) {
       for (let error of errors) {
-        this.validation[error.field]?.push(error.message)
+        this.validation[error.field]?.push(this.getLocalizedErrorMessage(error))
       }
     },
     clearValidation() {

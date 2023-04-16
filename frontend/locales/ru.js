@@ -82,7 +82,11 @@ const ru = {
 	'signal': {
 		name: 'Сигнал',
 		saveAsNew: 'Сохранить как новый',
-		sampleRate: 'Частота дискретизации = {sampleRate}'
+		sampleRate: 'Частота дискретизации = {sampleRate}',
+		transformSignalError: 'Ошибка при преобразовании сигнала',
+		signalDataSaveError: 'Ошибка при сохранении данных сигнала',
+		signalSaveError: 'Ошибка при сохранении сигнала',
+		signalNotFound: 'Сигнал не найден'
 	},
 	'signal-generator': {
 		name: 'Генерация сигнала',
@@ -261,6 +265,21 @@ const ru = {
 		preparingSignals: 'Подготовка сигналов',
 		estimating: 'Вычисление',
 		calculatingMaxAbsValue: 'Расчет максимального абсолютного значения',
+	},
+	serverMessages: {
+		SIGNAL_DOES_NOT_EXIST: 'Сигнал не нейден',
+		EMAIL_ALREADY_EXISTS: 'Данный email уже зарегистрирован',
+		EMAIL_ALREADY_CONFIRMED: 'Email уже подтвержден',
+		WRONG_EMAIL_PASSWORD: 'Неверная пара email и пароль',
+		WRONG_EMAIL: 'Email не существует или не подтвержден',
+		WRONG_OLD_PASSWORD: 'Неверный старый пароль',
+		TOO_LONG_FILE: 'Слишком большой файл. Максимальный размер файла {maxSize} байт.',
+		TOO_MANY_SIGNALS_STORED: 'Слишком много сохраненных сигналов. Максимальное число сигналов - {maxNumber}.',
+		NotEmpty: 'Поле обязательно к заполнению',
+		MinLength: 'Нарушение требования минимальной длины',
+		Size: 'Нарушение требований размера',
+		MaxLength: 'Нарушение требования максимальной длины',
+		Email: 'Должно быть в формате email'
 	}
 }
 
