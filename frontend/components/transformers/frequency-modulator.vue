@@ -18,13 +18,13 @@
       :error-messages="validation.amplitude"
       required/>
   <v-text-field
-      v-model="form.deviation"
+      v-model="form.coefficient"
       type="number"
       step="1"
       min="0"
-      :label="_trp('deviation')"
-      :error="!!validation.deviation.length"
-      :error-messages="validation.deviation"
+      :label="_trp('coefficient')"
+      :error="!!validation.coefficient.length"
+      :error-messages="validation.coefficient"
       required/>
 </template>
 
@@ -39,12 +39,12 @@ export default {
     form: {
       frequency: 300,
       amplitude: 1,
-      deviation: 2,
+      coefficient: 2,
     },
     validation: {
       frequency: [],
       amplitude: [],
-      deviation: [],
+      coefficient: [],
     },
   }),
   methods: {

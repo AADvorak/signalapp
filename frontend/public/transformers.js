@@ -295,7 +295,7 @@ const TransformFunctions = {
    */
 
   amplitudeModulator(signal, params) {
-    Counter.init(signal.data.length, 'estimating')
+    Counter.init(signal.data.length, 'calculating')
     for (let i = 0; i < signal.data.length; i++) {
       const x = signal.xMin + signal.params.step * i
       signal.data[i] = params.amplitude * (1 + params.depth * signal.data[i] / signal.maxAbsY) * Math.sin(2 * Math.PI * params.frequency * x)
@@ -306,10 +306,10 @@ const TransformFunctions = {
 
   frequencyModulator(signal, params) {
     const integrated = Common.integrate(signal.data, signal.params.step, 'preparingSignal')
-    Counter.init(signal.data.length, 'estimating')
+    Counter.init(signal.data.length, 'calculating')
     for (let i = 0; i < signal.data.length; i++) {
       const x = signal.xMin + signal.params.step * i
-      signal.data[i] = params.amplitude * Math.sin((2 * Math.PI * x + params.deviation * integrated[i]) * params.frequency)
+      signal.data[i] = params.amplitude * Math.sin((2 * Math.PI * x + params.coefficient * integrated[i]) * params.frequency)
       Counter.increase()
     }
     return signal
@@ -451,7 +451,7 @@ const DoubleTransformFunctions = {
     }
     let commonGrid = Common.makeCommonSignalsValueGrid([signal1, signal2])
     output.xMin = commonGrid[0]
-    Counter.init(commonGrid.length, 'estimating')
+    Counter.init(commonGrid.length, 'calculating')
     for (let x of commonGrid) {
       output.data.push(params.coefficient1 * Common.getSignalValue(signal1, x)
           + params.coefficient2 * Common.getSignalValue(signal2, x))
@@ -474,7 +474,7 @@ const DoubleTransformFunctions = {
     }
     let commonGrid = Common.makeCommonSignalsValueGrid([signal1, signal2])
     output.xMin = commonGrid[0]
-    Counter.init(commonGrid.length, 'estimating')
+    Counter.init(commonGrid.length, 'calculating')
     for (let x of commonGrid) {
       output.data.push(Common.getSignalValue(signal1, x) * (1 + params.depth * Common.getSignalValue(signal2, x) / signal2.maxAbsY))
       Counter.increase()

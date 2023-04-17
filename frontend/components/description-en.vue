@@ -15,10 +15,10 @@
     <h2 class="desc-h2">Signal recording</h2>
     <div class="desc-div">Use <a href="/signal-recorder">signal recorder</a> to record signals from your audio input device.</div>
     <h2 class="desc-h2">Signal management</h2>
-    <div class="desc-div">Use <a href="/signal-manager">signal manager</a> to see / edit / delete / play your stored signals, send them to transformers, view, export to txt and wav files, do transformations with two input signals.</div>
+    <div class="desc-div">Use <a href="/signal-manager">signal manager</a> to view, edit, delete, play, transform, export to txt and wav files your stored signals.</div>
     <div class="desc-div">All generated and stored signals can be opened to edit and do transformation chains. Every time you have generated new signal, opened stored signal, or done some transformation, the result signal is opened with the special module, where you can preview it, edit name and description, save it, export data, or do further transformations.</div>
     <h2 class="desc-h2" style="color: brown">Warning</h2>
-    <div class="desc-div">The app is for educational purposes only. Not for processing of real signals and sound. Maximal length of</div>
+    <div class="desc-div">The app is for educational purposes only. Not for long audio files processing. Maximal length of</div>
     <ul class="desc-div desc-ul">
       <li>generated signals is 512000 points,</li>
       <li>stored on server signals is 1024000 points,</li>
