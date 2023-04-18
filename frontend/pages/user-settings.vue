@@ -30,6 +30,7 @@
                 :error="!!validation.lastName.length"
                 :error-messages="validation.lastName"/>
             <v-text-field
+                v-if="$i18n.locale === 'ru'"
                 v-model="form.patronymic"
                 :label="_tc('fields.patronymic')"
                 :error="!!validation.patronymic.length"

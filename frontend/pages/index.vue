@@ -11,12 +11,13 @@
 </template>
 
 <script>
-import DescriptionEn from '../components/description-en'
-import DescriptionRu from '../components/description-ru'
+import DescriptionEn from '../locales/description-en'
+import DescriptionRu from '../locales/description-ru'
+import DescriptionPl from '../locales/description-pl'
 
 export default {
   components: {
-    DescriptionEn, DescriptionRu
+    DescriptionEn, DescriptionRu, DescriptionPl
   }
 }
 </script>

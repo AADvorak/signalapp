@@ -106,11 +106,11 @@ const en = {
       noise: 'noise'
     },
     signalName: 'Generated {form} signal',
-    description: 'Generated {form} signal with F = {frequency} ({length} points)',
+    description: 'Generated {form} signal with F = {frequency} ({length} samples)',
     'import': 'Import',
     fromTxtOrWavFile: 'From txt or wav file',
     importedFromFile: 'Imported from file {name}',
-    wrongPointsNumber: 'Number of signal points (S * L) must be in range from 2 to 512000. Now it is {pointsNumber}',
+    wrongPointsNumber: 'Number of signal samples (S * L) must be in range from 2 to 512000. Now it is {pointsNumber}',
     lessThanHalfSampleRate: 'Must be less than a half of sample rate'
   },
   'signal-manager': {

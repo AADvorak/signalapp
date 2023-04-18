@@ -20,20 +20,24 @@
     <h2 class="desc-h2" style="color: brown">Внимание</h2>
     <div class="desc-div">Приложение предназначено исключительно для образовательных целей. Оно не подойдет для обработки больших звукозаписей. Максимальная длина</div>
     <ul class="desc-div desc-ul">
-      <li>сгенерированного сигнала составляет 512000 точек,</li>
-      <li>сохраненного на сервере сигнала составляет 1024000 точек,</li>
+      <li>сгенерированного сигнала составляет 512000 отсчетов,</li>
+      <li>сохраненного на сервере сигнала составляет 1024000 отсчетов,</li>
       <li>импортированного из wav сигнала 2048000 байт.</li>
     </ul>
     <div class="desc-div">Не все браузеры поддерживают проигрывание сигналов. Рекомендуется использовать Google Chrome.</div>
     <h2 class="desc-h2">Контакты</h2>
-    <div class="desc-div">Автор: <a href="https://www.linkedin.com/in/anton-dvorak-49060099/" target="_blank">Антон Дворак</a></div>
-    <div class="desc-div">Исходный код: <a href="https://github.com/AADvorak/signalapp" target="_blank">SignalApp на гитхабе</a></div>
-    <div class="desc-div">Электронная почта: <a href="mailto:dvorakaa@icloud.com">dvorakaa@icloud.com</a></div>
+    <div class="desc-div">Автор: <linkedin-link>Антон Дворак</linkedin-link></div>
+    <div class="desc-div">Исходный код: <github-link>SignalApp на гитхабе</github-link></div>
+    <div class="desc-div">Электронная почта: <email-link/></div>
   </div>
 </template>
 
 <script>
+import LinkedinLink from "../components/links/linkedin-link";
+import GithubLink from "../components/links/github-link";
+import EmailLink from "../components/links/email-link";
 export default {
-  name: "description-ru"
+  name: "description-ru",
+  components: {EmailLink, GithubLink, LinkedinLink}
 }
 </script>

@@ -20,20 +20,24 @@
     <h2 class="desc-h2" style="color: brown">Warning</h2>
     <div class="desc-div">The app is for educational purposes only. Not for long audio files processing. Maximal length of</div>
     <ul class="desc-div desc-ul">
-      <li>generated signals is 512000 points,</li>
-      <li>stored on server signals is 1024000 points,</li>
+      <li>generated signals is 512000 samples,</li>
+      <li>stored on server signals is 1024000 samples,</li>
       <li>imported wav files is 2048000 bytes.</li>
     </ul>
     <div class="desc-div">Not all browsers support playing signals. It is recommended to use Google Chrome.</div>
     <h2 class="desc-h2">Contacts</h2>
-    <div class="desc-div">Author: <a href="https://www.linkedin.com/in/anton-dvorak-49060099/" target="_blank">Anton Dvorak</a></div>
-    <div class="desc-div">Source code: <a href="https://github.com/AADvorak/signalapp" target="_blank">SignalApp on GitHub</a></div>
-    <div class="desc-div">Email: <a href="mailto:dvorakaa@icloud.com">dvorakaa@icloud.com</a></div>
+    <div class="desc-div">Author: <linkedin-link>Anton Dvorak</linkedin-link></div>
+    <div class="desc-div">Source code: <github-link>SignalApp on GitHub</github-link></div>
+    <div class="desc-div">Email: <email-link/></div>
   </div>
 </template>
 
 <script>
+import EmailLink from "../components/links/email-link";
+import GithubLink from "../components/links/github-link";
+import LinkedinLink from "../components/links/linkedin-link";
 export default {
-  name: "description-en"
+  name: "description-en",
+  components: {LinkedinLink, GithubLink, EmailLink}
 }
 </script>

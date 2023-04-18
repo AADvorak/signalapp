@@ -96,6 +96,7 @@ import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog} from
 import DeviceUtils from "../utils/device-utils";
 import en from '../locales/en'
 import ru from '../locales/ru'
+import pl from '../locales/pl'
 import ComponentBase from "../components/component-base";
 
 export default {
@@ -113,7 +114,7 @@ export default {
       header: '',
       showMainMenu: false,
       isMobile: DeviceUtils.isMobile(),
-      locales: {en, ru}
+      locales: {en, ru, pl}
     }
   },
   computed: {

@@ -106,11 +106,11 @@ const ru = {
       noise: 'шумовой'
     },
     signalName: 'Сгенерированный {form} сигнал',
-    description: 'Сгенерированный {form} сигнал с частотой F = {frequency} ({length} точек)',
+    description: 'Сгенерированный {form} сигнал с частотой F = {frequency} ({length} отсчетов)',
     'import': 'Импортировать',
     fromTxtOrWavFile: 'Из файла txt или wav',
     importedFromFile: 'Импортирован из файла {name}',
-    wrongPointsNumber: 'Количество точек (S * L) должно быть в диапазоне от 2 до 512000. Сейчас оно равно {pointsNumber}',
+    wrongPointsNumber: 'Количество отсчетов (S * L) должно быть в диапазоне от 2 до 512000. Сейчас оно равно {pointsNumber}',
     lessThanHalfSampleRate: 'Значение должно быть не больше половины частоты дискретизации'
   },
   'signal-manager': {
