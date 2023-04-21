@@ -40,7 +40,7 @@ export default {
       return this.$t(`operationNames.${key}`)
     },
     doTransform() {
-      if (this.form) {
+      if (this.form && JSON.stringify(this.form) !== '{}') {
         this.clearValidation()
         this.parseFloatForm()
         if (!this.validateFunction()) {
@@ -76,8 +76,11 @@ export default {
       return paramsDescription && `(${paramsDescription})`
     },
     addSignalToHistoryAndOpen(signal) {
-      let signalKey = dataStore().addSignalToHistory(signal)
-      useRouter().push('/signal/' + signalKey)
+      const route = useRoute()
+      const signalId = route.params.id, currentHistoryKey = route.query.history
+      const historyKey = dataStore().addSignalToHistory(signal, currentHistoryKey)
+      useRouter().push(`/signal/${signalId}?history=${historyKey}`)
+      this.bus.emit('transformed')
     },
     transformFunction() {
       return this.signal

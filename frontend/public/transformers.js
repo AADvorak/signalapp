@@ -166,15 +166,6 @@ const Common = {
   },
 
   /**
-   * @param {Signal[]} signals
-   */
-  calculateSignalsParams(signals) {
-    for (let signal of signals) {
-      this.calculateSignalParams(signal)
-    }
-  },
-
-  /**
    * @param {Signal} signal
    */
   calculateSignalParams(signal) {

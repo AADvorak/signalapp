@@ -33,7 +33,7 @@
                 <v-btn color="secondary" @click="exportSignalToTxt">
                   {{ _tc('buttons.exportTxt') }}
                 </v-btn>
-                <v-btn color="secondary" v-if="!signalIsStoredLocally" @click="exportSignalToWav">
+                <v-btn color="secondary" v-if="signalId !== '0' && historyKey === '0'" @click="exportSignalToWav">
                   {{ _tc('buttons.exportWav') }}
                 </v-btn>
               </div>
@@ -70,7 +70,8 @@ export default {
   extends: PageBase,
   mixins: [formValidation],
   data: () => ({
-    signalKey: '',
+    signalId: '',
+    historyKey: '',
     signal: {},
     validation: {
       name: [],
@@ -79,14 +80,8 @@ export default {
     bus: new mitt()
   }),
   computed: {
-    transformers() {
-      return dataStore().getTransformers
-    },
     signalIsSaved() {
       return !!this.signal.id
-    },
-    signalIsStoredLocally() {
-      return this.signalKey.includes('-')
     },
     signalParamsText() {
       if (!this.signal.sampleRate) {
@@ -95,25 +90,13 @@ export default {
       return this._t('sampleRate', {sampleRate: this.signal.sampleRate})
     }
   },
-  mounted() {
-    this.signalKey = this.$route.params.id
-    if (this.signalIsStoredLocally) {
-      let signal = dataStore().getSignalFromHistory(this.signalKey)
-      if (signal) {
-        this.signal = signal
-      } else {
-        this.signalNotFound()
-      }
-    } else {
-      let signalId = parseInt(this.signalKey)
-      if (!isNaN(signalId)) {
-        this.loadWithOverlay(async () => {
-          await this.loadSignal(signalId)
-        })
-      } else {
-        this.signalNotFound()
-      }
+  watch: {
+    '$route.query.history'() {
+      this.getSignalFromHistoryOrLoad()
     }
+  },
+  mounted() {
+    this.getSignalFromHistoryOrLoad()
     this.bus.on('error', error => {
       this.showMessage({
         text: `${this._t('transformSignalError')}: ${error.message}`
@@ -124,12 +107,33 @@ export default {
     this.bus.off('error')
   },
   methods: {
+    getSignalFromHistoryOrLoad() {
+      this.signal = {}
+      const route = useRoute()
+      this.signalId = route.params.id
+      this.historyKey = route.query.history
+      let signal = dataStore().getSignalFromHistory(this.signalId, this.historyKey)
+      if (signal) {
+        this.signal = signal
+      } else if (!isNaN(this.signalId) && (!this.historyKey || this.historyKey === '0')) {
+        this.loadWithOverlay(async () => {
+          await this.loadSignal(this.signalId)
+        })
+      } else {
+        this.signalNotFound()
+      }
+    },
     async loadSignal(id) {
       let response = await this.getApiProvider().get('/api/signals/' + id)
       if (response.ok) {
         let signal = response.data
         SignalUtils.calculateSignalParams(signal)
-        this.signal = signal
+        const historyKey = dataStore().addSignalToHistory(signal)
+        if (this.historyKey === '0') {
+          this.signal = signal
+        } else {
+          useRouter().push(`/signal/${this.signalId}?history=${historyKey}`)
+        }
       } else if (response.status === 404) {
         this.signalNotFound()
       }
@@ -148,7 +152,6 @@ export default {
           response = await this.getApiProvider().postJson('/api/signals/', this.signal)
         }
         if (response.ok) {
-          dataStore().clearSignalHistory()
           useRouter().push('/signal-manager')
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
@@ -168,7 +171,7 @@ export default {
       this.showMessage({
         text: this._t('signalNotFound'),
         onHide: () => {
-          useRouter().push('/signal-manager')
+          useRouter().push(dataStore().getUserInfo ? '/signal-manager' : '/signal-generator')
         }
       })
     },

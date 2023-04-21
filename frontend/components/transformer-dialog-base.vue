@@ -25,7 +25,10 @@ export default {
   },
   watch: {
     dialog(newValue) {
-      if (!newValue) {
+      if (newValue) {
+        this.progress = 0
+        this.operation = ''
+      } else {
         this.bus.emit('cancel')
       }
     }
@@ -39,11 +42,15 @@ export default {
       this.operation = obj.operation
     })
     this.bus.on('transformerSelected', transformer => this.selectTransformer(transformer))
+    this.bus.on('transformed', () => {
+      this.dialog = false
+    })
   },
   beforeUnmount() {
     this.bus.off('validationFailed')
     this.bus.off('progress')
     this.bus.off('transformerSelected')
+    this.bus.off('transformed')
   },
   methods: {
     ok() {

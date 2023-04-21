@@ -80,7 +80,7 @@ const en = {
     passwordSendError: 'Error while sending new password',
   },
   'signal': {
-    name: 'Signal editor',
+    name: 'Signal',
     saveAsNew: 'Save as new',
     sampleRate: 'Sample rate = {sampleRate}',
     transformSignalError: 'Error while transforming signal',
@@ -262,6 +262,7 @@ const en = {
     modulatingSignal: 'Modulating signal'
   },
   operationNames: {
+    preparingSignal: 'Preparing signal',
     preparingSignals: 'Preparing signals',
     calculating: 'Calculating',
     calculatingMaxAbsValue: 'Calculating max abs value',

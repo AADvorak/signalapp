@@ -384,7 +384,7 @@ export default {
       return params
     },
     openSignal(signal) {
-      useRouter().push('/signal/' + signal.id)
+      useRouter().push(`/signal/${signal.id}?history=0`)
     },
     saveSignalToWavFile(signal) {
       FileUtils.saveSignalToWavFile(signal)

@@ -89,7 +89,7 @@ const ru = {
     signalNotFound: 'Сигнал не найден'
   },
   'signal-generator': {
-    name: 'Генерация сигнала',
+    name: 'Генератор сигналов',
     generate: 'Сгенерировать',
     begin: 'Начало сигнала',
     length: 'Длительность сигнала',
@@ -130,7 +130,7 @@ const ru = {
     confirmDeleteSignals: 'Удалить выбранные сигналы (количество: {length})?'
   },
   'signal-recorder': {
-    name: 'Запись сигнала',
+    name: 'Запись сигналов',
     sampleRateHz: 'Частота дискретизации (Гц)',
     rec: 'Запись',
     pause: 'Пауза',
@@ -262,6 +262,7 @@ const ru = {
     modulatingSignal: 'Модулирующий сигнал'
   },
   operationNames: {
+    preparingSignal: 'Подготовка сигнала',
     preparingSignals: 'Подготовка сигналов',
     calculating: 'Вычисление',
     calculatingMaxAbsValue: 'Расчет максимального абсолютного значения',

@@ -115,25 +115,20 @@ export const dataStore = defineStore('dataStore', {
     clearWaitingForAuthorization() {
       this.waitingForAuthorization = null
     },
-    addSignalToHistory(signal) {
-      let historyKey = String(signal.id || 0)
-      if (!this.signalHistory[historyKey]) {
-        this.signalHistory[historyKey] = []
+    addSignalToHistory(signal, currentHistoryKey) {
+      const signalId = String(signal.id || 0)
+      if (!this.signalHistory[signalId]) {
+        this.signalHistory[signalId] = []
       }
-      let numberOfSignalInHistory = this.signalHistory[historyKey].length
-      this.signalHistory[historyKey].push(JSON.stringify(signal))
-      return `${historyKey}-${numberOfSignalInHistory}`
+      const historyKey = currentHistoryKey ? parseInt(currentHistoryKey) + 1 : 0
+      this.signalHistory[signalId][historyKey] = JSON.stringify(signal)
+      return historyKey
     },
-    getSignalFromHistory(signalKey) {
-      let signalKeySplit = signalKey.split('-')
-      let historyKey = signalKeySplit[0], numberOfSignalInHistory = signalKeySplit[1]
-      let value = this.signalHistory[historyKey]?.[numberOfSignalInHistory]
+    getSignalFromHistory(signalId, historyKey) {
+      const value = this.signalHistory[signalId]?.[parseInt(historyKey)]
       if (value) {
         return JSON.parse(value)
       }
-    },
-    clearSignalHistory() {
-      this.signalHistory = {}
     },
     setRecordedAudio(recordedAudio) {
       this.recordedAudio = recordedAudio

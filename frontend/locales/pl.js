@@ -262,6 +262,7 @@ const pl = {
     modulatingSignal: 'Sygnał modulujący'
   },
   operationNames: {
+    preparingSignal: 'Przygotowywanie sygnału',
     preparingSignals: 'Przygotowywanie sygnałów',
     estimating: 'Obliczanie',
     calculatingMaxAbsValue: 'Obliczanie maksymalnej wartości bezwzględnej',
