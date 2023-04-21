@@ -163,6 +163,7 @@ export default {
     }
   },
   mounted() {
+    window.history.scrollRestoration = 'manual'
     dataStore().loadUserInfo()
     this.setHeaderByRoute()
     this.detectLocale()

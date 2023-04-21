@@ -83,8 +83,9 @@ export default {
       // todo executes 2 times console.log('makeChartParams')
       let commonGrid = SignalUtils.makeCommonSignalsValueGrid(this.signals)
       let categories = []
+      let fractionDigits = this.getFractionDigitsByStep(this.signals[0].params.step)
       for (let x of commonGrid) {
-        categories.push(x.toFixed(2))
+        categories.push(x.toFixed(fractionDigits))
       }
       let series = []
       for (let signal of this.signals) {
@@ -99,6 +100,19 @@ export default {
       }
       this.chartOptions.xAxis.categories = categories
       this.chartOptions.series = series
+    },
+    getFractionDigitsByStep(step) {
+      if (step < 0.0001) {
+        return 4
+      } else if (step < 0.001) {
+        return 3
+      } else if (step < 0.01) {
+        return 2
+      } else if (step < 0.1) {
+        return 1
+      } else {
+        return 0
+      }
     },
     makeChartStyles() {
       // todo try to do this in data

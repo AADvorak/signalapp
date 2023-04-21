@@ -92,6 +92,7 @@ export default {
   },
   watch: {
     '$route.query.history'() {
+      window.scrollTo(0,0)
       this.getSignalFromHistoryOrLoad()
     }
   },
