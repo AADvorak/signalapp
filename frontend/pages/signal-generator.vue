@@ -212,6 +212,7 @@ export default {
   },
   mounted() {
     this.restoreFormValues()
+    this.waitToFinishUserInput(JSON.stringify(this.form))
   },
   methods: {
     waitToFinishUserInput(formJson) {
