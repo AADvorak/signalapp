@@ -111,7 +111,8 @@ const en = {
     fromTxtOrWavFile: 'From txt or wav file',
     importedFromFile: 'Imported from file {name}',
     wrongPointsNumber: 'Number of signal samples (S * L) must be in range from 2 to 512000. Now it is {pointsNumber}',
-    lessThanHalfSampleRate: 'Must be less than a half of sample rate'
+    lessThanHalfSampleRate: 'Must be less than a half of sample rate',
+    preview: 'Preview'
   },
   'signal-manager': {
     name: 'Signal manager',
@@ -281,6 +282,9 @@ const en = {
     Size: 'Size violation',
     MaxLength: 'Max length violation',
     Email: 'Must be in the format of email'
+  },
+  chart: {
+    resetZoom: 'Reset zoom'
   }
 }
 

@@ -111,7 +111,8 @@ const ru = {
     fromTxtOrWavFile: 'Из файла txt или wav',
     importedFromFile: 'Импортирован из файла {name}',
     wrongPointsNumber: 'Количество отсчетов (S * L) должно быть в диапазоне от 2 до 512000. Сейчас оно равно {pointsNumber}',
-    lessThanHalfSampleRate: 'Значение должно быть не больше половины частоты дискретизации'
+    lessThanHalfSampleRate: 'Значение должно быть не больше половины частоты дискретизации',
+    preview: 'Предпросмотр'
   },
   'signal-manager': {
     name: 'Менеджер сигналов',
@@ -281,6 +282,9 @@ const ru = {
     Size: 'Нарушение требований размера',
     MaxLength: 'Нарушение требования максимальной длины',
     Email: 'Должно быть в формате email'
+  },
+  chart: {
+    resetZoom: 'Сбросить увеличение'
   }
 }
 

@@ -111,7 +111,8 @@ const pl = {
     fromTxtOrWavFile: 'Z pliku txt lub wav',
     importedFromFile: 'Zaimportowano z pliku {name}',
     wrongPointsNumber: 'Liczba próbek sygnału (S * L) musi być między 2 a 512000. Obecnie wynosi {pointsNumber}',
-    lessThanHalfSampleRate: 'Musi być mniejsza niż połowa częstotliwości próbkowania'
+    lessThanHalfSampleRate: 'Musi być mniejsza niż połowa częstotliwości próbkowania',
+    preview: 'Podgląd'
   },
   'signal-manager': {
     name: 'Menadżer sygnałów',
@@ -281,6 +282,9 @@ const pl = {
     Size: 'Naruszenie rozmiaru',
     MaxLength: 'Naruszenie maksymalnej długości',
     Email: 'Musi być w formacie adresu e-mail'
+  },
+  chart: {
+    resetZoom: 'Zresetuj zoom'
   }
 }
 

@@ -17,6 +17,10 @@ export default {
     signals: {
       type: Array,
       required: true
+    },
+    minimal: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => ({
@@ -54,6 +58,9 @@ export default {
     textColor() {
       return this.darkMode ? '#f1f1f1' : '#1F2227'
     },
+    legendEnabled() {
+      return this.signals.length > 1
+    }
   },
   watch: {
     signals() {
@@ -61,6 +68,9 @@ export default {
     },
   },
   mounted() {
+    if (this.minimal) {
+      this.chartOptions.chart.height = 150
+    }
     this.makeChartParams()
     this.makeChartStyles()
     dataStore().$subscribe((mutation, state) => {
@@ -120,7 +130,10 @@ export default {
       this.chartOptions.title.style = textColor
       this.chartOptions.xAxis.labels = {style: textColor}
       this.chartOptions.yAxis.labels = {style: textColor}
-      this.chartOptions.legend = {itemStyle: textColor}
+      this.chartOptions.legend = {
+        itemStyle: textColor,
+        enabled: this.legendEnabled
+      }
       this.chartOptions.tooltip = {
         backgroundColor: this.bgColor,
         style: textColor

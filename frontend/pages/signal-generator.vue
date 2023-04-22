@@ -66,11 +66,21 @@
                 :items="signalForms"
                 :label="_t('form')"/>
             <div class="d-flex">
-              <v-btn color="primary" @click="generateAndOpenSignal">
+              <v-btn color="primary" :disabled="!signal" @click="generateAndOpenSignal">
                 {{ _t('generate') }}
+              </v-btn>
+              <v-btn
+                  color="secondary"
+                  @click="preview = !preview"
+              >
+                {{ _t('preview') }}
+                <v-icon>
+                  {{ preview ? mdiEye : mdiEyeOff }}
+                </v-icon>
               </v-btn>
             </div>
           </v-form>
+          <chart-drawer class="mt-4" v-if="preview && signal" :signals="signal ? [signal] : []" :minimal="true"/>
         </v-card-text>
         <v-card-title>
           {{ _t('import') }}
@@ -95,12 +105,21 @@ import {dataStore} from "../stores/data-store";
 import FileUtils from "../utils/file-utils";
 import PageBase from "../components/page-base";
 import SignalUtils from "../utils/signal-utils";
+import ChartDrawer from "../components/chart-drawer";
+import {mdiEye, mdiEyeOff} from "@mdi/js";
+
+const PREVIEW_KEY = 'SignalGeneratorPreview'
 
 export default {
   name: "signal-generator",
+  components: {ChartDrawer},
   extends: PageBase,
   mixins: [formValidation, formValuesSaving, formNumberValues],
   data: () => ({
+    mdiEye,
+    mdiEyeOff,
+    preview: localStorage.getItem(PREVIEW_KEY) === 'true',
+    signal: null,
     file: [],
     form: {
       begin: 0,
@@ -180,16 +199,33 @@ export default {
           this.importFromTxtFile(file)
           break
       }
+    },
+    preview(newValue) {
+      localStorage.setItem(PREVIEW_KEY, newValue)
+    },
+    form: {
+      handler(newValue) {
+        this.waitToFinishUserInput(JSON.stringify(newValue))
+      },
+      deep: true
     }
   },
   mounted() {
     this.restoreFormValues()
   },
   methods: {
-    generateAndOpenSignal() {
+    waitToFinishUserInput(formJson) {
+      setTimeout(() => {
+        if (formJson === JSON.stringify(this.form)) {
+          this.precalculateSignal()
+        }
+      }, 600)
+    },
+    precalculateSignal() {
       this.clearValidation()
       this.parseFloatForm({exclude: ['form']})
       if (!this.validateForm()) {
+        this.signal = null
         return
       }
       this.saveFormValues()
@@ -199,14 +235,19 @@ export default {
         data.push(this.SIGNAL_FORMS[this.form.form]({x, ...this.form}))
       }
       const form = this._t('forms.' + this.form.form)
-      this.saveSignalToHistoryAndOpen({
+      let signal = {
         id: 0,
         name: this._t('signalName', {form}),
         description: this._t('description', {form, frequency: this.form.frequency, length: data.length}),
         sampleRate: this.form.sampleRate,
         xMin: this.form.begin,
         data
-      })
+      }
+      SignalUtils.calculateSignalParams(signal)
+      this.signal = signal
+    },
+    generateAndOpenSignal() {
+      this.signal && this.saveSignalToHistoryAndOpen(this.signal)
     },
     validateForm() {
       let validated = true
@@ -215,7 +256,7 @@ export default {
           let value = this.form[fieldName]
           let validationMsg = ''
           if (isNaN(value)) {
-            validationMsg = this._tc('validation.mustBeNumber')
+            validationMsg = this._tc('validation.number')
           } else {
             let validationFunction = this.VALIDATION_FUNCTIONS[fieldName]
             if (validationFunction) {

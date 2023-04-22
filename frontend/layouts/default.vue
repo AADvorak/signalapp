@@ -98,6 +98,7 @@ import en from '../locales/en'
 import ru from '../locales/ru'
 import pl from '../locales/pl'
 import ComponentBase from "../components/component-base";
+import Highcharts from "highcharts";
 
 export default {
   name: 'default',
@@ -160,6 +161,7 @@ export default {
     '$i18n.locale'(newValue) {
       dataStore().setLocale(newValue)
       this.setHeaderByRoute()
+      this.makeChartLang()
     }
   },
   mounted() {
@@ -167,6 +169,7 @@ export default {
     dataStore().loadUserInfo()
     this.setHeaderByRoute()
     this.detectLocale()
+    this.makeChartLang()
   },
   methods: {
     async signOut() {
@@ -231,6 +234,11 @@ export default {
     },
     localeFromLanguage(language) {
       return language.split('-')[0]
+    },
+    makeChartLang() {
+      Highcharts.setOptions({
+        lang: this.locales[this.$i18n.locale]?.chart
+      })
     }
   },
 }
