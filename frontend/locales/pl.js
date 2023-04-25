@@ -62,7 +62,12 @@ const pl = {
     startPage: 'Strona startowa',
     on: 'wł',
     off: 'wył',
-    darkMode: 'Tryb ciemny: {darkModeState}'
+    darkMode: 'Tryb ciemny: {darkModeState}',
+    numberInputType: 'Wprowadzanie liczb',
+    numberInputTypes: {
+      text: 'Tekst',
+      slider: 'Suwak'
+    }
   },
   'change-password': {
     name: 'Zmiana hasła',
@@ -91,12 +96,12 @@ const pl = {
   'signal-generator': {
     name: 'Generator sygnałów',
     generate: 'Generuj',
-    begin: 'Początek sygnału',
-    length: 'Długość sygnału',
-    sampleRate: 'Częstotliwość próbkowania sygnału',
-    frequency: 'Częstotliwość sygnału',
-    amplitude: 'Amplituda sygnału',
-    offset: 'Przesunięcie sygnału',
+    begin: 'Początek sygnału (B)',
+    length: 'Długość sygnału (L)',
+    sampleRate: 'Częstotliwość próbkowania sygnału (S)',
+    frequency: 'Częstotliwość sygnału (F)',
+    amplitude: 'Amplituda sygnału (A)',
+    offset: 'Przesunięcie sygnału (O)',
     form: 'Kształt sygnału',
     forms: {
       sine: 'sinusoidalny',
@@ -266,7 +271,7 @@ const pl = {
     preparingSignal: 'Przygotowywanie sygnału',
     preparingSignals: 'Przygotowywanie sygnałów',
     estimating: 'Obliczanie',
-    calculatingMaxAbsValue: 'Obliczanie maksymalnej wartości bezwzględnej',
+    calculatingMaxAbsValue: 'Przetwarzanie końcowe',
   },
   serverMessages: {
     SIGNAL_DOES_NOT_EXIST: 'Nie znaleziono sygnału',

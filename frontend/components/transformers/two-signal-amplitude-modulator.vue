@@ -1,21 +1,22 @@
 <template>
-  <v-text-field
-      v-model="form.depth"
-      type="number"
-      step="0.1"
-      min="0"
-      max="1"
-      :label="_trp('depth')"
-      :error="!!validation.depth.length"
-      :error-messages="validation.depth"
-      required/>
+  <number-input
+      v-for="numberInput in numberInputs"
+      :field="numberInput"
+      :label="_trp(numberInput)"
+      :form="form"
+      :validation="validation"
+      :min="INPUT_PARAMS[numberInput].min"
+      :max="INPUT_PARAMS[numberInput].max"
+      :step="INPUT_PARAMS[numberInput].step"/>
 </template>
 
 <script>
 import TransformerDoubleBase from "./transformer-double-base";
+import NumberInput from "../number-input";
 
 export default {
   name: "TwoSignalAmplitudeModulator",
+  components: {NumberInput},
   extends: TransformerDoubleBase,
   data: () => ({
     transformFunctionName: 'twoSignalAmplitudeModulator',
@@ -25,17 +26,13 @@ export default {
     validation: {
       depth: [],
     },
-  }),
-  methods: {
-    validateFunction() {
-      let validated = []
-      validated.push(this.validatePositiveNumber('depth'))
-      if (this.form.depth > 1) {
-        this.validation.depth.push(this._tc('validation.notGreaterThan', {maxValue: 1}))
-        validated.push(false)
-      }
-      return !validated.includes(false)
+    INPUT_PARAMS: {
+      depth: {
+        min: 0,
+        max: 1,
+        step: 0.001
+      },
     }
-  }
+  })
 }
 </script>

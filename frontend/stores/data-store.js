@@ -47,7 +47,9 @@ export const dataStore = defineStore('dataStore', {
       darkMode: localStorage.getItem('darkMode') === 'true',
       emailForPasswordRestore: null,
       defaultLocale: 'en',
-      locale: localStorage.getItem('locale')
+      locale: localStorage.getItem('locale'),
+      numberInputType: localStorage.getItem('numberInputType') || 'text',
+      numberInputTypes: ['text', 'slider']
     }
   },
   getters: {
@@ -97,6 +99,9 @@ export const dataStore = defineStore('dataStore', {
     },
     getDarkMode: state => {
       return state.darkMode
+    },
+    getNumberInputType: state => {
+      return state.numberInputType
     }
   },
   actions: {
@@ -140,6 +145,10 @@ export const dataStore = defineStore('dataStore', {
     setLocale(locale) {
       this.locale = locale
       localStorage.setItem('locale', locale)
+    },
+    setNumberInputType(numberInputType) {
+      this.numberInputType = numberInputType
+      localStorage.setItem('numberInputType', numberInputType)
     }
   },
 })

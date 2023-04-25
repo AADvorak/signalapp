@@ -1,5 +1,6 @@
 <script>
 import ComponentBase from "./component-base";
+import StringUtils from "../utils/string-utils";
 
 export default {
   name: "transformer-dialog-base",
@@ -21,6 +22,9 @@ export default {
     },
     okButtonText() {
       return this._tc('buttons.' + (this.processing ? 'working' : 'ok'))
+    },
+    titleWithRestrictedLength() {
+      return StringUtils.restrictLength(this._tr(this.selectedTransformer.code), 40)
     }
   },
   watch: {

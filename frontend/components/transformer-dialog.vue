@@ -1,11 +1,11 @@
 <template>
   <v-dialog
       v-model="dialog"
-      max-width="600px"
+      max-width="800px"
   >
     <v-card width="100%">
       <v-toolbar>
-        <v-toolbar-title>{{ _tr(selectedTransformer.code) }}</v-toolbar-title>
+        <v-toolbar-title>{{ titleWithRestrictedLength }}</v-toolbar-title>
       </v-toolbar>
       <v-card-text>
         <v-form>

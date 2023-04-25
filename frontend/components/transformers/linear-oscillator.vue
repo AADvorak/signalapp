@@ -1,29 +1,22 @@
 <template>
-  <v-text-field
-      v-model="form.frequency"
-      type="number"
-      step="1"
-      min="0"
-      :label="_trp('frequency')"
-      :error="!!validation.frequency.length"
-      :error-messages="validation.frequency"
-      required/>
-  <v-text-field
-      v-model="form.damping"
-      type="number"
-      step="0.1"
-      min="0"
-      :label="_trp('damping')"
-      :error="!!validation.damping.length"
-      :error-messages="validation.damping"
-      required/>
+  <number-input
+      v-for="numberInput in numberInputs"
+      :field="numberInput"
+      :label="_trp(numberInput)"
+      :form="form"
+      :validation="validation"
+      :min="INPUT_PARAMS[numberInput].min"
+      :max="INPUT_PARAMS[numberInput].max"
+      :step="INPUT_PARAMS[numberInput].step"/>
 </template>
 
 <script>
 import TransformerBase from "./transformer-base";
+import NumberInput from "../number-input";
 
 export default {
   name: "LinearOscillator",
+  components: {NumberInput},
   extends: TransformerBase,
   data: () => ({
     transformFunctionName: 'linearOscillator',
@@ -35,16 +28,18 @@ export default {
       frequency: [],
       damping: [],
     },
-
-  }),
-  methods: {
-    validateFunction() {
-      let validated = []
-      for (let key in this.form) {
-        validated.push(this.validatePositiveNumber(key))
+    INPUT_PARAMS: {
+      frequency: {
+        min: 0,
+        max: 20000,
+        step: 1
+      },
+      damping: {
+        min: 0,
+        max: 10,
+        step: 0.005
       }
-      return !validated.includes(false)
-    },
-  }
+    }
+  })
 }
 </script>

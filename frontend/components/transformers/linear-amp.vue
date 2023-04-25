@@ -1,20 +1,22 @@
 <template>
-  <v-text-field
-      v-model="form.coefficient"
-      type="number"
-      step="0.1"
-      min="0"
-      :label="_trp('coefficient')"
-      :error="!!validation.coefficient.length"
-      :error-messages="validation.coefficient"
-      required/>
+  <number-input
+      v-for="numberInput in numberInputs"
+      :field="numberInput"
+      :label="_trp(numberInput)"
+      :form="form"
+      :validation="validation"
+      :min="INPUT_PARAMS[numberInput].min"
+      :max="INPUT_PARAMS[numberInput].max"
+      :step="INPUT_PARAMS[numberInput].step"/>
 </template>
 
 <script>
 import TransformerBase from "./transformer-base";
+import NumberInput from "../number-input";
 
 export default {
   name: "LinearAmp",
+  components: {NumberInput},
   extends: TransformerBase,
   data: () => ({
     transformFunctionName: 'linearAmp',
@@ -23,12 +25,14 @@ export default {
     },
     validation: {
       coefficient: []
+    },
+    INPUT_PARAMS: {
+      coefficient: {
+        min: 0,
+        max: 10,
+        step: 0.01
+      }
     }
-  }),
-  methods: {
-    validateFunction() {
-      return this.validatePositiveNumber('coefficient')
-    }
-  }
+  })
 }
 </script>

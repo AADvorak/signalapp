@@ -1,39 +1,22 @@
 <template>
-  <v-text-field
-      v-model="form.frequency"
-      type="number"
-      step="10"
-      min="0"
-      :label="_trp('frequency')"
-      :error="!!validation.frequency.length"
-      :error-messages="validation.frequency"
-      required/>
-  <v-text-field
-      v-model="form.amplitude"
-      type="number"
-      step="0.1"
-      min="0"
-      :label="_trp('amplitude')"
-      :error="!!validation.amplitude.length"
-      :error-messages="validation.amplitude"
-      required/>
-  <v-text-field
-      v-model="form.depth"
-      type="number"
-      step="0.1"
-      min="0"
-      max="1"
-      :label="_trp('depth')"
-      :error="!!validation.depth.length"
-      :error-messages="validation.depth"
-      required/>
+  <number-input
+      v-for="numberInput in numberInputs"
+      :field="numberInput"
+      :label="_trp(numberInput)"
+      :form="form"
+      :validation="validation"
+      :min="INPUT_PARAMS[numberInput].min"
+      :max="INPUT_PARAMS[numberInput].max"
+      :step="INPUT_PARAMS[numberInput].step"/>
 </template>
 
 <script>
 import TransformerBase from "./transformer-base";
+import NumberInput from "../number-input";
 
 export default {
   name: "AmplitudeModulator",
+  components: {NumberInput},
   extends: TransformerBase,
   data: () => ({
     transformFunctionName: 'amplitudeModulator',
@@ -47,19 +30,23 @@ export default {
       amplitude: [],
       depth: [],
     },
-  }),
-  methods: {
-    validateFunction() {
-      let validated = []
-      for (let key in this.form) {
-        validated.push(this.validatePositiveNumber(key))
-      }
-      if (this.form.depth > 1) {
-        this.validation.depth.push(this._tc('validation.notGreaterThan', {maxValue: 1}))
-        validated.push(false)
-      }
-      return !validated.includes(false)
-    },
-  }
+    INPUT_PARAMS: {
+      frequency: {
+        min: 0,
+        max: 20000,
+        step: 1
+      },
+      amplitude: {
+        min: 0,
+        max: 10,
+        step: 0.01
+      },
+      depth: {
+        min: 0,
+        max: 1,
+        step: 0.001
+      },
+    }
+  })
 }
 </script>

@@ -62,7 +62,12 @@ const en = {
     startPage: 'Start page',
     on: 'on',
     off: 'off',
-    darkMode: 'Dark mode: {darkModeState}'
+    darkMode: 'Dark mode: {darkModeState}',
+    numberInputType: 'Number input',
+    numberInputTypes: {
+      text: 'Text',
+      slider: 'Slider'
+    }
   },
   'change-password': {
     name: 'Change password',
@@ -91,12 +96,12 @@ const en = {
   'signal-generator': {
     name: 'Signal generator',
     generate: 'Generate',
-    begin: 'Signal begin',
-    length: 'Signal length',
-    sampleRate: 'Signal sample rate',
-    frequency: 'Signal frequency',
-    amplitude: 'Signal amplitude',
-    offset: 'Signal offset',
+    begin: 'Signal begin (B)',
+    length: 'Signal length (L)',
+    sampleRate: 'Signal sample rate (S)',
+    frequency: 'Signal frequency (F)',
+    amplitude: 'Signal amplitude (A)',
+    offset: 'Signal offset (O)',
     form: 'Signal form',
     forms: {
       sine: 'sine',
@@ -266,7 +271,7 @@ const en = {
     preparingSignal: 'Preparing signal',
     preparingSignals: 'Preparing signals',
     calculating: 'Calculating',
-    calculatingMaxAbsValue: 'Calculating max abs value',
+    calculatingMaxAbsValue: 'Post processing',
   },
   serverMessages: {
     SIGNAL_DOES_NOT_EXIST: 'Signal does not exist',

@@ -1,7 +1,7 @@
 <template>
   <v-dialog
       v-model="dialog"
-      max-width="600px"
+      max-width="800px"
       max-height="500px"
   >
     <template v-slot:activator="{ props }">
@@ -39,8 +39,7 @@
             <v-col>
               <v-text-field
                   v-model="form.filter"
-                  :label="_tc('search')"
-                  autofocus/>
+                  :label="_tc('search')"/>
             </v-col>
           </v-row>
         </v-form>

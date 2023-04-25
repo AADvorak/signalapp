@@ -75,6 +75,12 @@
                       item-value="code"
                       :items="localeItems"
                       :label="$t('language')"/>
+                  <v-select
+                      v-model="numberInputType"
+                      item-title="name"
+                      item-value="code"
+                      :items="numberInputTypes"
+                      :label="_t('numberInputType')"/>
                 </v-form>
               </v-card-text>
             </v-card>
@@ -115,7 +121,8 @@ export default {
       header: '',
       showMainMenu: false,
       isMobile: DeviceUtils.isMobile(),
-      locales: {en, ru, pl}
+      locales: {en, ru, pl},
+      numberInputType: dataStore().getNumberInputType
     }
   },
   computed: {
@@ -152,6 +159,13 @@ export default {
         items.push({code, name: this.locales[code].name})
       }
       return items
+    },
+    numberInputTypes() {
+      let items = []
+      for (const code of dataStore().numberInputTypes) {
+        items.push({code, name: this._t('numberInputTypes.' + code)})
+      }
+      return items
     }
   },
   watch: {
@@ -162,6 +176,9 @@ export default {
       dataStore().setLocale(newValue)
       this.setHeaderByRoute()
       this.makeChartLang()
+    },
+    numberInputType(newValue) {
+      dataStore().setNumberInputType(newValue)
     }
   },
   mounted() {

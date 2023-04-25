@@ -62,7 +62,12 @@ const ru = {
     startPage: 'Стартовая страница',
     on: 'вкл',
     off: 'выкл',
-    darkMode: 'Темный режим: {darkModeState}'
+    darkMode: 'Темный режим: {darkModeState}',
+    numberInputType: 'Ввод чисел',
+    numberInputTypes: {
+      text: 'Текст',
+      slider: 'Слайдер'
+    }
   },
   'change-password': {
     name: 'Изменение пароля',
@@ -91,12 +96,12 @@ const ru = {
   'signal-generator': {
     name: 'Генератор сигналов',
     generate: 'Сгенерировать',
-    begin: 'Начало сигнала',
-    length: 'Длительность сигнала',
-    sampleRate: 'Частота дискретизации сигнала',
-    frequency: 'Частота сигнала',
-    amplitude: 'Амплитуда сигнала',
-    offset: 'Сдвиг сигнала',
+    begin: 'Начало сигнала (B)',
+    length: 'Длительность сигнала (L)',
+    sampleRate: 'Частота дискретизации сигнала (S)',
+    frequency: 'Частота сигнала (F)',
+    amplitude: 'Амплитуда сигнала (A)',
+    offset: 'Сдвиг сигнала (O)',
     form: 'Форма сигнала',
     forms: {
       sine: 'синусоидальный',
@@ -187,7 +192,7 @@ const ru = {
     HpRcFilter: 'RC фильтр верхних частот',
     withHpRcFilter: 'RC фильтром верхних частот',
     LinearOscillator: 'Линейный осциллятор',
-    withLinearOscillator: 'линейныйм осциллятор',
+    withLinearOscillator: 'линейным осциллятором',
     Integrator: 'Интегратор',
     withIntegrator: 'интегратором',
     Differentiator: 'Дифференциатор',
@@ -253,7 +258,7 @@ const ru = {
     },
     TwoSignalAmplitudeModulator: {
       depth: 'Глубина модуляции',
-      transformed: '{name1} модулированный по амплитуде сигналом {name2} с глубиной модуляции {depth}'
+      description: '{name1} модулированный по амплитуде сигналом {name2} с глубиной модуляции {depth}'
     }
   },
   signalNames: {
@@ -266,7 +271,7 @@ const ru = {
     preparingSignal: 'Подготовка сигнала',
     preparingSignals: 'Подготовка сигналов',
     calculating: 'Вычисление',
-    calculatingMaxAbsValue: 'Расчет максимального абсолютного значения',
+    calculatingMaxAbsValue: 'Постобработка',
   },
   serverMessages: {
     SIGNAL_DOES_NOT_EXIST: 'Сигнал не нейден',

@@ -16,8 +16,19 @@ export default {
   data: () => ({
     worker: null,
     transformFunctionName: '',
-    form: {}
+    form: {},
+    validation: {},
+    INPUT_PARAMS: {}
   }),
+  computed: {
+    numberInputs() {
+      let inputs = []
+      for (let key in this.form) {
+        inputs.push(key)
+      }
+      return inputs
+    }
+  },
   mounted() {
     this.initWorker()
     this.form && this.restoreFormValues()
@@ -43,7 +54,7 @@ export default {
       if (this.form && JSON.stringify(this.form) !== '{}') {
         this.clearValidation()
         this.parseFloatForm()
-        if (!this.validateFunction()) {
+        if (!this.validateForm()) {
           this.bus.emit('validationFailed')
           return
         }
@@ -79,27 +90,22 @@ export default {
       const route = useRoute()
       const signalId = route.params.id, currentHistoryKey = route.query.history
       const historyKey = dataStore().addSignalToHistory(signal, currentHistoryKey)
-      useRouter().push(`/signal/${signalId}?history=${historyKey}`)
+      useRouter().push(`/signal/${signalId || '0'}?history=${historyKey}`)
       this.bus.emit('transformed')
     },
     transformFunction() {
       return this.signal
     },
-    validateFunction() {
-      return true
-    },
-    validatePositiveNumber(key) {
-      let value = this.form[key]
-      let invalidMsg = ''
-      if (isNaN(value)) {
-        invalidMsg = this._tc('validation.number')
-      } else if (value < 0) {
-        invalidMsg = this._tc('validation.positive')
+    validateForm() {
+      let validated = true
+      for (let field in this.form) {
+        const validationMsg = this.getNumberValidationMsg(field)
+        if (validationMsg) {
+          this.validation[field].push(validationMsg)
+          validated = false
+        }
       }
-      if (invalidMsg) {
-        this.validation[key].push(invalidMsg)
-      }
-      return !invalidMsg
+      return validated
     },
     initWorker() {
       this.worker = new Worker('/transformers.js')

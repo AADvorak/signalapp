@@ -11,5 +11,17 @@ export default {
         }
       }
     },
+    getNumberValidationMsg(field) {
+      const value = this.form[field],
+          minValue = this.INPUT_PARAMS[field].min,
+          maxValue = this.INPUT_PARAMS[field].max
+      let validationMsg = ''
+      if (isNaN(value)) {
+        validationMsg = this._tc('validation.number')
+      } else if (value < minValue || value > maxValue) {
+        validationMsg = this._tc('validation.between', {minValue, maxValue})
+      }
+      return validationMsg
+    },
   }
 }

@@ -7,58 +7,15 @@
         </v-card-title>
         <v-card-text>
           <v-form @submit.prevent="generateAndOpenSignal">
-            <v-text-field
-                v-model="form.begin"
-                type="number"
-                step="0.01"
-                :label="_t('begin') + ' (B)'"
-                :error="!!validation.begin.length"
-                :error-messages="validation.begin"
-                required/>
-            <v-text-field
-                v-model="form.length"
-                type="number"
-                step="0.1"
-                min="0"
-                :label="_t('length') + ' (L)'"
-                :error="!!validation.length.length"
-                :error-messages="validation.length"
-                required/>
-            <v-text-field
-                v-model="form.sampleRate"
-                type="number"
-                step="100"
-                min="0"
-                :label="_t('sampleRate') + ' (S)'"
-                :error="!!validation.sampleRate.length"
-                :error-messages="validation.sampleRate"
-                required/>
-            <v-text-field
-                v-model="form.frequency"
-                type="number"
-                step="10"
-                min="0"
-                :label="_t('frequency') + ' (F)'"
-                :error="!!validation.frequency.length"
-                :error-messages="validation.frequency"
-                required/>
-            <v-text-field
-                v-model="form.amplitude"
-                type="number"
-                step="1"
-                min="0"
-                :label="_t('amplitude') + ' (A)'"
-                :error="!!validation.amplitude.length"
-                :error-messages="validation.amplitude"
-                required/>
-            <v-text-field
-                v-model="form.offset"
-                type="number"
-                step="1"
-                :label="_t('offset') + ' (O)'"
-                :error="!!validation.offset.length"
-                :error-messages="validation.offset"
-                required/>
+            <number-input
+                v-for="numberInput in numberInputs"
+                :field="numberInput"
+                :parent-name="$options.name"
+                :form="form"
+                :validation="validation"
+                :min="INPUT_PARAMS[numberInput].min"
+                :max="INPUT_PARAMS[numberInput].max"
+                :step="INPUT_PARAMS[numberInput].step"/>
             <v-select
                 v-model="form.form"
                 item-title="name"
@@ -107,12 +64,43 @@ import PageBase from "../components/page-base";
 import SignalUtils from "../utils/signal-utils";
 import ChartDrawer from "../components/chart-drawer";
 import {mdiEye, mdiEyeOff} from "@mdi/js";
+import NumberInput from "../components/number-input";
 
 const PREVIEW_KEY = 'SignalGeneratorPreview'
+const SIGNAL_FORMS = {
+  sine: ({x, frequency, amplitude, offset}) => {
+    return offset + amplitude * Math.sin(x * 2 * Math.PI * frequency)
+  },
+  square: ({x, frequency, amplitude, offset}) => {
+    return Math.sin(x * 2 * Math.PI * frequency) >= 0 ? offset + amplitude : offset - amplitude
+  },
+  triangle: ({x, frequency, amplitude, offset}) => {
+    return offset + (2 * amplitude / Math.PI) * Math.asin(Math.sin(x * 2 * Math.PI * frequency))
+  },
+  sawtooth: ({x, frequency, amplitude, offset}) => {
+    return offset + (2 * amplitude / Math.PI) * Math.atan(Math.tan(x * Math.PI * frequency))
+  },
+  noise: ({amplitude, offset}) => {
+    return offset + amplitude * (Math.random() * 2 - 1)
+  }
+}
+const VALIDATION_FUNCTIONS = {
+  length(values, ctx) {
+    let pointsNumber = values.length * values.sampleRate
+    if (pointsNumber < 2 || pointsNumber > 512000) {
+      return ctx._t('wrongPointsNumber', {pointsNumber: Math.floor(pointsNumber)})
+    }
+  },
+  frequency(values, ctx) {
+    if (2 * values.frequency > values.sampleRate) {
+      return ctx._t('lessThanHalfSampleRate')
+    }
+  }
+}
 
 export default {
   name: "signal-generator",
-  components: {ChartDrawer},
+  components: {NumberInput, ChartDrawer},
   extends: PageBase,
   mixins: [formValidation, formValuesSaving, formNumberValues],
   data: () => ({
@@ -138,54 +126,53 @@ export default {
       amplitude: [],
       offset: []
     },
-    SIGNAL_FORMS: {
-      sine: ({x, frequency, amplitude, offset}) => {
-        return offset + amplitude * Math.sin(x * 2 * Math.PI * frequency)
+    INPUT_PARAMS: {
+      begin: {
+        min: -10,
+        max: 10,
+        step: 0.01
       },
-      square: ({x, frequency, amplitude, offset}) => {
-        return Math.sin(x * 2 * Math.PI * frequency) >= 0 ? offset + amplitude : offset - amplitude
+      length: {
+        min: 0,
+        max: 20,
+        step: 0.01
       },
-      triangle: ({x, frequency, amplitude, offset}) => {
-        return offset + (2 * amplitude / Math.PI) * Math.asin(Math.sin(x * 2 * Math.PI * frequency))
+      sampleRate: {
+        min: 0,
+        max: 48000,
+        step: 1
       },
-      sawtooth: ({x, frequency, amplitude, offset}) => {
-        return offset + (2 * amplitude / Math.PI) * Math.atan(Math.tan(x * Math.PI * frequency))
+      frequency: {
+        min: 0,
+        max: 20000,
+        step: 1
       },
-      noise: ({x, frequency, amplitude, offset}) => {
-        return offset + amplitude * (Math.random() * 2 - 1)
-      }
-    },
-    VALIDATION_FUNCTIONS: {
-      length(values, ctx) {
-        if (values.length <= 0) return ctx._tc('validation.greaterThanZero')
-        let pointsNumber = values.length * values.sampleRate
-        if (!ctx.VALIDATION_FUNCTIONS.sampleRate(values, ctx) && (pointsNumber < 2 || pointsNumber > 512000)) {
-          return ctx._t('wrongPointsNumber', {pointsNumber: Math.floor(pointsNumber)})
-        }
+      amplitude: {
+        min: 0,
+        max: 10,
+        step: 0.01
       },
-      sampleRate(values, ctx) {
-        const maxValue = 48000
-        if (values.sampleRate <= 0) return ctx._tc('validation.greaterThanZero')
-        if (values.sampleRate > maxValue) return ctx._t('notGreaterThan', {maxValue})
-      },
-      frequency(values, ctx) {
-        if (values.frequency <= 0) return ctx._tc('validation.greaterThanZero')
-        if (!ctx.VALIDATION_FUNCTIONS.sampleRate(values, ctx) && 2 * values.frequency > values.sampleRate) {
-          return ctx._t('lessThanHalfSampleRate')
-        }
-      },
-      amplitude(values, ctx) {
-        if (values.amplitude < 0) return ctx._tc('validation.greaterThanZero')
+      offset: {
+        min: -5,
+        max: 5,
+        step: 0.01
       },
     }
   }),
   computed: {
     signalForms() {
       let forms = []
-      for (let code in this.SIGNAL_FORMS) {
+      for (let code in SIGNAL_FORMS) {
         forms.push({code, name: this._t('forms.' + code)})
       }
       return forms
+    },
+    numberInputs() {
+      let inputs = []
+      for (let key in this.form) {
+        key !== 'form' && inputs.push(key)
+      }
+      return inputs
     }
   },
   watch: {
@@ -233,7 +220,7 @@ export default {
       let data = []
       let step = 1 / this.form.sampleRate
       for (let x = this.form.begin; x < this.form.begin + this.form.length; x += step) {
-        data.push(this.SIGNAL_FORMS[this.form.form]({x, ...this.form}))
+        data.push(SIGNAL_FORMS[this.form.form]({x, ...this.form}))
       }
       const form = this._t('forms.' + this.form.form)
       let signal = {
@@ -252,20 +239,17 @@ export default {
     },
     validateForm() {
       let validated = true
-      for (let fieldName in this.form) {
-        if (fieldName !== 'form') {
-          let value = this.form[fieldName]
-          let validationMsg = ''
-          if (isNaN(value)) {
-            validationMsg = this._tc('validation.number')
-          } else {
-            let validationFunction = this.VALIDATION_FUNCTIONS[fieldName]
+      for (const field in this.form) {
+        if (field !== 'form') {
+          let validationMsg = this.getNumberValidationMsg(field)
+          if (!validationMsg) {
+            const validationFunction = VALIDATION_FUNCTIONS[field]
             if (validationFunction) {
               validationMsg = validationFunction(this.form, this)
             }
           }
           if (validationMsg) {
-            this.validation[fieldName].push(validationMsg)
+            this.validation[field].push(validationMsg)
             validated = false
           }
         }

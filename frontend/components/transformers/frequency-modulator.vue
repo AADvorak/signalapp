@@ -1,38 +1,22 @@
 <template>
-  <v-text-field
-      v-model="form.frequency"
-      type="number"
-      step="10"
-      min="0"
-      :label="_trp('frequency')"
-      :error="!!validation.frequency.length"
-      :error-messages="validation.frequency"
-      required/>
-  <v-text-field
-      v-model="form.amplitude"
-      type="number"
-      step="0.1"
-      min="0"
-      :label="_trp('amplitude')"
-      :error="!!validation.amplitude.length"
-      :error-messages="validation.amplitude"
-      required/>
-  <v-text-field
-      v-model="form.coefficient"
-      type="number"
-      step="1"
-      min="0"
-      :label="_trp('coefficient')"
-      :error="!!validation.coefficient.length"
-      :error-messages="validation.coefficient"
-      required/>
+  <number-input
+      v-for="numberInput in numberInputs"
+      :field="numberInput"
+      :label="_trp(numberInput)"
+      :form="form"
+      :validation="validation"
+      :min="INPUT_PARAMS[numberInput].min"
+      :max="INPUT_PARAMS[numberInput].max"
+      :step="INPUT_PARAMS[numberInput].step"/>
 </template>
 
 <script>
 import TransformerBase from "./transformer-base";
+import NumberInput from "../number-input";
 
 export default {
   name: "FrequencyModulator",
+  components: {NumberInput},
   extends: TransformerBase,
   data: () => ({
     transformFunctionName: 'frequencyModulator',
@@ -46,15 +30,23 @@ export default {
       amplitude: [],
       coefficient: [],
     },
-  }),
-  methods: {
-    validateFunction() {
-      let validated = []
-      for (let key in this.form) {
-        validated.push(this.validatePositiveNumber(key))
-      }
-      return !validated.includes(false)
-    },
-  }
+    INPUT_PARAMS: {
+      frequency: {
+        min: 0,
+        max: 20000,
+        step: 1
+      },
+      amplitude: {
+        min: 0,
+        max: 10,
+        step: 0.01
+      },
+      coefficient: {
+        min: 0,
+        max: 10,
+        step: 0.01
+      },
+    }
+  })
 }
 </script>

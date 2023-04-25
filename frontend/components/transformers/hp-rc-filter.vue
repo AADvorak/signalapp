@@ -1,20 +1,22 @@
 <template>
-  <v-text-field
-      v-model="form.tau"
-      type="number"
-      step="0.1"
-      min="0"
-      :label="_trp('tau')"
-      :error="!!validation.tau.length"
-      :error-messages="validation.tau"
-      required/>
+  <number-input
+      v-for="numberInput in numberInputs"
+      :field="numberInput"
+      :label="_trp(numberInput)"
+      :form="form"
+      :validation="validation"
+      :min="INPUT_PARAMS[numberInput].min"
+      :max="INPUT_PARAMS[numberInput].max"
+      :step="INPUT_PARAMS[numberInput].step"/>
 </template>
 
 <script>
 import TransformerBase from "./transformer-base";
+import NumberInput from "../number-input";
 
 export default {
   name: "HpRcFilter",
+  components: {NumberInput},
   extends: TransformerBase,
   data: () => ({
     transformFunctionName: 'hpRcFilter',
@@ -23,12 +25,14 @@ export default {
     },
     validation: {
       tau: []
+    },
+    INPUT_PARAMS: {
+      tau: {
+        min: 0,
+        max: 1,
+        step: 0.0005
+      }
     }
-  }),
-  methods: {
-    validateFunction() {
-      return this.validatePositiveNumber('tau')
-    }
-  }
+  })
 }
 </script>
