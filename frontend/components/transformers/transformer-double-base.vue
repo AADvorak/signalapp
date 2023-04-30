@@ -14,7 +14,7 @@ export default {
         transformFunctionName: this.transformFunctionName,
         signal1: JSON.stringify(this.signal1),
         signal2: JSON.stringify(this.signal2),
-        params: JSON.stringify(this.form || {})
+        params: JSON.stringify(this.formValues)
       }
     },
     changeSignalNameAndDescription(signal) {
@@ -22,7 +22,7 @@ export default {
       signal.description = this.makeResultSignalDescription()
     },
     makeResultSignalDescription() {
-      return this._trp('description', {name1: this.signal1.name, name2: this.signal2.name, ...this.form})
+      return this._trp('description', {name1: this.signal1.name, name2: this.signal2.name, ...this.formValues})
     }
   }
 }

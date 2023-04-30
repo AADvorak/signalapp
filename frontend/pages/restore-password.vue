@@ -4,12 +4,10 @@
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
           <v-form @submit.prevent="restorePasswordRequest">
-            <v-text-field
-                v-model="form.email"
-                :label="_tc('fields.email')"
-                :error="!!validation.email.length"
-                :error-messages="validation.email"
-                required/>
+            <text-input
+                v-for="field in formFields"
+                :field="field"
+                :field-obj="form[field]"/>
             <div class="d-flex">
               <v-btn color="primary" :loading="restorePasswordRequestSent" @click="restorePasswordRequest">
                 {{ _t('name') }}
@@ -29,28 +27,28 @@ import formValidation from "../mixins/form-validation";
 import {dataStore} from "../stores/data-store";
 import ApiProvider from "../api/api-provider";
 import PageBase from "../components/page-base";
+import formValues from "../mixins/form-values";
+import TextInput from "../components/text-input";
 
 export default {
   name: "restore-password",
+  components: {TextInput},
   extends: PageBase,
-  mixins: [formValidation],
+  mixins: [formValidation, formValues],
   data: () => ({
     form: {
-      email: '',
-    },
-    validation: {
-      email: [],
+      email: {value: ''},
     },
     restorePasswordRequestSent: false,
   }),
   mounted() {
-    this.form.email = dataStore().emailForPasswordRestore || ''
+    this.formValue('email', dataStore().emailForPasswordRestore || '')
   },
   methods: {
     async restorePasswordRequest() {
       this.clearValidation()
       await this.loadWithFlag(async () => {
-        const response = await ApiProvider.postJson('/api/users/restore/' + this.form.email, {})
+        const response = await ApiProvider.postJson('/api/users/restore/' + this.formValues.email, {})
         if (response.ok) {
           this.showMessage({
             text: this._t('newPasswordSentByEmail'),

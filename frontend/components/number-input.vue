@@ -1,22 +1,22 @@
 <template>
   <v-text-field
       v-if="type === 'text'"
-      v-model="form[field]"
+      v-model="fieldObj.value"
       type="number"
-      :step="step"
+      :step="fieldObj.params.step"
       :label="labelComputed"
-      :error="!!validation[field].length"
-      :error-messages="validation[field]"
+      :error="!!fieldObj.validation?.length"
+      :error-messages="fieldObj.validation"
       required/>
   <div v-if="type === 'slider'">
     <div class="text-caption">{{ labelComputed }}</div>
     <v-slider
-        v-model="form[field]"
-        :min="min"
-        :max="max"
-        :step="step"
-        :error="!!validation[field].length"
-        :error-messages="validation[field]"
+        v-model="fieldObj.value"
+        :min="fieldObj.params.min"
+        :max="fieldObj.params.max"
+        :step="fieldObj.params.step"
+        :error="!!fieldObj.validation?.length"
+        :error-messages="fieldObj.validation"
         thumb-label/>
   </div>
 </template>
@@ -39,24 +39,8 @@ export default {
       type: String,
       required: true
     },
-    form: {
+    fieldObj: {
       type: Object,
-      required: true
-    },
-    validation: {
-      type: Object,
-      required: true
-    },
-    min: {
-      type: Number,
-      required: true
-    },
-    max: {
-      type: Number,
-      required: true
-    },
-    step: {
-      type: Number,
       required: true
     },
   },

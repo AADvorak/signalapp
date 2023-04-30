@@ -13,28 +13,10 @@
             <p style="color: #4CAF50">{{ _t('emailConfirmed') }}</p>
           </div>
           <v-form>
-            <v-text-field
-                v-model="form.email"
-                :label="_tc('fields.email')"
-                :error="!!validation.email.length"
-                :error-messages="validation.email"
-                required/>
-            <v-text-field
-                v-model="form.firstName"
-                :label="_tc('fields.firstName')"
-                :error="!!validation.firstName.length"
-                :error-messages="validation.firstName"/>
-            <v-text-field
-                v-model="form.lastName"
-                :label="_tc('fields.lastName')"
-                :error="!!validation.lastName.length"
-                :error-messages="validation.lastName"/>
-            <v-text-field
-                v-if="$i18n.locale === 'ru'"
-                v-model="form.patronymic"
-                :label="_tc('fields.patronymic')"
-                :error="!!validation.patronymic.length"
-                :error-messages="validation.patronymic"/>
+            <text-input
+                v-for="field in filteredFormFields"
+                :field="field"
+                :field-obj="form[field]"/>
             <div class="d-flex flex-wrap">
               <v-btn color="success" :loading="saveRequestSent" @click="save">
                 {{ _tc('buttons.save') }}
@@ -63,24 +45,22 @@ import {mdiDelete} from "@mdi/js";
 import PageBase from "../components/page-base";
 import formValidation from "../mixins/form-validation";
 import {dataStore} from "../stores/data-store";
+import TextInput from "../components/text-input";
+import formValues from "../mixins/form-values";
+import filterPatronymicField from "../mixins/filter-patronymic-field";
 
 export default {
   name: "user-settings",
+  components: {TextInput},
   extends: PageBase,
-  mixins: [formValidation],
+  mixins: [formValidation, formValues, filterPatronymicField],
   data: () => ({
     mdiDelete,
     form: {
-      email: '',
-      firstName: '',
-      lastName: '',
-      patronymic: '',
-    },
-    validation: {
-      email: [],
-      firstName: [],
-      lastName: [],
-      patronymic: [],
+      email: {value: ''},
+      firstName: {value: ''},
+      lastName: {value: ''},
+      patronymic: {value: ''},
     },
     emailConfirmed: true,
     confirmEmailSent: false,
@@ -107,15 +87,14 @@ export default {
         return
       }
       this.emailConfirmed = userInfo.emailConfirmed
-      this.form.email = userInfo.email
-      this.form.firstName = userInfo.firstName
-      this.form.lastName = userInfo.lastName
-      this.form.patronymic = userInfo.patronymic
+      this.formFields.forEach(field => {
+        this.formValue(field, userInfo[field])
+      })
     },
     async save() {
       this.clearValidation()
       await this.loadWithFlag(async () => {
-        const response = await this.getApiProvider().putJson('/api/users/me/', this.form)
+        const response = await this.getApiProvider().putJson('/api/users/me/', this.formValues)
         if (response.ok) {
           dataStore().setUserInfo(response.data)
           this.showMessage({

@@ -1,20 +1,23 @@
+import formValues from "~/mixins/form-values";
+
 export default {
+  extends: formValues,
   methods: {
     parseFloatForm({include, exclude} = {}) {
-      for (let key in this.form) {
-        if (this.form.hasOwnProperty(key)) {
-          if ((include && include.includes(key)
-              || exclude && !exclude.includes(key)
-              || !include && !exclude) && !isNaN(this.form[key])) {
-            this.form[key] = parseFloat(this.form[key])
+      for (let field in this.form) {
+        if (this.form.hasOwnProperty(field)) {
+          if ((include && include.includes(field)
+              || exclude && !exclude.includes(field)
+              || !include && !exclude) && !isNaN(this.formValue(field))) {
+            this.formValue(field, parseFloat(this.formValue(field)))
           }
         }
       }
     },
     getNumberValidationMsg(field) {
-      const value = this.form[field],
-          minValue = this.INPUT_PARAMS[field].min,
-          maxValue = this.INPUT_PARAMS[field].max
+      const value = this.formValue(field),
+          minValue = this.form[field].params.min,
+          maxValue = this.form[field].params.max
       let validationMsg = ''
       if (isNaN(value)) {
         validationMsg = this._tc('validation.number')

@@ -5,21 +5,12 @@
         <v-card-text>
           <p v-if="waitingForAuthorization" class="mb-5">{{ _t('signInToContinue') }}</p>
           <v-form @submit.prevent="signInRequest">
-            <v-text-field
-                v-model="form.email"
-                :label="_tc('fields.email')"
-                :error="!!validation.email.length"
-                :error-messages="validation.email"
-                required/>
-            <v-text-field
-                v-model="form.password"
-                :append-icon="showPassword ? mdiEyeOff : mdiEye"
-                :type="showPassword ? 'text' : 'password'"
-                :label="_tc('fields.password')"
-                @click:append="showPassword = !showPassword"
-                :error="!!validation.password.length"
-                :error-messages="validation.password"
-                required/>
+            <text-input
+                v-for="field in formFields"
+                :field="field"
+                :field-obj="form[field]"
+                :show-password="showPassword"
+                @show="switchShowPassword"/>
             <div class="d-flex flex-wrap">
               <v-btn color="success" :loading="signInRequestSent" @click="signInRequest">
                 {{ _tc('buttons.signIn') }}
@@ -39,27 +30,23 @@
 </template>
 
 <script>
-import {mdiEye, mdiEyeOff} from "@mdi/js";
 import ApiProvider from "../api/api-provider";
 import {dataStore} from "../stores/data-store";
 import formValidation from "../mixins/form-validation"
 import PageBase from "../components/page-base";
+import TextInput from "../components/text-input";
+import formValues from "../mixins/form-values";
+import showPassword from "../mixins/show-password";
 
 export default {
   name: 'signin',
+  components: {TextInput},
   extends: PageBase,
-  mixins: [formValidation],
+  mixins: [formValidation, formValues, showPassword],
   data: () => ({
-    mdiEye,
-    mdiEyeOff,
-    showPassword: false,
     form: {
-      email: '',
-      password: '',
-    },
-    validation: {
-      email: [],
-      password: []
+      email: {value: ''},
+      password: {value: ''},
     },
     signInRequestSent: false
   }),
@@ -69,13 +56,13 @@ export default {
     }
   },
   mounted() {
-    this.form.email = dataStore().emailForPasswordRestore || ''
+    this.formValue('email', dataStore().emailForPasswordRestore || '')
   },
   methods: {
     async signInRequest() {
       this.clearValidation()
       await this.loadWithFlag(async () => {
-        const response = await ApiProvider.postJson('/api/sessions/', this.form)
+        const response = await ApiProvider.postJson('/api/sessions/', this.formValues)
         if (response.ok) {
           dataStore().setUserInfo(response.data)
           useRouter().push(this.waitingForAuthorization ? this.waitingForAuthorization : '/')
@@ -88,7 +75,7 @@ export default {
       }, 'signInRequestSent')
     },
     restorePassword() {
-      dataStore().emailForPasswordRestore = this.form.email
+      dataStore().emailForPasswordRestore = this.formValues.email
       useRouter().push('/restore-password')
     }
   },

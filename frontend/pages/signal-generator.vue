@@ -11,13 +11,9 @@
                 v-for="numberInput in numberInputs"
                 :field="numberInput"
                 :parent-name="$options.name"
-                :form="form"
-                :validation="validation"
-                :min="INPUT_PARAMS[numberInput].min"
-                :max="INPUT_PARAMS[numberInput].max"
-                :step="INPUT_PARAMS[numberInput].step"/>
+                :field-obj="form[numberInput]"/>
             <v-select
-                v-model="form.form"
+                v-model="form.form.value"
                 item-title="name"
                 item-value="code"
                 :items="signalForms"
@@ -110,54 +106,56 @@ export default {
     signal: null,
     file: [],
     form: {
-      begin: 0,
-      length: 0.1,
-      sampleRate: 3000,
-      frequency: 100,
-      amplitude: 1,
-      offset: 0,
-      form: 'sine'
-    },
-    validation: {
-      begin: [],
-      length: [],
-      sampleRate: [],
-      frequency: [],
-      amplitude: [],
-      offset: []
-    },
-    INPUT_PARAMS: {
       begin: {
-        min: -10,
-        max: 10,
-        step: 0.01
+        value: 0,
+        params: {
+          min: -10,
+          max: 10,
+          step: 0.01
+        }
       },
       length: {
-        min: 0,
-        max: 20,
-        step: 0.01
+        value: 0.1,
+        params: {
+          min: 0,
+          max: 20,
+          step: 0.01
+        }
       },
       sampleRate: {
-        min: 0,
-        max: 48000,
-        step: 1
+        value: 3000,
+        params: {
+          min: 0,
+          max: 48000,
+          step: 50
+        }
       },
       frequency: {
-        min: 0,
-        max: 20000,
-        step: 1
+        value: 100,
+        params: {
+          min: 0,
+          max: 20000,
+          step: 20
+        }
       },
       amplitude: {
-        min: 0,
-        max: 10,
-        step: 0.01
+        value: 1,
+        params: {
+          min: 0,
+          max: 10,
+          step: 0.01
+        }
       },
       offset: {
-        min: -5,
-        max: 5,
-        step: 0.01
+        value: 0,
+        params: {
+          min: -5,
+          max: 5,
+          step: 0.01
+        }
       },
-    }
+      form: {value: 'sine'}
+    },
   }),
   computed: {
     signalForms() {
@@ -168,11 +166,7 @@ export default {
       return forms
     },
     numberInputs() {
-      let inputs = []
-      for (let key in this.form) {
-        key !== 'form' && inputs.push(key)
-      }
-      return inputs
+      return this.formFields.filter(field => field !== 'form')
     }
   },
   watch: {
@@ -190,21 +184,23 @@ export default {
     preview(newValue) {
       localStorage.setItem(PREVIEW_KEY, newValue)
     },
-    form: {
-      handler(newValue) {
-        this.waitToFinishUserInput(JSON.stringify(newValue))
+    formValues: {
+      handler(newValue, oldValue) {
+        if (!this.onlyTypesChanged(newValue, oldValue)) {
+          this.waitToFinishUserInput(JSON.stringify(newValue))
+        }
       },
       deep: true
     }
   },
   mounted() {
     this.restoreFormValues()
-    this.waitToFinishUserInput(JSON.stringify(this.form))
+    this.waitToFinishUserInput(JSON.stringify(this.formValues))
   },
   methods: {
     waitToFinishUserInput(formJson) {
       setTimeout(() => {
-        if (formJson === JSON.stringify(this.form)) {
+        if (formJson === JSON.stringify(this.formValues)) {
           this.precalculateSignal()
         }
       }, 600)
@@ -218,17 +214,17 @@ export default {
       }
       this.saveFormValues()
       let data = []
-      let step = 1 / this.form.sampleRate
-      for (let x = this.form.begin; x < this.form.begin + this.form.length; x += step) {
-        data.push(SIGNAL_FORMS[this.form.form]({x, ...this.form}))
+      let step = 1 / this.formValues.sampleRate
+      for (let x = this.formValues.begin; x < this.formValues.begin + this.formValues.length; x += step) {
+        data.push(SIGNAL_FORMS[this.formValues.form]({x, ...this.formValues}))
       }
-      const form = this._t('forms.' + this.form.form)
+      const form = this._t('forms.' + this.formValues.form)
       let signal = {
         id: 0,
         name: this._t('signalName', {form}),
-        description: this._t('description', {form, frequency: this.form.frequency, length: data.length}),
-        sampleRate: this.form.sampleRate,
-        xMin: this.form.begin,
+        description: this._t('description', {form, frequency: this.formValues.frequency, length: data.length}),
+        sampleRate: this.formValues.sampleRate,
+        xMin: this.formValues.begin,
         data
       }
       SignalUtils.calculateSignalParams(signal)
@@ -249,7 +245,7 @@ export default {
             }
           }
           if (validationMsg) {
-            this.validation[field].push(validationMsg)
+            this.pushValidationMsg(field, validationMsg)
             validated = false
           }
         }
@@ -283,6 +279,14 @@ export default {
       signal.maxAbsY = SignalUtils.calculateMaxAbsY(signal)
       SignalUtils.calculateSignalParams(signal)
       useRouter().push('/signal/0?history=' + dataStore().addSignalToHistory(signal))
+    },
+    onlyTypesChanged(oldForm, newForm) {
+      for (let field in newForm) {
+        if (oldForm[field].toString() !== newForm[field].toString()) {
+          return false
+        }
+      }
+      return true
     }
   },
 }

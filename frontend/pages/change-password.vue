@@ -4,33 +4,12 @@
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
           <v-form @submit.prevent="">
-            <v-text-field
-                v-model="form.oldPassword"
-                :append-icon="showPassword ? mdiEyeOff : mdiEye"
-                :type="showPassword ? 'text' : 'password'"
-                :label="_t('oldPassword')"
-                @click:append="showPassword = !showPassword"
-                :error="!!validation.oldPassword.length"
-                :error-messages="validation.oldPassword"
-                required/>
-            <v-text-field
-                v-model="form.password"
-                :append-icon="showPassword ? mdiEyeOff : mdiEye"
-                :type="showPassword ? 'text' : 'password'"
-                :label="_tc('fields.password')"
-                @click:append="showPassword = !showPassword"
-                :error="!!validation.password.length"
-                :error-messages="validation.password"
-                required/>
-            <v-text-field
-                v-model="form.passwordRepeat"
-                :append-icon="showPassword ? mdiEyeOff : mdiEye"
-                :type="showPassword ? 'text' : 'password'"
-                :label="_tc('fields.passwordRepeat')"
-                @click:append="showPassword = !showPassword"
-                :error="!!validation.passwordRepeat.length"
-                :error-messages="validation.passwordRepeat"
-                required/>
+            <text-input
+                v-for="field in formFields"
+                :field="field"
+                :field-obj="form[field]"
+                :show-password="showPassword"
+                @show="switchShowPassword"/>
             <div class="d-flex">
               <v-btn color="success" :loading="changePasswordRequestSent" @click="changePasswordRequest">
                 {{ _tc('buttons.changePassword') }}
@@ -46,49 +25,40 @@
 
 <script>
 import formValidation from "../mixins/form-validation";
-import {mdiEye, mdiEyeOff} from "@mdi/js";
 import PageBase from "../components/page-base";
+import formValues from "../mixins/form-values";
+import showPassword from "../mixins/show-password";
+import TextInput from "../components/text-input";
 
 export default {
   name: "change-password",
+  components: {TextInput},
   extends: PageBase,
-  mixins: [formValidation],
+  mixins: [formValidation, formValues, showPassword],
   data: () => ({
-    mdiEye,
-    mdiEyeOff,
-    showPassword: false,
     form: {
-      oldPassword: '',
-      password: '',
-      passwordRepeat: '',
-    },
-    validation: {
-      oldPassword: [],
-      password: [],
-      passwordRepeat: [],
+      oldPassword: {value: ''},
+      password: {value: ''},
+      passwordRepeat: {value: ''},
     },
     changePasswordRequestSent: false
   }),
   methods: {
     async changePasswordRequest() {
       this.clearValidation()
-      if (this.form.passwordRepeat !== this.form.password) {
+      if (this.formValues.passwordRepeat !== this.formValues.password) {
         const msg = this._tc('validation.same')
-        this.validation.password.push(msg)
-        this.validation.passwordRepeat.push(msg)
+        this.pushValidationMsg('password', msg)
+        this.pushValidationMsg('passwordRepeat', msg)
         return
       }
       await this.loadWithFlag(async () => {
-        const response = await this.getApiProvider().putJson('/api/users/me/password', this.form)
+        const response = await this.getApiProvider().putJson('/api/users/me/password', this.formValues)
         if (response.ok) {
           this.showMessage({
             text: this._t('passwordChangeSuccess')
           })
-          this.form = {
-            oldPassword: '',
-            password: '',
-            passwordRepeat: '',
-          }
+          this.clearForm()
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
         } else {

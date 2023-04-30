@@ -4,15 +4,11 @@
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
           <v-form>
-            <v-text-field
-                v-model="form.sampleRate"
-                type="number"
-                step="100"
-                min="0"
-                :label="_t('sampleRateHz')"
-                :error="!!validation.sampleRate.length"
-                :error-messages="validation.sampleRate"
-                required/>
+            <number-input
+                v-for="field in formFields"
+                :field="field"
+                :parent-name="$options.name"
+                :field-obj="form[field]"/>
           </v-form>
           <div>{{ info }}</div>
           <div>{{ _t('recordStatuses.' + recordStatus) }}</div>
@@ -53,17 +49,24 @@ import formValuesSaving from "../mixins/form-values-saving";
 import {dataStore} from "../stores/data-store";
 import FileUtils from "../utils/file-utils";
 import Recorder from "../audio/recorder";
+import NumberInput from "../components/number-input";
+import formNumberValues from "../mixins/form-number-values";
 
 export default {
   name: "signal-recorder",
+  components: {NumberInput},
   extends: PageBase,
-  mixins: [formValidation, formValuesSaving],
+  mixins: [formValidation, formValuesSaving, formNumberValues],
   data: () => ({
     form: {
-      sampleRate: 8000
-    },
-    validation: {
-      sampleRate: []
+      sampleRate: {
+        value: 8000,
+        params: {
+          min: 3000,
+          max: 48000,
+          step: 50
+        }
+      }
     },
     RECORD_STATUSES: {
       READY: 'ready',
@@ -95,12 +98,12 @@ export default {
   },
   methods: {
     validateForm() {
-      const minValue = 3000, maxValue = 48000
-      if (!this.form.sampleRate || this.form.sampleRate < minValue || this.form.sampleRate > maxValue) {
-        this.validation.sampleRate.push(this._tc('validation.between', {minValue, maxValue}))
-        return false
+      const field = 'sampleRate'
+      const validationMsg = this.getNumberValidationMsg(field)
+      if (validationMsg) {
+        this.pushValidationMsg(field, validationMsg)
       }
-      return true
+      return !validationMsg
     },
     startRecord() {
       this.clearValidation()
@@ -108,12 +111,11 @@ export default {
         return
       }
       this.saveFormValues()
-      let constraints = {audio: true, video: false}
+      const constraints = {audio: true, video: false},
+          sampleRate = this.formValues.sampleRate
       navigator.mediaDevices.getUserMedia(constraints).then(stream => {
-        this.audioContext = new AudioContext({
-          sampleRate: this.form.sampleRate
-        })
-        this.info = this._t('audioFormat', {sampleRate: this.audioContext.sampleRate})
+        this.audioContext = new AudioContext({sampleRate})
+        this.info = this._t('audioFormat', {sampleRate})
         this.gumStream = stream
         this.input = this.audioContext.createMediaStreamSource(stream)
         this.rec = new Recorder(this.input,{numChannels:1})

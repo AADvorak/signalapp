@@ -14,14 +14,14 @@
               <v-text-field
                   v-model="signal.name"
                   :label="_tc('fields.name')"
-                  :error="!!validation.name.length"
-                  :error-messages="validation.name"
+                  :error="!!form.name.validation?.length"
+                  :error-messages="form.name.validation"
                   required/>
               <v-textarea
                   v-model="signal.description"
                   :label="_tc('fields.description')"
-                  :error="!!validation.description.length"
-                  :error-messages="validation.description"/>
+                  :error="!!form.description.validation?.length"
+                  :error-messages="form.description.validation"/>
               <div class="d-flex flex-wrap">
                 <select-transformer-dialog :bus="bus"/>
                 <v-btn color="success" @click="saveSignal">
@@ -73,9 +73,9 @@ export default {
     signalId: '',
     historyKey: '',
     signal: {},
-    validation: {
-      name: [],
-      description: []
+    form: {
+      name: {},
+      description: {}
     },
     bus: new mitt()
   }),

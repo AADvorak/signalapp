@@ -15,18 +15,12 @@ export default {
   },
   data: () => ({
     worker: null,
-    transformFunctionName: '',
     form: {},
-    validation: {},
-    INPUT_PARAMS: {}
   }),
   computed: {
-    numberInputs() {
-      let inputs = []
-      for (let key in this.form) {
-        inputs.push(key)
-      }
-      return inputs
+    transformFunctionName() {
+      const name = this.$options.name
+      return name.charAt(0).toLowerCase() + name.slice(1)
     }
   },
   mounted() {
@@ -51,7 +45,7 @@ export default {
       return this.$t(`operationNames.${key}`)
     },
     doTransform() {
-      if (this.form && JSON.stringify(this.form) !== '{}') {
+      if (JSON.stringify(this.formValues) !== '{}') {
         this.clearValidation()
         this.parseFloatForm()
         if (!this.validateForm()) {
@@ -60,17 +54,13 @@ export default {
         }
         this.saveFormValues()
       }
-      if (this.transformFunctionName) {
-        this.worker.postMessage(this.makeWorkerMessage())
-      } else {
-        this.addSignalToHistoryAndOpen(this.transformFunction())
-      }
+      this.worker.postMessage(this.makeWorkerMessage())
     },
     makeWorkerMessage() {
       return {
         transformFunctionName: this.transformFunctionName,
         signal: JSON.stringify(this.signal),
-        params: JSON.stringify(this.form || {})
+        params: JSON.stringify(this.formValues)
       }
     },
     changeSignalNameAndDescription(signal) {
@@ -81,8 +71,8 @@ export default {
     },
     makeParamsText() {
       let paramsDescription = ''
-      for (const key in this.form) {
-        paramsDescription += (paramsDescription && ', ') + `${this._trp(key).toLowerCase()} = ${this.form[key]}`
+      for (const field in this.formValues) {
+        paramsDescription += (paramsDescription && ', ') + `${this._trp(field).toLowerCase()} = ${this.formValues[field]}`
       }
       return paramsDescription && `(${paramsDescription})`
     },
@@ -93,15 +83,12 @@ export default {
       useRouter().push(`/signal/${signalId || '0'}?history=${historyKey}`)
       this.bus.emit('transformed')
     },
-    transformFunction() {
-      return this.signal
-    },
     validateForm() {
       let validated = true
       for (let field in this.form) {
         const validationMsg = this.getNumberValidationMsg(field)
         if (validationMsg) {
-          this.validation[field].push(validationMsg)
+          this.pushValidationMsg(field, validationMsg)
           validated = false
         }
       }

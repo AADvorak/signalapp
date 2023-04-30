@@ -1,0 +1,55 @@
+<template>
+  <v-text-field
+      v-model="fieldObj.value"
+      :append-icon="appendIcon"
+      :type="(!isPasswordField || showPassword) ? 'text' : 'password'"
+      :label="$t('common.fields.' + field)"
+      @click:append="onClickAppend"
+      :error="!!fieldObj.validation?.length"
+      :error-messages="fieldObj.validation"
+      required/>
+</template>
+
+<script>
+import {mdiEye, mdiEyeOff} from "@mdi/js";
+
+const PASSWORD_FIELDS = ['password', 'passwordRepeat', 'oldPassword']
+
+export default {
+  name: "text-input",
+  props: {
+    field: {
+      type: String,
+      required: true
+    },
+    fieldObj: {
+      type: Object,
+      required: true
+    },
+    showPassword: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ['show'],
+  computed: {
+    isPasswordField() {
+      return PASSWORD_FIELDS.includes(this.field)
+    },
+    appendIcon() {
+      if (!this.isPasswordField) {
+        return null
+      }
+      return this.showPassword ? mdiEyeOff : mdiEye
+    },
+  },
+  methods: {
+    onClickAppend() {
+      if (!this.isPasswordField) {
+        return
+      }
+      this.$emit('show')
+    }
+  }
+}
+</script>

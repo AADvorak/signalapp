@@ -1,4 +1,7 @@
+import formValues from "~/mixins/form-values";
+
 export default {
+  extends: formValues,
   computed: {
     formValuesKey() {
       return this.$options.name + 'FormValues'
@@ -6,15 +9,15 @@ export default {
   },
   methods: {
     saveFormValues() {
-      localStorage.setItem(this.formValuesKey, JSON.stringify(this.form))
+      localStorage.setItem(this.formValuesKey, JSON.stringify(this.formValues))
     },
     restoreFormValues() {
-      let values = localStorage.getItem(this.formValuesKey)
-      if (values) {
-        let parsedValues = JSON.parse(values)
-        for (let key in parsedValues) {
-          if (parsedValues.hasOwnProperty(key) && this.form.hasOwnProperty(key)) {
-            this.form[key] = parsedValues[key]
+      const formJson = localStorage.getItem(this.formValuesKey)
+      if (formJson) {
+        const parsedForm = JSON.parse(formJson)
+        for (let field in parsedForm) {
+          if (parsedForm.hasOwnProperty(field) && this.form.hasOwnProperty(field)) {
+            this.formValue(field, parsedForm[field])
           }
         }
       }

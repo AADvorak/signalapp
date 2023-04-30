@@ -39,6 +39,7 @@ const en = {
       email: 'Email',
       password: 'Password',
       passwordRepeat: 'Password repeat',
+      oldPassword: 'Old password',
       firstName: 'First name',
       lastName: 'Last name',
       patronymic: 'Patronymic'
@@ -71,7 +72,6 @@ const en = {
   },
   'change-password': {
     name: 'Change password',
-    oldPassword: 'Old password',
     passwordChangeSuccess: 'Password changed successfully',
     passwordChangeError: 'Error while changing password',
   },
@@ -137,7 +137,7 @@ const en = {
   },
   'signal-recorder': {
     name: 'Signal recorder',
-    sampleRateHz: 'Sample rate (Hz)',
+    sampleRate: 'Sample rate (Hz)',
     rec: 'REC',
     pause: 'Pause',
     stop: 'Stop',

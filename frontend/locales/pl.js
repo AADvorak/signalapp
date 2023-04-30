@@ -39,6 +39,7 @@ const pl = {
       email: 'E-mail',
       password: 'Hasło',
       passwordRepeat: 'Powtórz hasło',
+      oldPassword: 'Stare hasło',
       firstName: 'Imię',
       lastName: 'Nazwisko',
       patronymic: 'Patronimik'
@@ -71,7 +72,6 @@ const pl = {
   },
   'change-password': {
     name: 'Zmiana hasła',
-    oldPassword: 'Stare hasło',
     passwordChangeSuccess: 'Hasło zostało zmienione pomyślnie',
     passwordChangeError: 'Błąd podczas zmiany hasła',
   },
@@ -137,7 +137,7 @@ const pl = {
   },
   'signal-recorder': {
     name: 'Nagrywarka sygnałów',
-    sampleRateHz: 'Częstotliwość próbkowania (Hz)',
+    sampleRate: 'Częstotliwość próbkowania (Hz)',
     rec: 'Nagrywaj',
     pause: 'Pauza',
     stop: 'Stop',

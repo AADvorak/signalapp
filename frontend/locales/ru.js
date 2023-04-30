@@ -39,6 +39,7 @@ const ru = {
       email: 'Email',
       password: 'Пароль',
       passwordRepeat: 'Повтор пароля',
+      oldPassword: 'Старый пароль',
       firstName: 'Имя',
       lastName: 'Фамилия',
       patronymic: 'Отчество'
@@ -71,7 +72,6 @@ const ru = {
   },
   'change-password': {
     name: 'Изменение пароля',
-    oldPassword: 'Старый пароль',
     passwordChangeSuccess: 'Пароль успешно изменен',
     passwordChangeError: 'Ошибка при изменении пароля',
   },
@@ -137,7 +137,7 @@ const ru = {
   },
   'signal-recorder': {
     name: 'Запись сигналов',
-    sampleRateHz: 'Частота дискретизации (Гц)',
+    sampleRate: 'Частота дискретизации (Гц)',
     rec: 'Запись',
     pause: 'Пауза',
     stop: 'Стоп',

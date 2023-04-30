@@ -1,13 +1,9 @@
 <template>
   <number-input
-      v-for="numberInput in numberInputs"
-      :field="numberInput"
-      :label="_trp(numberInput)"
-      :form="form"
-      :validation="validation"
-      :min="INPUT_PARAMS[numberInput].min"
-      :max="INPUT_PARAMS[numberInput].max"
-      :step="INPUT_PARAMS[numberInput].step"/>
+      v-for="field in formFields"
+      :field="field"
+      :label="_trp(field)"
+      :field-obj="form[field]"/>
 </template>
 
 <script>
@@ -19,20 +15,16 @@ export default {
   components: {NumberInput},
   extends: TransformerBase,
   data: () => ({
-    transformFunctionName: 'lpRcFilter',
     form: {
-      tau: 1
-    },
-    validation: {
-      tau: []
-    },
-    INPUT_PARAMS: {
       tau: {
-        min: 0,
-        max: 1,
-        step: 0.0005
+        value: 1,
+        params: {
+          min: 0,
+          max: 1,
+          step: 0.0005
+        }
       }
-    }
+    },
   })
 }
 </script>

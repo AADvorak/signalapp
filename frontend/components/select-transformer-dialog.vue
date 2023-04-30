@@ -29,7 +29,7 @@
           <v-row>
             <v-col>
               <v-select
-                  v-model="form.types"
+                  v-model="form.types.value"
                   item-title="name"
                   item-value="code"
                   :items="types"
@@ -38,7 +38,7 @@
             </v-col>
             <v-col>
               <v-text-field
-                  v-model="form.filter"
+                  v-model="form.filter.value"
                   :label="_tc('search')"/>
             </v-col>
           </v-row>
@@ -88,20 +88,21 @@ export default {
     mdiClose,
     transformers: [],
     form: {
-      types: [],
-      filter: ''
+      types: {value: []},
+      filter: {value: ''}
     },
     selectedTypes: []
   }),
   computed: {
     filteredTransformers() {
       return this.transformers.filter(transformer => {
+        const {filter, types} = this.formValues
         let matchType = true, matchFilter = true
-        if (this.form.filter.length) {
-          matchFilter = this._tr(transformer.code).toLowerCase().includes(this.form.filter.toLowerCase())
+        if (filter.length) {
+          matchFilter = this._tr(transformer.code).toLowerCase().includes(filter.toLowerCase())
         }
-        if (this.form.types.length) {
-          matchType = this.form.types.includes(transformer.type)
+        if (types.length) {
+          matchType = types.includes(transformer.type)
         }
         return matchFilter && matchType
       })
@@ -113,12 +114,12 @@ export default {
     }
   },
   watch: {
-    'form.types'() {
-      this.saveFormValues()
-    },
-    'form.filter'() {
-      this.saveFormValues()
-    },
+    formValues: {
+      handler() {
+        this.saveFormValues()
+      },
+      deep: true
+    }
   },
   mounted() {
     this.restoreFormValues()
