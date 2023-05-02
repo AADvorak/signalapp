@@ -30,7 +30,8 @@ const pl = {
       fileSaveError: 'Błąd podczas zapisywania pliku',
       transformSignalWith: 'Przetwórz sygnał {transformerName}',
       transformSignalsWith: 'Przetwórz sygnały {transformerName}',
-      transformed: 'Przetworzony'
+      transformed: 'Przetworzony',
+      nothingIsFound: 'Nic nie znaleziono. Zmień kryteria wyszukiwania.'
     },
     fields: {
       name: 'Nazwa',
@@ -52,7 +53,7 @@ const pl = {
   'message': {
     title: 'Wiadomość'
   },
-  'select-transformer-dialog': {
+  'select-transformer': {
     title: 'Wybór przetwarzacza',
     filterByTypes: 'Filtruj według typów',
   },

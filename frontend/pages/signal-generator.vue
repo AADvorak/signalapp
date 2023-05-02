@@ -61,6 +61,7 @@ import SignalUtils from "../utils/signal-utils";
 import ChartDrawer from "../components/chart-drawer";
 import {mdiEye, mdiEyeOff} from "@mdi/js";
 import NumberInput from "../components/number-input";
+import actionWithTimeout from "../mixins/action-with-timeout";
 
 const PREVIEW_KEY = 'SignalGeneratorPreview'
 const SIGNAL_FORMS = {
@@ -81,14 +82,14 @@ const SIGNAL_FORMS = {
   }
 }
 const VALIDATION_FUNCTIONS = {
-  length(values, ctx) {
-    let pointsNumber = values.length * values.sampleRate
+  length(ctx) {
+    let pointsNumber = ctx.formValues.length * ctx.formValues.sampleRate
     if (pointsNumber < 2 || pointsNumber > 512000) {
       return ctx._t('wrongPointsNumber', {pointsNumber: Math.floor(pointsNumber)})
     }
   },
-  frequency(values, ctx) {
-    if (2 * values.frequency > values.sampleRate) {
+  frequency(ctx) {
+    if (2 * ctx.formValues.frequency > ctx.formValues.sampleRate) {
       return ctx._t('lessThanHalfSampleRate')
     }
   }
@@ -98,7 +99,7 @@ export default {
   name: "signal-generator",
   components: {NumberInput, ChartDrawer},
   extends: PageBase,
-  mixins: [formValidation, formValuesSaving, formNumberValues],
+  mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout],
   data: () => ({
     mdiEye,
     mdiEyeOff,
@@ -187,7 +188,7 @@ export default {
     formValues: {
       handler(newValue, oldValue) {
         if (!this.onlyTypesChanged(newValue, oldValue)) {
-          this.waitToFinishUserInput(JSON.stringify(newValue))
+          this.actionWithTimeout('formValues', () => this.precalculateSignal())
         }
       },
       deep: true
@@ -195,16 +196,9 @@ export default {
   },
   mounted() {
     this.restoreFormValues()
-    this.waitToFinishUserInput(JSON.stringify(this.formValues))
+    this.precalculateSignal()
   },
   methods: {
-    waitToFinishUserInput(formJson) {
-      setTimeout(() => {
-        if (formJson === JSON.stringify(this.formValues)) {
-          this.precalculateSignal()
-        }
-      }, 600)
-    },
     precalculateSignal() {
       this.clearValidation()
       this.parseFloatForm({exclude: ['form']})
@@ -235,19 +229,17 @@ export default {
     },
     validateForm() {
       let validated = true
-      for (const field in this.form) {
-        if (field !== 'form') {
-          let validationMsg = this.getNumberValidationMsg(field)
-          if (!validationMsg) {
-            const validationFunction = VALIDATION_FUNCTIONS[field]
-            if (validationFunction) {
-              validationMsg = validationFunction(this.form, this)
-            }
+      for (const field of this.numberInputs) {
+        let validationMsg = this.getNumberValidationMsg(field)
+        if (!validationMsg) {
+          const validationFunction = VALIDATION_FUNCTIONS[field]
+          if (validationFunction) {
+            validationMsg = validationFunction(this)
           }
-          if (validationMsg) {
-            this.pushValidationMsg(field, validationMsg)
-            validated = false
-          }
+        }
+        if (validationMsg) {
+          this.pushValidationMsg(field, validationMsg)
+          validated = false
         }
       }
       return validated

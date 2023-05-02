@@ -78,9 +78,9 @@ export default {
     },
     addSignalToHistoryAndOpen(signal) {
       const route = useRoute()
-      const signalId = route.params.id, currentHistoryKey = route.query.history
+      const signalId = route.params.id || signal.id || '0', currentHistoryKey = route.query.history || '0'
       const historyKey = dataStore().addSignalToHistory(signal, currentHistoryKey)
-      useRouter().push(`/signal/${signalId || '0'}?history=${historyKey}`)
+      useRouter().push(`/signal/${signalId}?history=${historyKey}`)
       this.bus.emit('transformed')
     },
     validateForm() {

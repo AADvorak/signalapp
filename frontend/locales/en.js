@@ -30,7 +30,8 @@ const en = {
       fileSaveError: 'Error while saving file',
       transformSignalWith: 'Transform signal with {transformerName}',
       transformSignalsWith: 'Transform signals with {transformerName}',
-      transformed: 'Transformed'
+      transformed: 'Transformed',
+      nothingIsFound: 'Nothing is found. Change search criteria.'
     },
     fields: {
       name: 'Name',
@@ -52,7 +53,7 @@ const en = {
   'message': {
     title: 'Message'
   },
-  'select-transformer-dialog': {
+  'select-transformer': {
     title: 'Select transformer',
     filterByTypes: 'Filter by types',
   },

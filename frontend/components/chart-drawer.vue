@@ -65,6 +65,7 @@ export default {
   watch: {
     signals() {
       this.makeChartParams()
+      this.makeChartStyles()
     },
   },
   mounted() {

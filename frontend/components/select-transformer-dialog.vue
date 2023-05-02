@@ -13,65 +13,18 @@
         {{ _tc('buttons.transform') }}
       </v-btn>
     </template>
-    <v-card width="100%">
-      <v-toolbar>
-        <v-toolbar-title>{{ _t('title') }}</v-toolbar-title>
-        <v-spacer/>
-        <v-btn
-            icon
-            @click="dialog = false"
-        >
-          <v-icon>{{mdiClose}}</v-icon>
-        </v-btn>
-      </v-toolbar>
-      <v-card-text>
-        <v-form>
-          <v-row>
-            <v-col>
-              <v-select
-                  v-model="form.types.value"
-                  item-title="name"
-                  item-value="code"
-                  :items="types"
-                  :label="_t('filterByTypes')"
-                  multiple/>
-            </v-col>
-            <v-col>
-              <v-text-field
-                  v-model="form.filter.value"
-                  :label="_tc('search')"/>
-            </v-col>
-          </v-row>
-        </v-form>
-        <v-table fixed-header height="300px">
-          <thead>
-          <tr>
-            <th>{{ _tc('fields.name') }}</th>
-            <th>{{ _tc('fields.type') }}</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="transformer in filteredTransformers" @click="select(transformer)">
-            <td style="cursor: pointer;">{{ _tr(transformer.code) }}</td>
-            <td style="cursor: pointer;">{{ _trt(transformer.type) }}</td>
-          </tr>
-          </tbody>
-        </v-table>
-      </v-card-text>
-    </v-card>
+    <select-transformer :bus="bus" :double="double" @close="dialog = false"/>
   </v-dialog>
 </template>
 
 <script>
-import {dataStore} from "../stores/data-store";
-import formValuesSaving from "../mixins/form-values-saving";
-import {mdiClose} from "@mdi/js";
 import ComponentBase from "./component-base";
+import SelectTransformer from "./select-transformer";
 
 export default {
   name: "select-transformer-dialog",
+  components: {SelectTransformer},
   extends: ComponentBase,
-  mixins: [formValuesSaving],
   props: {
     bus: Object,
     double: {
@@ -84,52 +37,7 @@ export default {
     },
   },
   data: () => ({
-    dialog: false,
-    mdiClose,
-    transformers: [],
-    form: {
-      types: {value: []},
-      filter: {value: ''}
-    },
-    selectedTypes: []
+    dialog: false
   }),
-  computed: {
-    filteredTransformers() {
-      return this.transformers.filter(transformer => {
-        const {filter, types} = this.formValues
-        let matchType = true, matchFilter = true
-        if (filter.length) {
-          matchFilter = this._tr(transformer.code).toLowerCase().includes(filter.toLowerCase())
-        }
-        if (types.length) {
-          matchType = types.includes(transformer.type)
-        }
-        return matchFilter && matchType
-      })
-    },
-    types() {
-      return this.transformers.map(t => t.type)
-          .filter((value, index, self) => self.indexOf(value) === index)
-          .map(code => ({code, name: this._trt(code)}))
-    }
-  },
-  watch: {
-    formValues: {
-      handler() {
-        this.saveFormValues()
-      },
-      deep: true
-    }
-  },
-  mounted() {
-    this.restoreFormValues()
-    this.transformers = this.double ? dataStore().getDoubleTransformers : dataStore().getTransformers
-  },
-  methods: {
-    select(transformer) {
-      this.dialog = false
-      this.bus.emit('transformerSelected', transformer)
-    },
-  },
 }
 </script>

@@ -31,6 +31,7 @@ const ru = {
       transformSignalWith: 'Преобразовать сигнал {transformerName}',
       transformSignalsWith: 'Преобразовать сигналы {transformerName}',
       transformed: 'Преобразован',
+      nothingIsFound: 'Ничего не найдено. Измените критерии поиска.'
     },
     fields: {
       name: 'Имя',
@@ -52,7 +53,7 @@ const ru = {
   'message': {
     title: 'Сообщение'
   },
-  'select-transformer-dialog': {
+  'select-transformer': {
     title: 'Выбор преобразователя',
     filterByTypes: 'Фильтр по типу'
   },
