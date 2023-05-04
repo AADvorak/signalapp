@@ -43,9 +43,9 @@ const en = {
       oldPassword: 'Old password',
       firstName: 'First name',
       lastName: 'Last name',
-      patronymic: 'Patronymic'
+      patronymic: 'Patronymic',
+      search: 'Search'
     },
-    search: 'Search'
   },
   'confirm-dialog': {
     title: 'Confirmation'

@@ -25,7 +25,7 @@
           <v-col>
             <v-text-field
                 v-model="form.filter.value"
-                :label="_tc('search')"/>
+                :label="_tc('fields.search')"/>
           </v-col>
         </v-row>
       </v-form>

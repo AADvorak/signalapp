@@ -12,6 +12,7 @@ export default {
     dialog: false,
     selectedTransformer: null,
     processing: false,
+    processingDisabled: false,
     progress: 0,
     operation: '',
   }),
@@ -32,6 +33,7 @@ export default {
       if (newValue) {
         this.progress = 0
         this.operation = ''
+        this.processingDisabled = false
       } else {
         this.bus.emit('cancel')
       }
@@ -39,7 +41,10 @@ export default {
   },
   mounted() {
     this.bus.on('validationFailed', () => {
-      this.processing = false
+      this.processingDisabled = true
+    })
+    this.bus.on('validationPassed', () => {
+      this.processingDisabled = false
     })
     this.bus.on('progress', obj => {
       this.progress = obj.progress
@@ -52,6 +57,7 @@ export default {
   },
   beforeUnmount() {
     this.bus.off('validationFailed')
+    this.bus.off('validationPassed')
     this.bus.off('progress')
     this.bus.off('transformerSelected')
     this.bus.off('transformed')

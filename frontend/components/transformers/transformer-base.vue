@@ -4,11 +4,12 @@ import {dataStore} from "../../stores/data-store";
 import formValuesSaving from "../../mixins/form-values-saving";
 import formNumberValues from "../../mixins/form-number-values";
 import ComponentBase from "../component-base";
+import actionWithTimeout from "../../mixins/action-with-timeout";
 
 export default {
   name: "TransformerBase",
   extends: ComponentBase,
-  mixins: [formValidation, formValuesSaving, formNumberValues],
+  mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout],
   props: {
     signal: Object,
     bus: Object
@@ -21,6 +22,21 @@ export default {
     transformFunctionName() {
       const name = this.$options.name
       return name.charAt(0).toLowerCase() + name.slice(1)
+    }
+  },
+  watch: {
+    formValues() {
+      this.bus.emit('validationFailed')
+      this.actionWithTimeout(() => {
+        this.clearValidation()
+        this.parseFloatForm()
+        if (!this.validateForm()) {
+          this.bus.emit('validationFailed')
+          return
+        }
+        this.bus.emit('validationPassed')
+        this.saveFormValues()
+      })
     }
   },
   mounted() {
@@ -45,15 +61,6 @@ export default {
       return this.$t(`operationNames.${key}`)
     },
     doTransform() {
-      if (JSON.stringify(this.formValues) !== '{}') {
-        this.clearValidation()
-        this.parseFloatForm()
-        if (!this.validateForm()) {
-          this.bus.emit('validationFailed')
-          return
-        }
-        this.saveFormValues()
-      }
       this.worker.postMessage(this.makeWorkerMessage())
     },
     makeWorkerMessage() {

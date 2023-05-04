@@ -38,7 +38,7 @@
             <component v-bind:is="selectedTransformer.code" :signal1="signal1" :signal2="signal2" :bus="bus"/>
           </div>
           <div class="d-flex">
-            <v-btn :disabled="processing" color="primary" class="mr-4" @click="ok">
+            <v-btn :disabled="processing || processingDisabled" color="primary" class="mr-4" @click="ok">
               {{ okButtonText }}
             </v-btn>
             <v-btn @click="cancel">

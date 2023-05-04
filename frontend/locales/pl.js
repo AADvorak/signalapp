@@ -43,9 +43,9 @@ const pl = {
       oldPassword: 'Stare hasło',
       firstName: 'Imię',
       lastName: 'Nazwisko',
-      patronymic: 'Patronimik'
+      patronymic: 'Patronimik',
+      search: 'Szukaj'
     },
-    search: 'Szukaj'
   },
   'confirm-dialog': {
     title: 'Potwierdzenie'

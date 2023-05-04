@@ -43,9 +43,9 @@ const ru = {
       oldPassword: 'Старый пароль',
       firstName: 'Имя',
       lastName: 'Фамилия',
-      patronymic: 'Отчество'
+      patronymic: 'Отчество',
+      search: 'Поиск',
     },
-    search: 'Поиск',
   },
   'confirm-dialog': {
     title: 'Подтверждение'

@@ -188,7 +188,7 @@ export default {
     formValues: {
       handler(newValue, oldValue) {
         if (!this.onlyTypesChanged(newValue, oldValue)) {
-          this.actionWithTimeout('formValues', () => this.precalculateSignal())
+          this.actionWithTimeout(() => this.precalculateSignal())
         }
       },
       deep: true

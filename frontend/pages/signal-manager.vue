@@ -16,15 +16,14 @@
                       :field-obj="form.pageSize"/>
                 </v-col>
                 <v-col>
-                  <search-field
-                      :init-search-value="filter"
-                      @search="search => this.setFilter(search)"/>
+                  <text-input field="search" :field-obj="form.search"/>
                 </v-col>
               </v-row>
             </v-form>
           </fixed-width-wrapper>
           <fixed-width-wrapper v-if="signalsEmpty">
-            <h3 v-if="!filter">{{ _t('youHaveNoStoredSignals') }}. <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
+            <h3 v-if="!formValues.search">{{ _t('youHaveNoStoredSignals') }}.
+              <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
               <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
             <h3 v-else>{{ _tc('messages.nothingIsFound') }}</h3>
           </fixed-width-wrapper>
@@ -185,10 +184,12 @@ import formNumberValues from "../mixins/form-number-values";
 import formValidation from "../mixins/form-validation";
 import actionWithTimeout from "../mixins/action-with-timeout";
 import formValuesSaving from "../mixins/form-values-saving";
+import TextInput from "../components/text-input";
 
 export default {
   name: "signal-manager",
   components: {
+    TextInput,
     NumberInput,
     SelectTransformer, TransformerDialog,
     ChartDrawer, TransformerDoubleDialog,
@@ -202,7 +203,6 @@ export default {
     signals: [],
     signalsLoadedFrom: '',
     signalsEmpty: false,
-    filter: '',
     elements: 0,
     pages: 0,
     page: 1,
@@ -225,7 +225,8 @@ export default {
           max: 25,
           step: 1
         }
-      }
+      },
+      search: {value: ''}
     },
     SORT_DIRS: {
       DESC: 'desc',
@@ -268,19 +269,16 @@ export default {
     }
   },
   watch: {
-    filter() {
-      this.setUrlParams()
-      this.loadSignals()
-    },
     page() {
       this.setUrlParams()
       this.loadSignals()
     },
-    'formValues.pageSize'() {
-      this.actionWithTimeout('formValues', () => {
+    formValues() {
+      this.actionWithTimeout(() => {
         if (!this.validatePageSize()) {
           return
         }
+        this.page = 1
         this.saveFormValues()
         this.setUrlParams()
         this.loadSignals()
@@ -347,10 +345,6 @@ export default {
         SignalUtils.calculateSignalParams(signal)
       }
     },
-    setFilter(filter) {
-      this.filter = filter
-      this.page = 1
-    },
     setSortingName() {
       this.setSorting(this.SORT_COLS.NAME)
     },
@@ -391,7 +385,7 @@ export default {
       }
       const filter = ref(route.query.filter)
       if (filter.value) {
-        this.filter = filter.value
+        this.formValue('search', filter.value)
       }
       const sortBy = ref(route.query.sortBy)
       if (sortBy.value) {
@@ -409,8 +403,8 @@ export default {
     },
     makeUrlParams(pageMinus1) {
       let params = `?page=${pageMinus1 ? this.page - 1 : this.page}&size=${this.formValue('pageSize')}`
-      if (this.filter) {
-        params += `&filter=${this.filter}`
+      if (this.formValues.search) {
+        params += `&filter=${this.formValues.search}`
       }
       if (this.sortBy) {
         params += `&sortBy=${this.sortBy}`
