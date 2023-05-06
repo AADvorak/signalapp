@@ -126,7 +126,11 @@ export default {
     },
     async sendConfirmEmailRequest() {
       await this.loadWithFlag(async () => {
-        const response = await this.getApiProvider().post('/api/users/confirm', window.location.origin)
+        const response = await this.getApiProvider().postJson('/api/users/confirm', {
+          origin: window.location.origin,
+          localeTitle: this._t('confirmEmailMailTitle'),
+          localeMsg: this._t('confirmEmailMailMsg'),
+        })
         if (response.ok) {
           this.confirmEmailSent = true
           this.showMessage({

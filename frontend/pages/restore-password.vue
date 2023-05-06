@@ -48,7 +48,11 @@ export default {
     async restorePasswordRequest() {
       this.clearValidation()
       await this.loadWithFlag(async () => {
-        const response = await ApiProvider.postJson('/api/users/restore/' + this.formValues.email, {})
+        const response = await ApiProvider.postJson('/api/users/restore/', {
+          email: this.formValues.email,
+          localeTitle: this._t('restorePasswordMailTitle'),
+          localeMsg: this._t('restorePasswordMailMsg'),
+        })
         if (response.ok) {
           this.showMessage({
             text: this._t('newPasswordSentByEmail'),

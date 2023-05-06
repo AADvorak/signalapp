@@ -1,10 +1,7 @@
 package com.example.signalapp.service;
 
 import com.example.signalapp.ApplicationProperties;
-import com.example.signalapp.dto.request.ChangePasswordDtoRequest;
-import com.example.signalapp.dto.request.EditUserDtoRequest;
-import com.example.signalapp.dto.request.LoginDtoRequest;
-import com.example.signalapp.dto.request.UserDtoRequest;
+import com.example.signalapp.dto.request.*;
 import com.example.signalapp.dto.response.ResponseWithToken;
 import com.example.signalapp.dto.response.UserDtoResponse;
 import com.example.signalapp.error.SignalAppDataErrorCode;
@@ -139,7 +136,7 @@ public class UserService extends ServiceBase {
     }
 
     @Transactional(rollbackFor = MessagingException.class)
-    public void makeUserEmailConfirmation(String token, String origin) throws SignalAppUnauthorizedException,
+    public void makeUserEmailConfirmation(String token, EmailConfirmDtoRequest request) throws SignalAppUnauthorizedException,
             MessagingException, SignalAppDataException {
         User user = getUserByToken(token);
         if (user.isEmailConfirmed()) {
@@ -150,7 +147,9 @@ public class UserService extends ServiceBase {
                 .setCode(String.valueOf(randomUUID()))
                 .setCreateTime(LocalDateTime.now());
         userConfirmRepository.save(userConfirm);
-        mailTransport.sendEmailConfirmation(origin, userConfirm.getCode(), user.getEmail());
+        mailTransport.send(user.getEmail(), request.getLocaleTitle(), request.getLocaleMsg()
+                        .replace("$origin$", request.getOrigin())
+                        .replace("$code$", userConfirm.getCode()));
     }
 
     @Transactional
@@ -164,15 +163,16 @@ public class UserService extends ServiceBase {
     }
 
     @Transactional(rollbackFor = MessagingException.class)
-    public void restorePassword(String email) throws SignalAppDataException, MessagingException {
-        User user = userRepository.findByEmailAndEmailConfirmedTrue(email);
+    public void restorePassword(RestorePasswordDtoRequest request) throws SignalAppDataException, MessagingException {
+        User user = userRepository.findByEmailAndEmailConfirmedTrue(request.getEmail());
         if (user == null) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL);
         }
         String newPassword = RandomStringUtils.randomAlphanumeric(applicationProperties.getMinPasswordLength());
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
-        mailTransport.sendNewPassword(newPassword, user.getEmail());
+        mailTransport.send(user.getEmail(), request.getLocaleTitle(), request.getLocaleMsg()
+                .replace("$newPassword$", newPassword));
     }
 
     private String generateAndSaveToken(User user) {

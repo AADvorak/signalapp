@@ -84,6 +84,8 @@ const en = {
     name: 'Restore password',
     newPasswordSentByEmail: 'New password is sent by email',
     passwordSendError: 'Error while sending new password',
+    restorePasswordMailTitle: 'SignalApp - restore password',
+    restorePasswordMailMsg: 'Your new password for SignalApp: $newPassword$. It is recommended to change it immediately after sign in.',
   },
   'signal': {
     name: 'Signal',
@@ -173,7 +175,9 @@ const en = {
     deleteConfirm: 'Are you sure to delete your account? All your data will be removed immediately with no possibility of recover.',
     deleteError: 'Error while deleting account',
     sendEmailError: 'Error while sending email',
-    confirmSentCheckEmail: 'Confirm message is sent, check your email {email}'
+    confirmSentCheckEmail: 'Confirm message is sent, check your email {email}',
+    confirmEmailMailTitle: 'SignalApp - confirm email',
+    confirmEmailMailMsg: 'To confirm you email use the link $origin$/api/users/confirm/$code$'
   },
   transformerNames: {
     LinearAmp: 'Linear amplifier',

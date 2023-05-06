@@ -84,6 +84,8 @@ const ru = {
     name: 'Восстановление пароля',
     newPasswordSentByEmail: 'Новый пароль отправлен на эл почту',
     passwordSendError: 'Ошибка при отправке нового пароля',
+    restorePasswordMailTitle: 'SignalApp - восстановление пароля',
+    restorePasswordMailMsg: 'Ваш новый пароль: $newPassword$. Рекомендуется изменить его сразу после входа в учетную запись.',
   },
   'signal': {
     name: 'Сигнал',
@@ -173,7 +175,9 @@ const ru = {
     deleteConfirm: 'Вы точно хотите удалить аккаунт? Все ваши данные будут немедленно удалены без возможности восстановления.',
     deleteError: 'Ошибка при удалении аккаунта',
     sendEmailError: 'Ошибка при отправке письма',
-    confirmSentCheckEmail: 'Письмо с ссылкой для подтвержения отправлено на {email}'
+    confirmSentCheckEmail: 'Письмо с ссылкой для подтвержения отправлено на {email}',
+    confirmEmailMailTitle: 'SignalApp - подтверждение эл. почты',
+    confirmEmailMailMsg: 'Чтобы подтвердить электронную почту перейдите по ссылке $origin$/api/users/confirm/$code$'
   },
   transformerNames: {
     LinearAmp: 'Линейный усилитель',

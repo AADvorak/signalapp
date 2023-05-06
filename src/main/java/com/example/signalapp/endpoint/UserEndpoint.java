@@ -1,8 +1,6 @@
 package com.example.signalapp.endpoint;
 
-import com.example.signalapp.dto.request.ChangePasswordDtoRequest;
-import com.example.signalapp.dto.request.EditUserDtoRequest;
-import com.example.signalapp.dto.request.UserDtoRequest;
+import com.example.signalapp.dto.request.*;
 import com.example.signalapp.dto.response.ResponseWithToken;
 import com.example.signalapp.dto.response.UserDtoResponse;
 import com.example.signalapp.error.SignalAppDataException;
@@ -55,16 +53,15 @@ public class UserEndpoint extends EndpointBase {
 
     @PostMapping("/confirm")
     public void postMailConfirm(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                @RequestHeader(name = "Host", defaultValue = "localhost:8080") String host,
-                                @RequestBody String origin)
+                                @RequestBody EmailConfirmDtoRequest request)
             throws SignalAppUnauthorizedException, MessagingException, SignalAppDataException {
-        userService.makeUserEmailConfirmation(sessionId, origin != null && !origin.isEmpty()
-                ? origin : "http://" + host);
+        userService.makeUserEmailConfirmation(sessionId, request);
     }
 
-    @PostMapping(path = "/restore/{email}")
-    public void restorePassword(@PathVariable String email) throws MessagingException, SignalAppDataException {
-        userService.restorePassword(email);
+    @PostMapping(path = "/restore")
+    public void restorePassword(@RequestBody RestorePasswordDtoRequest request)
+            throws MessagingException, SignalAppDataException {
+        userService.restorePassword(request);
     }
 
 }

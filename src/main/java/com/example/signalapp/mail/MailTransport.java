@@ -15,15 +15,8 @@ public class MailTransport {
 
     private final MailingSender mailingSender;
 
-    public void sendEmailConfirmation(String origin, String code, String email) throws MessagingException {
-        send(new MailingMessage(email, "SignalApp email confirmation",
-                "To confirm you email use the link " + origin + "/api/users/confirm/" + code));
-    }
-
-    public void sendNewPassword(String newPassword, String email) throws MessagingException {
-        send(new MailingMessage(email, "SignalApp new password",
-                "Your new password for SignalApp: " + newPassword +
-                        ". It is recommended to change it immediately after sign in"));
+    public void send(String email, String subject, String body) throws MessagingException {
+        send(new MailingMessage(email, subject, body));
     }
 
     private void send(MailingMessage mailingMessage) throws MessagingException {

@@ -84,6 +84,8 @@ const pl = {
     name: 'Przywrócenie hasła',
     newPasswordSentByEmail: 'Nowe hasło zostało wysłane e-mailem',
     passwordSendError: 'Błąd podczas wysyłania nowego hasła',
+    restorePasswordMailTitle: 'SignalApp - przywrócenie hasła',
+    restorePasswordMailMsg: 'Twoje nowe hasło: $newPassword$. Zaleca się zmienić go natychmiast po zalogowaniu.',
   },
   'signal': {
     name: 'Sygnał',
@@ -173,7 +175,9 @@ const pl = {
     deleteConfirm: 'Czy na pewno chcesz usunąć swoje konto? Wszystkie Twoje dane zostaną natychmiast usunięte bez możliwości odzyskania.',
     deleteError: 'Błąd podczas usuwania konta',
     sendEmailError: 'Błąd podczas wysyłania e-maila',
-    confirmSentCheckEmail: 'Wiadomość potwierdzająca została wysłana, sprawdź swój e-mail {email}'
+    confirmSentCheckEmail: 'Wiadomość potwierdzająca została wysłana, sprawdź swój e-mail {email}',
+    confirmEmailMailTitle: 'SignalApp - potwierdzenie e-maila',
+    confirmEmailMailMsg: 'Aby potwierdzić e-mail, użyj linku $origin$/api/users/confirm/$code$'
   },
   transformerNames: {
     LinearAmp: 'Wzmacniacz liniowy',
