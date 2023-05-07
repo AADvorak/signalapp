@@ -7,9 +7,24 @@
             <chart-drawer :signals="signal.params ? [signal] : []"/>
           </div>
           <fixed-width-wrapper>
-            <div v-if="signalParamsText" class="mb-5">
-              {{ signalParamsText }}
-            </div>
+            <v-row>
+              <v-col cols="9">
+                <div v-if="signalParamsText" class="mb-5">
+                  {{ signalParamsText }}
+                </div>
+              </v-col>
+              <v-col cols="3" class="text-right">
+                <v-btn
+                    v-if="!isMobile && signal.sampleRate >= 3000"
+                    color="primary"
+                    @click="playOrStopSignal"
+                >
+                  <v-icon>
+                    {{ isSignalPlayed ? mdiStop : mdiPlay }}
+                  </v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
             <v-form @submit.prevent="saveSignal">
               <v-text-field
                   v-model="signal.name"
@@ -33,7 +48,7 @@
                 <v-btn color="secondary" @click="exportSignalToTxt">
                   {{ _tc('buttons.exportTxt') }}
                 </v-btn>
-                <v-btn color="secondary" v-if="signalId !== '0' && historyKey === '0'" @click="exportSignalToWav">
+                <v-btn color="secondary" @click="exportSignalToWav">
                   {{ _tc('buttons.exportWav') }}
                 </v-btn>
               </div>
@@ -59,6 +74,10 @@ import FileUtils from "../../../utils/file-utils";
 import SelectTransformerDialog from "../../../components/select-transformer-dialog";
 import SignalUtils from "../../../utils/signal-utils";
 import FixedWidthWrapper from "../../../components/fixed-width-wrapper";
+import WavCoder from "../../../audio/wav-coder";
+import SignalPlayer from "../../../audio/signal-player";
+import {mdiPlay, mdiStop} from "@mdi/js";
+import DeviceUtils from "../../../utils/device-utils";
 
 export default {
   name: "signal",
@@ -77,7 +96,11 @@ export default {
       name: {},
       description: {}
     },
-    bus: new mitt()
+    bus: new mitt(),
+    isSignalPlayed: false,
+    mdiPlay,
+    mdiStop,
+    isMobile: DeviceUtils.isMobile()
   }),
   computed: {
     signalIsSaved() {
@@ -180,7 +203,25 @@ export default {
       FileUtils.saveSignalToTxtFile(this.signal)
     },
     exportSignalToWav() {
-      FileUtils.saveSignalToWavFile(this.signal)
+      if (this.signalId !== '0' && this.historyKey === '0') {
+        FileUtils.saveSignalToWavFile(this.signal)
+      } else {
+        FileUtils.saveBlobToWavFile({
+          fileName: FileUtils.getFileNameWithExtension(this.signal.name, '.wav'),
+          blob: WavCoder.signalToWav(this.signal)
+        })
+      }
+    },
+    async playOrStopSignal() {
+      if (this.isSignalPlayed) {
+        SignalPlayer.stop()
+        this.isSignalPlayed = false
+      } else {
+        this.isSignalPlayed = true
+        await SignalPlayer.setSignal(this.signal).play(() => {
+          this.isSignalPlayed = false
+        })
+      }
     },
   },
 }

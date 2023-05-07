@@ -25,6 +25,16 @@
           </div>
           <div>{{ recordedInfo }}</div>
           <div class="d-flex flex-wrap">
+            <v-btn
+                v-if="!isMobile"
+                color="primary"
+                :disabled="!recordedAudio"
+                @click="playOrStopSignal"
+            >
+              <v-icon>
+                {{ isSignalPlayed ? mdiStop : mdiPlay }}
+              </v-icon>
+            </v-btn>
             <v-btn color="success" :disabled="!recordedAudio" :loading="saveRequestSent" @click="saveRecorded">
               {{ _tc('buttons.save') }}
             </v-btn>
@@ -51,6 +61,9 @@ import FileUtils from "../utils/file-utils";
 import Recorder from "../audio/recorder";
 import NumberInput from "../components/number-input";
 import formNumberValues from "../mixins/form-number-values";
+import {mdiPlay, mdiStop} from "@mdi/js";
+import DeviceUtils from "../utils/device-utils";
+import SignalPlayer from "../audio/signal-player";
 
 export default {
   name: "signal-recorder",
@@ -79,7 +92,11 @@ export default {
     recorder: undefined,
     input: undefined,
     audioContext: undefined,
-    saveRequestSent: false
+    saveRequestSent: false,
+    isSignalPlayed: false,
+    mdiPlay,
+    mdiStop,
+    isMobile: DeviceUtils.isMobile()
   }),
   computed: {
     recordedAudio() {
@@ -169,6 +186,17 @@ export default {
     },
     clearRecorded() {
       dataStore().setRecordedAudio(null)
+    },
+    async playOrStopSignal() {
+      if (this.isSignalPlayed) {
+        SignalPlayer.stop()
+        this.isSignalPlayed = false
+      } else {
+        this.isSignalPlayed = true
+        await SignalPlayer.setBlob(this.recordedAudio.blob).play(() => {
+          this.isSignalPlayed = false
+        })
+      }
     },
   },
 }

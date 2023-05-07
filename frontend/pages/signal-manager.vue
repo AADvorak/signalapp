@@ -69,7 +69,7 @@
                 </v-icon>
               </td>
               <td v-if="!isMobile" class="text-right">
-                <v-icon @click.stop="playOrStopSignal(signal)">
+                <v-icon v-if="signal.sampleRate >= 3000" @click.stop="playOrStopSignal(signal)">
                   {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
                 </v-icon>
               </td>
@@ -426,7 +426,7 @@ export default {
         this.playedSignal = null
       } else {
         this.playedSignal = signal
-        await SignalPlayer.setSignalId(signal.id).play(() => {
+        await SignalPlayer.setSignal(signal).play(() => {
           if (this.isSignalPlayed(signal)) {
             this.playedSignal = null
           }

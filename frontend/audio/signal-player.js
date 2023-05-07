@@ -1,4 +1,5 @@
 import ApiProvider from "~/api/api-provider";
+import WavCoder from "~/audio/wav-coder";
 
 const SignalPlayer = {
 
@@ -6,11 +7,18 @@ const SignalPlayer = {
   buffer: null,
   source: null,
 
-  signalId: undefined,
+  signal: null,
+  blob: null,
 
-  setSignalId(signalId) {
+  setSignal(signal) {
     this.stop()
-    this.signalId = signalId
+    this.signal = signal
+    return this
+  },
+
+  setBlob(blob) {
+    this.stop()
+    this.blob = blob
     return this
   },
 
@@ -19,7 +27,13 @@ const SignalPlayer = {
       this.audioCtx = new AudioContext()
     }
     if (!this.buffer) {
-      await this.load()
+      if (this.signal?.data) {
+        await this.decodeSignalData()
+      } else if (this.signal?.id) {
+        await this.load()
+      } else if (this.blob) {
+        await this.decodeBlob(this.blob)
+      }
     }
     if (!this.buffer) {
       return
@@ -42,18 +56,29 @@ const SignalPlayer = {
   clear() {
     this.buffer = null
     this.source = null
-    this.signalId = undefined
+    this.signal = null
+    this.blob = null
   },
 
   async load() {
-    let response = await ApiProvider.get('/api/signals/' + this.signalId + '/wav')
+    const response = await ApiProvider.get('/api/signals/' + this.signal.id + '/wav')
     if (response.ok) {
-      try {
-        await this.audioCtx.decodeAudioData(response.data, data => this.buffer = data)
-      } catch (e) {
-        // todo
-      }
+      await this.decodeArrayBuffer(response.data)
     }
+  },
+
+  async decodeSignalData() {
+    await this.decodeBlob(WavCoder.signalToWav(this.signal))
+  },
+
+  async decodeBlob(blob) {
+    await this.decodeArrayBuffer(await blob.arrayBuffer())
+  },
+
+  async decodeArrayBuffer(arrayBuffer) {
+    await this.audioCtx.decodeAudioData(arrayBuffer,
+        data => this.buffer = data,
+        error => console.log(error))
   }
 
 }
