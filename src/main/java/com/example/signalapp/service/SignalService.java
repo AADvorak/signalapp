@@ -117,14 +117,14 @@ public class SignalService extends ServiceBase {
     @Transactional(rollbackFor = IOException.class)
     public void importWav(String token, String fileName, byte[] data)
             throws SignalAppUnauthorizedException, UnsupportedAudioFileException, IOException, SignalAppException {
-        if (data.length > 2 * MAX_SIGNAL_LENGTH) {
-            throw new SignalAppException(SignalAppErrorCode.TOO_LONG_FILE,
-                    new MaxSizeExceptionParams(2 * SignalService.MAX_SIGNAL_LENGTH));
+        AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(data));
+        long sampleCount = asr.getSampleCount();
+        if (sampleCount > MAX_SIGNAL_LENGTH) {
+            throw new SignalAppException(SignalAppErrorCode.TOO_LONG_SIGNAL,
+                    new MaxSizeExceptionParams(SignalService.MAX_SIGNAL_LENGTH));
         }
         User user = getUserByToken(token);
         checkStoredByUserSignalsNumber(user.getId());
-        AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(data));
-        long sampleCount = asr.getSampleCount();
         if (asr.getFormat().getChannels() == 1) {
             double [] samples = new double[(int)sampleCount];
             asr.getMonoSamples(samples);
@@ -133,8 +133,8 @@ public class SignalService extends ServiceBase {
             double [] rightSamples = new double[(int)sampleCount];
             double [] leftSamples = new double[(int)sampleCount];
             asr.getStereoSamples(leftSamples, rightSamples);
-            makeAndSaveSignal(fileName + " (right)", rightSamples, asr.getFormat(), user);
-            makeAndSaveSignal(fileName + " (left)", leftSamples, asr.getFormat(), user);
+            makeAndSaveSignal(fileName + "(r)", rightSamples, asr.getFormat(), user);
+            makeAndSaveSignal(fileName + "(l)", leftSamples, asr.getFormat(), user);
         }
     }
 
@@ -164,7 +164,6 @@ public class SignalService extends ServiceBase {
                 format.getSampleSizeInBits(), 1, true, format.isBigEndian());
         Signal signal = new Signal()
                 .setName(fileName)
-                .setDescription("Imported from file " + fileName)
                 .setUserId(user.getId())
                 .setMaxAbsY(BigDecimal.ONE)
                 .setSampleRate(BigDecimal.valueOf(format.getSampleRate()))

@@ -8,11 +8,6 @@ public class SignalAppException extends Exception {
     private final SignalAppErrorCode errorCode;
     private final Object params;
 
-    public SignalAppException(SignalAppErrorCode errorCode) {
-        this.errorCode = errorCode;
-        this.params = null;
-    }
-
     public SignalAppException(SignalAppErrorCode errorCode, Object params) {
         this.errorCode = errorCode;
         this.params = params;

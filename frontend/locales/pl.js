@@ -286,6 +286,7 @@ const pl = {
     WRONG_EMAIL: 'Adres e-mail nie istnieje lub nie jest potwierdzony',
     WRONG_OLD_PASSWORD: 'Nieprawidłowe stare hasło',
     TOO_LONG_FILE: 'Plik jest zbyt długi. Maksymalny rozmiar wynosi {maxSize} bajtów.',
+    TOO_LONG_SIGNAL: 'Sygnał jest zbyt długi. Maksymalny rozmiar wynosi {maxSize} próbek.',
     TOO_MANY_SIGNALS_STORED: 'Masz zbyt wiele przechowywanych sygnałów. Maksymalna ich liczba to {maxNumber}.',
     NotEmpty: 'To pole jest wymagane',
     MinLength: 'Naruszenie minimalnej długości',

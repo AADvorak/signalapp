@@ -286,6 +286,7 @@ const en = {
     WRONG_EMAIL: 'Email does not exist or is not confirmed',
     WRONG_OLD_PASSWORD: 'Wrong old password',
     TOO_LONG_FILE: 'Too long file. Max size is {maxSize} bytes.',
+    TOO_LONG_SIGNAL: 'Too long signal. Max size is {maxSize} samples.',
     TOO_MANY_SIGNALS_STORED: 'Too many signals are stored. Max number is {maxNumber} signals.',
     NotEmpty: 'This field is required',
     MinLength: 'Min length violation',
