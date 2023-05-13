@@ -11,7 +11,7 @@
           {{ text }}
         </div>
         <div class="d-flex mt-4">
-          <v-btn @click="hide">
+          <v-btn color="primary" @click="hide">
             {{ _tc('buttons.ok') }}
           </v-btn>
         </div>

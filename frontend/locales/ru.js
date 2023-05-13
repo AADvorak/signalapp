@@ -3,6 +3,7 @@ const ru = {
   name: 'Русский',
   common: {
     buttons: {
+      open: 'Открыть',
       save: 'Сохранить',
       delete: 'Удалить',
       ok: 'OK',
@@ -31,7 +32,8 @@ const ru = {
       transformSignalWith: 'Преобразовать сигнал {transformerName}',
       transformSignalsWith: 'Преобразовать сигналы {transformerName}',
       transformed: 'Преобразован',
-      nothingIsFound: 'Ничего не найдено. Измените критерии поиска.'
+      nothingIsFound: 'Ничего не найдено. Измените критерии поиска.',
+      error: 'Ошибка'
     },
     fields: {
       name: 'Имя',
@@ -52,6 +54,9 @@ const ru = {
   },
   'message': {
     title: 'Сообщение'
+  },
+  'select-dialog': {
+    title: 'Выбор'
   },
   'select-transformer': {
     title: 'Выбор преобразователя',
@@ -96,6 +101,14 @@ const ru = {
     signalSaveError: 'Ошибка при сохранении сигнала',
     signalNotFound: 'Сигнал не найден'
   },
+  'signal-importer': {
+    'import': 'Импортировать',
+    fromTxtOrWavFile: 'Из файла txt или wav',
+    importedFromFile: 'Импортирован из файла {name}',
+    wrongSignalSamplesNumber: 'Количество отсчетов импортируемого сигнала должно быть не более {maxSamplesNumber}. В выбранном файле оно равно {samplesNumber}',
+    selectAction: 'Выберите действие с импортируемым сигналом',
+    wrongTxtFormat: 'Неверный формат txt файла'
+  },
   'signal-generator': {
     name: 'Генератор сигналов',
     generate: 'Сгенерировать',
@@ -115,9 +128,6 @@ const ru = {
     },
     signalName: 'Сгенерированный {form} сигнал',
     description: 'Сгенерированный {form} сигнал с частотой F = {frequency} ({length} отсчетов)',
-    'import': 'Импортировать',
-    fromTxtOrWavFile: 'Из файла txt или wav',
-    importedFromFile: 'Импортирован из файла {name}',
     wrongPointsNumber: 'Количество отсчетов (S * L) должно быть в диапазоне от 2 до 512000. Сейчас оно равно {pointsNumber}',
     lessThanHalfSampleRate: 'Значение должно быть не больше половины частоты дискретизации',
     preview: 'Предпросмотр'
@@ -292,7 +302,8 @@ const ru = {
     MinLength: 'Нарушение требования минимальной длины',
     Size: 'Нарушение требований размера',
     MaxLength: 'Нарушение требования максимальной длины',
-    Email: 'Должно быть в формате email'
+    Email: 'Должно быть в формате email',
+    INTERNAL_SERVER_ERROR: 'Внутренняя ошибка сервера'
   },
   chart: {
     resetZoom: 'Сбросить увеличение'

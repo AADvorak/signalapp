@@ -3,6 +3,7 @@ const en = {
   name: 'English',
   common: {
     buttons: {
+      open: 'Open',
       save: 'Save',
       delete: 'Delete',
       ok: 'OK',
@@ -31,7 +32,8 @@ const en = {
       transformSignalWith: 'Transform signal with {transformerName}',
       transformSignalsWith: 'Transform signals with {transformerName}',
       transformed: 'Transformed',
-      nothingIsFound: 'Nothing is found. Change search criteria.'
+      nothingIsFound: 'Nothing is found. Change search criteria.',
+      error: 'Error'
     },
     fields: {
       name: 'Name',
@@ -52,6 +54,9 @@ const en = {
   },
   'message': {
     title: 'Message'
+  },
+  'select-dialog': {
+    title: 'Selection'
   },
   'select-transformer': {
     title: 'Select transformer',
@@ -96,6 +101,14 @@ const en = {
     signalSaveError: 'Error while saving signal',
     signalNotFound: 'Signal is not found'
   },
+  'signal-importer': {
+    'import': 'Import',
+    fromTxtOrWavFile: 'From txt or wav file',
+    importedFromFile: 'Imported from file {name}',
+    wrongSignalSamplesNumber: 'Number of imported signal samples must be not greater than {maxSamplesNumber}. In selected file it is {samplesNumber}',
+    selectAction: 'Select action with imported signal',
+    wrongTxtFormat: 'Wrong txt file format'
+  },
   'signal-generator': {
     name: 'Signal generator',
     generate: 'Generate',
@@ -115,10 +128,7 @@ const en = {
     },
     signalName: 'Generated {form} signal',
     description: 'Generated {form} signal with F = {frequency} ({length} samples)',
-    'import': 'Import',
-    fromTxtOrWavFile: 'From txt or wav file',
-    importedFromFile: 'Imported from file {name}',
-    wrongPointsNumber: 'Number of signal samples (S * L) must be in range from 2 to 512000. Now it is {pointsNumber}',
+    wrongPointsNumber: 'Number of samples (S * L) must be in range from 2 to 512000. Now it is {pointsNumber}',
     lessThanHalfSampleRate: 'Must be less than a half of sample rate',
     preview: 'Preview'
   },
@@ -292,7 +302,8 @@ const en = {
     MinLength: 'Min length violation',
     Size: 'Size violation',
     MaxLength: 'Max length violation',
-    Email: 'Must be in the format of email'
+    Email: 'Must be in the format of email',
+    INTERNAL_SERVER_ERROR: 'Internal server error'
   },
   chart: {
     resetZoom: 'Reset zoom'

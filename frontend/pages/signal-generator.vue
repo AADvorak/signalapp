@@ -35,18 +35,11 @@
           </v-form>
           <chart-drawer class="mt-4" v-if="preview && signal" :signals="signal ? [signal] : []" :minimal="true"/>
         </v-card-text>
-        <v-card-title>
-          {{ _t('import') }}
-        </v-card-title>
-        <v-card-text>
-          <v-file-input
-              v-model="file"
-              accept=".txt,.wav"
-              :label="_t('fromTxtOrWavFile')"/>
-        </v-card-text>
+        <signal-importer @signal="s => saveSignalToHistoryAndOpen(s)"/>
       </v-card>
     </div>
     <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
+    <loading-overlay :show="loadingOverlay"/>
   </NuxtLayout>
 </template>
 
@@ -55,13 +48,13 @@ import formValidation from "../mixins/form-validation";
 import formValuesSaving from "../mixins/form-values-saving";
 import formNumberValues from "../mixins/form-number-values";
 import {dataStore} from "../stores/data-store";
-import FileUtils from "../utils/file-utils";
 import PageBase from "../components/page-base";
 import SignalUtils from "../utils/signal-utils";
 import ChartDrawer from "../components/chart-drawer";
 import {mdiEye, mdiEyeOff} from "@mdi/js";
 import NumberInput from "../components/number-input";
 import actionWithTimeout from "../mixins/action-with-timeout";
+import SignalImporter from "../components/signal-importer";
 
 const PREVIEW_KEY = 'SignalGeneratorPreview'
 const SIGNAL_FORMS = {
@@ -97,7 +90,7 @@ const VALIDATION_FUNCTIONS = {
 
 export default {
   name: "signal-generator",
-  components: {NumberInput, ChartDrawer},
+  components: {SignalImporter, NumberInput, ChartDrawer},
   extends: PageBase,
   mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout],
   data: () => ({
@@ -105,7 +98,6 @@ export default {
     mdiEyeOff,
     preview: localStorage.getItem(PREVIEW_KEY) === 'true',
     signal: null,
-    file: [],
     form: {
       begin: {
         value: 0,
@@ -171,17 +163,6 @@ export default {
     }
   },
   watch: {
-    file(newValue) {
-      let file = newValue[0]
-      switch (file.type) {
-        case 'audio/wav':
-          this.importFromWavFile(file)
-          break
-        case 'text/plain':
-          this.importFromTxtFile(file)
-          break
-      }
-    },
     preview(newValue) {
       localStorage.setItem(PREVIEW_KEY, newValue)
     },
@@ -243,29 +224,6 @@ export default {
         }
       }
       return validated
-    },
-    async importFromTxtFile(file) {
-      try {
-        let signal = await FileUtils.readSignalFromTxtFile(file)
-        signal.name = file.name
-        signal.description = this._t('importedFromFile', {name: file.name})
-        this.saveSignalToHistoryAndOpen(signal)
-      } catch (e) {
-        this.showMessage({
-          text: e.message
-        })
-      }
-    },
-    async importFromWavFile(file) {
-      let data = await FileUtils.readSignalFromWavFile(file)
-      let response = await this.getApiProvider().post('/api/signals/wav/' + file.name,
-          data, 'audio/wave')
-      if (response && response.ok) {
-        useRouter().push('/signal-manager')
-      } else {
-        this.showErrorsFromResponse(response, this._tc('messages.fileSaveError'))
-        // todo clear file input
-      }
     },
     saveSignalToHistoryAndOpen(signal) {
       signal.maxAbsY = SignalUtils.calculateMaxAbsY(signal)

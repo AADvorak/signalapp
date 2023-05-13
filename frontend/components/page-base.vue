@@ -4,11 +4,12 @@ import ConfirmDialog from "./confirm-dialog";
 import Message from "./message";
 import LoadingOverlay from "./loading-overlay";
 import ComponentBase from "./component-base"
+import SelectDialog from "./select-dialog";
 
 export default {
   name: "page-base",
   extends: ComponentBase,
-  components: {ConfirmDialog, Message, LoadingOverlay},
+  components: {ConfirmDialog, SelectDialog, Message, LoadingOverlay},
   data: () => ({
     message: {
       opened: false,
@@ -23,6 +24,15 @@ export default {
       cancel: () => {
       }
     },
+    select: {
+      opened: false,
+      text: '',
+      select: () => {
+      },
+      cancel: () => {
+      }
+    },
+    selectItems: [],
     loadingOverlay: false
   }),
   mounted() {
@@ -56,6 +66,20 @@ export default {
         }
       }
     },
+    askSelect({text, select, cancel}) {
+      this.select = {
+        opened: true,
+        text,
+        select: (itemName) => {
+          this.select.opened = false
+          select && select(itemName)
+        },
+        cancel: () => {
+          this.select.opened = false
+          cancel && cancel()
+        }
+      }
+    },
     async loadWithOverlay(loadFunction) {
       this.loadingOverlay = true
       try {
@@ -72,7 +96,7 @@ export default {
         this[flagName] = false
       }
     },
-    showErrorsFromResponse(response, text = 'Error') {
+    showErrorsFromResponse(response, text) {
       if (response.status === 401) {
         return
       }
@@ -83,7 +107,7 @@ export default {
         }
       }
       this.showMessage({
-        text: text + (errorMsg ? ': ' + errorMsg : '')
+        text: (text || this._tc('messages.error')) + (errorMsg ? ': ' + errorMsg : '')
       })
     },
     getLocalizedErrorMessage(error) {

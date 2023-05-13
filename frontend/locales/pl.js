@@ -3,6 +3,7 @@ const pl = {
   name: 'Polski',
   common: {
     buttons: {
+      open: 'Otwórz',
       save: 'Zapisz',
       delete: 'Usuń',
       ok: 'OK',
@@ -31,7 +32,8 @@ const pl = {
       transformSignalWith: 'Przetwórz sygnał {transformerName}',
       transformSignalsWith: 'Przetwórz sygnały {transformerName}',
       transformed: 'Przetworzony',
-      nothingIsFound: 'Nic nie znaleziono. Zmień kryteria wyszukiwania.'
+      nothingIsFound: 'Nic nie znaleziono. Zmień kryteria wyszukiwania.',
+      error: 'Błąd'
     },
     fields: {
       name: 'Nazwa',
@@ -52,6 +54,9 @@ const pl = {
   },
   'message': {
     title: 'Wiadomość'
+  },
+  'select-dialog': {
+    title: 'Wybór'
   },
   'select-transformer': {
     title: 'Wybór przetwarzacza',
@@ -96,6 +101,14 @@ const pl = {
     signalSaveError: 'Błąd podczas zapisywania sygnału',
     signalNotFound: 'Nie znaleziono sygnału'
   },
+  'signal-importer': {
+    'import': 'Importuj',
+    fromTxtOrWavFile: 'Z pliku txt lub wav',
+    importedFromFile: 'Zaimportowano z pliku {name}',
+    wrongSignalSamplesNumber: 'Liczba próbek importowanego sygnału nie może być większa niż {maxSamplesNumber}. W wybranym pliku wynosi {samplesNumber}',
+    selectAction: 'Wybierz akcję z importowanym sygnałem',
+    wrongTxtFormat: 'Niewłaściwy format pliku txt'
+  },
   'signal-generator': {
     name: 'Generator sygnałów',
     generate: 'Generuj',
@@ -115,9 +128,6 @@ const pl = {
     },
     signalName: 'Wygenerowany sygnał {form}',
     description: 'Wygenerowany sygnał {form} z F = {frequency} ({length} próbek)',
-    'import': 'Importuj',
-    fromTxtOrWavFile: 'Z pliku txt lub wav',
-    importedFromFile: 'Zaimportowano z pliku {name}',
     wrongPointsNumber: 'Liczba próbek sygnału (S * L) musi być między 2 a 512000. Obecnie wynosi {pointsNumber}',
     lessThanHalfSampleRate: 'Musi być mniejsza niż połowa częstotliwości próbkowania',
     preview: 'Podgląd'
@@ -292,7 +302,8 @@ const pl = {
     MinLength: 'Naruszenie minimalnej długości',
     Size: 'Naruszenie rozmiaru',
     MaxLength: 'Naruszenie maksymalnej długości',
-    Email: 'Musi być w formacie adresu e-mail'
+    Email: 'Musi być w formacie adresu e-mail',
+    INTERNAL_SERVER_ERROR: 'Wewnętrzny błąd serwera'
   },
   chart: {
     resetZoom: 'Zresetuj zoom'

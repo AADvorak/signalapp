@@ -33,7 +33,7 @@ const FileUtils = {
     return this.readFromFile(file).then(result => this.txtToSignal(result))
   },
 
-  readSignalFromWavFile(file) {
+  readArrayBufferFromWavFile(file) {
     return this.readFromFile(file, 'readAsArrayBuffer')
   },
 
@@ -61,6 +61,9 @@ const FileUtils = {
           y: values[1]
         }
         if (item.x && item.y) {
+          if (isNaN(item.x) || isNaN(item.y)) {
+            throw new Error()
+          }
           points.push({
             x: parseFloat(values[0]),
             y: parseFloat(values[1])
@@ -68,12 +71,22 @@ const FileUtils = {
         }
       }
       const xMin = points[0].x
-      // todo check steps
-      const sampleRate = 1 / (points[1].x - xMin)
-      const data = points.map(point => point.y)
+      const step = points[1].x - xMin
+      if (step <= 0) {
+        throw new Error()
+      }
+      const sampleRate = 1 / step
+      const maxStepError = step / 1000
+      let data = []
+      for (let i = 0; i < points.length; i++) {
+        if (points[i + 1] && Math.abs(points[i + 1].x - points[i].x - step) > maxStepError) {
+          throw new Error()
+        }
+        data.push(points[i].y)
+      }
       return {xMin, sampleRate, data}
     } catch (e) {
-      throw new Error('Wrong txt file format')
+      throw new Error('wrongTxtFormat')
     }
   },
 

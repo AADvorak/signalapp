@@ -1,9 +1,21 @@
+import WavDecoder from 'wav-decoder'
+
 const WavCoder = {
 
   signalToWav(signal) {
     const data = signal.data.map(value => value / signal.maxAbsY)
     const dataView = this.encodeWAV(data, 1, signal.sampleRate)
     return new Blob([dataView], {type: 'audio/wav'})
+  },
+
+  async wavToSignal(arrayBuffer) {
+    const audioData = await WavDecoder.decode(arrayBuffer)
+    // todo different channels
+    return {
+      xMin: 0,
+      sampleRate: audioData.sampleRate,
+      data: Array.prototype.slice.call(audioData.channelData[0])
+    }
   },
 
   encodeWAV(samples, numChannels, sampleRate) {
