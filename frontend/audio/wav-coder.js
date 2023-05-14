@@ -8,14 +8,13 @@ const WavCoder = {
     return new Blob([dataView], {type: 'audio/wav'})
   },
 
-  async wavToSignal(arrayBuffer) {
+  async wavToSignals(arrayBuffer) {
     const audioData = await WavDecoder.decode(arrayBuffer)
-    // todo different channels
-    return {
+    return audioData.channelData.map(channelDataItem => ({
       xMin: 0,
       sampleRate: audioData.sampleRate,
-      data: Array.prototype.slice.call(audioData.channelData[0])
-    }
+      data: Array.prototype.slice.call(channelDataItem)
+    }))
   },
 
   encodeWAV(samples, numChannels, sampleRate) {

@@ -35,6 +35,9 @@
                 {{ isSignalPlayed ? mdiStop : mdiPlay }}
               </v-icon>
             </v-btn>
+            <v-btn color="primary" :disabled="!recordedAudio" :loading="saveRequestSent" @click="openRecorded">
+              {{ _tc('buttons.open') }}
+            </v-btn>
             <v-btn color="success" :disabled="!recordedAudio" :loading="saveRequestSent" @click="saveRecorded">
               {{ _tc('buttons.save') }}
             </v-btn>
@@ -64,12 +67,14 @@ import formNumberValues from "../mixins/form-number-values";
 import {mdiPlay, mdiStop} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
 import SignalPlayer from "../audio/signal-player";
+import WavCoder from "../audio/wav-coder";
+import SignalActions from "../mixins/signal-actions";
 
 export default {
   name: "signal-recorder",
   components: {NumberInput},
   extends: PageBase,
-  mixins: [formValidation, formValuesSaving, formNumberValues],
+  mixins: [formValidation, formValuesSaving, formNumberValues, SignalActions],
   data: () => ({
     form: {
       sampleRate: {
@@ -169,6 +174,14 @@ export default {
         })
       })
       this.recordStatus = this.RECORD_STATUSES.READY
+    },
+    async openRecorded() {
+      const signal = (await WavCoder.wavToSignals(await this.recordedAudio.blob.arrayBuffer()))[0]
+      if (!this.validateSignalLength(signal)) {
+        return
+      }
+      signal.name = this.recordedAudio.fileName
+      this.saveSignalToHistoryAndOpen(signal)
     },
     async saveRecorded() {
       await this.loadWithFlag(async () => {

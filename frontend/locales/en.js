@@ -33,7 +33,8 @@ const en = {
       transformSignalsWith: 'Transform signals with {transformerName}',
       transformed: 'Transformed',
       nothingIsFound: 'Nothing is found. Change search criteria.',
-      error: 'Error'
+      error: 'Error',
+      wrongSignalSamplesNumber: 'Number of imported signal samples must be not greater than {maxSamplesNumber}. In selected file it is {samplesNumber}',
     },
     fields: {
       name: 'Name',
@@ -105,8 +106,8 @@ const en = {
     'import': 'Import',
     fromTxtOrWavFile: 'From txt or wav file',
     importedFromFile: 'Imported from file {name}',
-    wrongSignalSamplesNumber: 'Number of imported signal samples must be not greater than {maxSamplesNumber}. In selected file it is {samplesNumber}',
     selectAction: 'Select action with imported signal',
+    selectChannel: 'Select audio channel to import',
     wrongTxtFormat: 'Wrong txt file format'
   },
   'signal-generator': {

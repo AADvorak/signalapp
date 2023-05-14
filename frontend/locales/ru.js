@@ -33,7 +33,8 @@ const ru = {
       transformSignalsWith: 'Преобразовать сигналы {transformerName}',
       transformed: 'Преобразован',
       nothingIsFound: 'Ничего не найдено. Измените критерии поиска.',
-      error: 'Ошибка'
+      error: 'Ошибка',
+      wrongSignalSamplesNumber: 'Количество отсчетов импортируемого сигнала должно быть не более {maxSamplesNumber}. В выбранном файле оно равно {samplesNumber}',
     },
     fields: {
       name: 'Имя',
@@ -105,8 +106,8 @@ const ru = {
     'import': 'Импортировать',
     fromTxtOrWavFile: 'Из файла txt или wav',
     importedFromFile: 'Импортирован из файла {name}',
-    wrongSignalSamplesNumber: 'Количество отсчетов импортируемого сигнала должно быть не более {maxSamplesNumber}. В выбранном файле оно равно {samplesNumber}',
     selectAction: 'Выберите действие с импортируемым сигналом',
+    selectChannel: 'Выберите аудиоканал для импорта',
     wrongTxtFormat: 'Неверный формат txt файла'
   },
   'signal-generator': {

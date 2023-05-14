@@ -55,6 +55,7 @@ import {mdiEye, mdiEyeOff} from "@mdi/js";
 import NumberInput from "../components/number-input";
 import actionWithTimeout from "../mixins/action-with-timeout";
 import SignalImporter from "../components/signal-importer";
+import SignalActions from "../mixins/signal-actions";
 
 const PREVIEW_KEY = 'SignalGeneratorPreview'
 const SIGNAL_FORMS = {
@@ -92,7 +93,7 @@ export default {
   name: "signal-generator",
   components: {SignalImporter, NumberInput, ChartDrawer},
   extends: PageBase,
-  mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout],
+  mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout, SignalActions],
   data: () => ({
     mdiEye,
     mdiEyeOff,
@@ -224,11 +225,6 @@ export default {
         }
       }
       return validated
-    },
-    saveSignalToHistoryAndOpen(signal) {
-      signal.maxAbsY = SignalUtils.calculateMaxAbsY(signal)
-      SignalUtils.calculateSignalParams(signal)
-      useRouter().push('/signal/0?history=' + dataStore().addSignalToHistory(signal))
     },
     onlyTypesChanged(oldForm, newForm) {
       for (let field in newForm) {

@@ -12,7 +12,7 @@
         </div>
         <div class="d-flex">
           <v-btn v-for="item in items" :color="item.color" class="mr-4" @click="() => select(item.name)">
-            {{ _tc('buttons.' + item.name) }}
+            {{ getButtonText(item) }}
           </v-btn>
           <v-btn @click="cancel">
             {{ _tc('buttons.cancel') }}
@@ -44,6 +44,9 @@ export default {
     },
     cancel() {
       this.$emit('cancel')
+    },
+    getButtonText(item) {
+      return item.noLocale ? item.name : this._tc('buttons.' + item.name)
     }
   }
 }

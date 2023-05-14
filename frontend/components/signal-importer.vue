@@ -17,16 +17,20 @@ import PageBase from "./page-base";
 import FileUtils from "../utils/file-utils";
 import WavCoder from "../audio/wav-coder";
 import SignalUtils from "../utils/signal-utils";
+import SignalActions from "../mixins/signal-actions";
+
+const ACTION_SELECT_ITEMS = [
+  {name: 'open', color: 'primary'},
+  {name: 'save', color: 'success'},
+]
 
 export default {
   name: "signal-importer",
   extends: PageBase,
+  mixins: [SignalActions],
   data: () => ({
     file: [],
-    selectItems: [
-      {name: 'open', color: 'primary'},
-      {name: 'save', color: 'success'},
-    ],
+    selectItems: ACTION_SELECT_ITEMS,
   }),
   emits: ['signal'],
   watch: {
@@ -44,6 +48,7 @@ export default {
   },
   methods: {
     async importFromFile(file, openFunc, saveFunc) {
+      this.selectItems = ACTION_SELECT_ITEMS
       this.askSelect({
         text: this._t('selectAction'),
         select: async (action) => {
@@ -59,12 +64,27 @@ export default {
     async openWav(file) {
       try {
         const arrayBuffer = await FileUtils.readArrayBufferFromWavFile(file)
-        const signal = await WavCoder.wavToSignal(arrayBuffer)
-        if (!this.validateSignalLength(signal)) {
+        const signals = await WavCoder.wavToSignals(arrayBuffer)
+        if (!this.validateSignalLength(signals[0])) {
           return
         }
-        this.makeSignalNameAndDescriptionFromFile(signal, file)
-        this.$emit('signal', signal)
+        if (signals.length === 1) {
+          this.makeSignalNameAndDescriptionFromFile(signals[0], file)
+          this.$emit('signal', signals[0])
+        } else {
+          this.selectItems = []
+          for (let i = 0; i < signals.length; i++) {
+            this.selectItems.push({name: i + 1, color: 'secondary', noLocale: true})
+          }
+          this.askSelect({
+            text: this._t('selectChannel'),
+            select: async (channel) => {
+              const channelNumber = parseInt(channel) - 1
+              this.makeSignalNameAndDescriptionFromFile(signals[channelNumber], file)
+              this.$emit('signal', signals[channelNumber])
+            }
+          })
+        }
       } catch (e) {
         this.showMessage({
           text: `${this._tc('messages.error')}: ${e.message}`
@@ -123,16 +143,6 @@ export default {
     makeSignalNameAndDescriptionFromFile(signal, file) {
       signal.name = file.name
       signal.description = this._t('importedFromFile', {name: file.name})
-    },
-    validateSignalLength(signal) {
-      const maxSamplesNumber = 1024000, samplesNumber = signal.data.length
-      if (samplesNumber > maxSamplesNumber) {
-        this.showMessage({
-          text: this._t('wrongSignalSamplesNumber', {samplesNumber, maxSamplesNumber})
-        })
-        return false
-      }
-      return true
     }
   }
 }
