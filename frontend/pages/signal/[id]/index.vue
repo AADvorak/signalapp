@@ -139,16 +139,16 @@ export default {
       let signal = dataStore().getSignalFromHistory(this.signalId, this.historyKey)
       if (signal) {
         this.signal = signal
-      } else if (!isNaN(this.signalId) && (!this.historyKey || this.historyKey === '0')) {
+      } else if (!isNaN(this.signalId) && this.signalId !== '0' && (!this.historyKey || this.historyKey === '0')) {
         this.loadWithOverlay(async () => {
-          await this.loadSignal(this.signalId)
+          await this.loadSignal()
         })
       } else {
         this.signalNotFound()
       }
     },
-    async loadSignal(id) {
-      let response = await this.getApiProvider().get('/api/signals/' + id)
+    async loadSignal() {
+      let response = await this.getApiProvider().get('/api/signals/' + this.signalId)
       if (response.ok) {
         let signal = response.data
         SignalUtils.calculateSignalParams(signal)

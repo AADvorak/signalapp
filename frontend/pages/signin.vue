@@ -58,6 +58,9 @@ export default {
   mounted() {
     this.formValue('email', dataStore().emailForPasswordRestore || '')
   },
+  beforeUnmount() {
+    dataStore().clearWaitingForAuthorization()
+  },
   methods: {
     async signInRequest() {
       this.clearValidation()
@@ -66,7 +69,6 @@ export default {
         if (response.ok) {
           dataStore().setUserInfo(response.data)
           useRouter().push(this.waitingForAuthorization ? this.waitingForAuthorization : '/')
-          this.waitingForAuthorization && dataStore().clearWaitingForAuthorization()
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
         } else {
