@@ -44,7 +44,7 @@
               </th>
               <th class="text-left"></th>
               <th class="text-left"></th>
-              <th v-if="!isMobile" class="text-left"></th>
+              <th class="text-left"></th>
               <th class="text-left"></th>
             </tr>
             </thead>
@@ -68,7 +68,7 @@
                   {{ mdi.mdiFileImport }}
                 </v-icon>
               </td>
-              <td v-if="!isMobile" class="text-right">
+              <td class="text-right">
                 <v-icon v-if="signal.sampleRate >= 3000" @click.stop="playOrStopSignal(signal)">
                   {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
                 </v-icon>
@@ -175,7 +175,6 @@ import ChartDrawer from "../components/chart-drawer";
 import mitt from "mitt";
 import TransformerDoubleDialog from "../components/transformer-double-dialog";
 import SignalUtils from "../utils/signal-utils";
-import DeviceUtils from "../utils/device-utils";
 import FixedWidthWrapper from "../components/fixed-width-wrapper";
 import TransformerDialog from "../components/transformer-dialog";
 import SelectTransformer from "../components/select-transformer";
@@ -237,8 +236,7 @@ export default {
       DESCRIPTION: 'description'
     },
     bus: new mitt(),
-    selectSignals: false,
-    isMobile: DeviceUtils.isMobile()
+    selectSignals: false
   }),
   computed: {
     sortingNameSign() {

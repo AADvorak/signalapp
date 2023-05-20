@@ -26,7 +26,6 @@
           <div>{{ recordedInfo }}</div>
           <div class="d-flex flex-wrap">
             <v-btn
-                v-if="!isMobile"
                 color="primary"
                 :disabled="!recordedAudio"
                 @click="playOrStopSignal"
@@ -65,7 +64,6 @@ import Recorder from "../audio/recorder";
 import NumberInput from "../components/number-input";
 import formNumberValues from "../mixins/form-number-values";
 import {mdiPlay, mdiStop} from "@mdi/js";
-import DeviceUtils from "../utils/device-utils";
 import SignalPlayer from "../audio/signal-player";
 import WavCoder from "../audio/wav-coder";
 import SignalActions from "../mixins/signal-actions";
@@ -100,8 +98,7 @@ export default {
     saveRequestSent: false,
     isSignalPlayed: false,
     mdiPlay,
-    mdiStop,
-    isMobile: DeviceUtils.isMobile()
+    mdiStop
   }),
   computed: {
     recordedAudio() {

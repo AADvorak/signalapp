@@ -15,7 +15,7 @@
               </v-col>
               <v-col cols="3" class="text-right">
                 <v-btn
-                    v-if="!isMobile && signal.sampleRate >= 3000"
+                    v-if="signal.sampleRate >= 3000"
                     color="primary"
                     @click="playOrStopSignal"
                 >
@@ -77,7 +77,6 @@ import FixedWidthWrapper from "../../../components/fixed-width-wrapper";
 import WavCoder from "../../../audio/wav-coder";
 import SignalPlayer from "../../../audio/signal-player";
 import {mdiPlay, mdiStop} from "@mdi/js";
-import DeviceUtils from "../../../utils/device-utils";
 
 export default {
   name: "signal",
@@ -99,8 +98,7 @@ export default {
     bus: new mitt(),
     isSignalPlayed: false,
     mdiPlay,
-    mdiStop,
-    isMobile: DeviceUtils.isMobile()
+    mdiStop
   }),
   computed: {
     signalIsSaved() {
