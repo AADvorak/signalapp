@@ -1,3 +1,11 @@
+<template>
+  <number-input
+      v-for="field in formFields"
+      :field="field"
+      :label="_trp(field)"
+      :field-obj="form[field]"/>
+</template>
+
 <script>
 import formValidation from "../../mixins/form-validation";
 import {dataStore} from "../../stores/data-store";
@@ -5,9 +13,11 @@ import formValuesSaving from "../../mixins/form-values-saving";
 import formNumberValues from "../../mixins/form-number-values";
 import ComponentBase from "../component-base";
 import actionWithTimeout from "../../mixins/action-with-timeout";
+import NumberInput from "../number-input";
 
 export default {
   name: "TransformerBase",
+  components: {NumberInput},
   extends: ComponentBase,
   mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout],
   props: {

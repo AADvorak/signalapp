@@ -1,18 +1,8 @@
-<template>
-  <number-input
-      v-for="field in formFields"
-      :field="field"
-      :label="_trp(field)"
-      :field-obj="form[field]"/>
-</template>
-
 <script>
 import TransformerBase from "./transformer-base";
-import NumberInput from "../number-input";
 
 export default {
   name: "LinearAmp",
-  components: {NumberInput},
   extends: TransformerBase,
   data: () => ({
     form: {

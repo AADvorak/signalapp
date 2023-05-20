@@ -1,18 +1,8 @@
-<template>
-  <number-input
-      v-for="field in formFields"
-      :field="field"
-      :label="_trp(field)"
-      :field-obj="form[field]"/>
-</template>
-
 <script>
 import TransformerDoubleBase from "./transformer-double-base";
-import NumberInput from "../number-input";
 
 export default {
   name: "Adder",
-  components: {NumberInput},
   extends: TransformerDoubleBase,
   data: () => ({
     form: {

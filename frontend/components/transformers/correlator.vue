@@ -1,5 +1,3 @@
-<template></template>
-
 <script>
 import TransformerDoubleBase from "./transformer-double-base";
 

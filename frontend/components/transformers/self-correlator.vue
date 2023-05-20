@@ -1,5 +1,3 @@
-<template></template>
-
 <script>
 import TransformerBase from "./transformer-base";
 
