@@ -13,6 +13,8 @@ import java.util.Properties;
 @Component
 public class MailTransport {
 
+    private static final String ENCODING = "UTF-8";
+
     private final MailingSender mailingSender;
 
     public void send(String email, String subject, String body) throws MessagingException {
@@ -31,14 +33,15 @@ public class MailTransport {
                         return new PasswordAuthentication(mailingSender.getUsername(), mailingSender.getPassword());
                     }
                 });
-        Message message = new MimeMessage(session);
+        MimeMessage message = new MimeMessage(session);
         message.setFrom(new InternetAddress(mailingSender.getUsername()));
         message.setRecipients(
                 Message.RecipientType.TO,
                 InternetAddress.parse(mailingMessage.getEmail())
         );
-        message.setSubject(mailingMessage.getSubject());
-        message.setText(mailingMessage.getBody());
+        message.setSubject(mailingMessage.getSubject(), ENCODING);
+        message.setText(mailingMessage.getBody(), ENCODING);
+        message.setHeader("Content-Type", "text/plain; charset=" + ENCODING);
         Transport.send(message);
     }
 
