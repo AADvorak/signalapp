@@ -47,7 +47,6 @@
 import formValidation from "../mixins/form-validation";
 import formValuesSaving from "../mixins/form-values-saving";
 import formNumberValues from "../mixins/form-number-values";
-import {dataStore} from "../stores/data-store";
 import PageBase from "../components/page-base";
 import SignalUtils from "../utils/signal-utils";
 import ChartDrawer from "../components/chart-drawer";
@@ -77,12 +76,18 @@ const SIGNAL_FORMS = {
 }
 const VALIDATION_FUNCTIONS = {
   length(ctx) {
+    if (!ctx.isAllFieldsValidated(['length', 'sampleRate'])) {
+      return
+    }
     let pointsNumber = ctx.formValues.length * ctx.formValues.sampleRate
     if (pointsNumber < 2 || pointsNumber > 512000) {
       return ctx._t('wrongPointsNumber', {pointsNumber: Math.floor(pointsNumber)})
     }
   },
   frequency(ctx) {
+    if (!ctx.isAllFieldsValidated(['frequency', 'sampleRate'])) {
+      return
+    }
     if (2 * ctx.formValues.frequency > ctx.formValues.sampleRate) {
       return ctx._t('lessThanHalfSampleRate')
     }
@@ -210,21 +215,28 @@ export default {
       this.signal && this.saveSignalToHistoryAndOpen(this.signal)
     },
     validateForm() {
-      let validated = true
+      let validationObj = {}
       for (const field of this.numberInputs) {
-        let validationMsg = this.getNumberValidationMsg(field)
-        if (!validationMsg) {
-          const validationFunction = VALIDATION_FUNCTIONS[field]
-          if (validationFunction) {
-            validationMsg = validationFunction(this)
-          }
-        }
+        const validationMsg = this.getNumberValidationMsg(field)
         if (validationMsg) {
-          this.pushValidationMsg(field, validationMsg)
-          validated = false
+          validationObj[field] = validationMsg
         }
       }
-      return validated
+      this.pushValidationMsgFromObject(validationObj)
+      validationObj = {}
+      for (const field in VALIDATION_FUNCTIONS) {
+        const validationMsg = VALIDATION_FUNCTIONS[field](this)
+        if (validationMsg) {
+          validationObj[field] = validationMsg
+        }
+      }
+      this.pushValidationMsgFromObject(validationObj)
+      return this.isAllFieldsValidated(this.numberInputs)
+    },
+    pushValidationMsgFromObject(validationObj) {
+      for (const field in validationObj) {
+        this.pushValidationMsg(field, validationObj[field])
+      }
     },
     onlyTypesChanged(oldForm, newForm) {
       for (let field in newForm) {
