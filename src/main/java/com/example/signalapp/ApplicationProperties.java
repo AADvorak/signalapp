@@ -17,4 +17,8 @@ public class ApplicationProperties {
 
     private boolean debug;
 
+    private boolean verifyCaptcha;
+
+    private String dataPath;
+
 }

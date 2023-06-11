@@ -1,12 +1,11 @@
 package com.example.signalapp.service;
 
 import com.example.signalapp.ApplicationProperties;
+import com.example.signalapp.captcha.RecaptchaVerifier;
 import com.example.signalapp.dto.request.*;
 import com.example.signalapp.dto.response.ResponseWithToken;
 import com.example.signalapp.dto.response.UserDtoResponse;
-import com.example.signalapp.error.SignalAppDataErrorCode;
-import com.example.signalapp.error.SignalAppDataException;
-import com.example.signalapp.error.SignalAppUnauthorizedException;
+import com.example.signalapp.error.*;
 import com.example.signalapp.file.FileManager;
 import com.example.signalapp.mail.MailTransport;
 import com.example.signalapp.mapper.UserMapper;
@@ -50,17 +49,23 @@ public class UserService extends ServiceBase {
 
     private final FileManager fileManager;
 
+    private final RecaptchaVerifier recaptchaVerifier;
+
     public UserService(UserTokenRepository userTokenRepository, ApplicationProperties applicationProperties,
                        UserRepository userRepository, UserConfirmRepository userConfirmRepository,
-                       MailTransport mailTransport, FileManager fileManager) {
+                       MailTransport mailTransport, FileManager fileManager, RecaptchaVerifier recaptchaVerifier) {
         super(userTokenRepository, applicationProperties);
         this.userRepository = userRepository;
         this.userConfirmRepository = userConfirmRepository;
         this.mailTransport = mailTransport;
         this.fileManager = fileManager;
+        this.recaptchaVerifier = recaptchaVerifier;
     }
 
-    public ResponseWithToken<UserDtoResponse> register(UserDtoRequest request) throws SignalAppDataException {
+    public ResponseWithToken<UserDtoResponse> register(UserDtoRequest request) throws Exception {
+        if (applicationProperties.isVerifyCaptcha()) {
+            recaptchaVerifier.verify(request.getToken());
+        }
         User user = UserMapper.INSTANCE.dtoToUser(request);
         user.setPassword(encoder.encode(user.getPassword()));
         try {
@@ -73,7 +78,10 @@ public class UserService extends ServiceBase {
                 .setToken(generateAndSaveToken(user));
     }
 
-    public ResponseWithToken<UserDtoResponse> login(LoginDtoRequest request) throws SignalAppDataException {
+    public ResponseWithToken<UserDtoResponse> login(LoginDtoRequest request) throws Exception {
+        if (applicationProperties.isVerifyCaptcha()) {
+            recaptchaVerifier.verify(request.getToken());
+        }
         User user = userRepository.findByEmail(request.getEmail());
         if (user == null) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD);

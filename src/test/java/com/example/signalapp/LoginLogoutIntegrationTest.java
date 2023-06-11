@@ -6,38 +6,39 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.HttpClientErrorException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class LoginLogoutIntegrationTest extends IntegrationTestBase {
+@TestPropertySource(locations = "/test.properties")
+public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
 
     @BeforeAll
-    public void clearAndRegisterUsers() {
+    public void beforeAll() throws Exception {
         userRepository.deleteAll();
         registerUsers();
+        prepareRecaptchaVerifier();
     }
 
     @Test
-    public void testLoginOk() {
+    public void loginOk() {
         ResponseEntity<String> response = template.postForEntity(fullUrl(SESSIONS_URL),
                 new LoginDtoRequest().setEmail(email1).setPassword(password), String.class);
         assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
                 () -> assertNotNull(response.getHeaders().get("Set-Cookie")));
+        // todo check db
     }
 
     @Test
-    public void testLoginEmptyEmail() throws JsonProcessingException {
+    public void loginWithEmptyEmail() throws JsonProcessingException {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail("").setPassword(password), String.class));
@@ -48,7 +49,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testLoginEmptyPassword() throws JsonProcessingException {
+    public void loginWithEmptyPassword() throws JsonProcessingException {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail(email1).setPassword(""), String.class));
@@ -59,7 +60,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testLoginWrongEmail() throws JsonProcessingException {
+    public void loginWithWrongEmail() throws JsonProcessingException {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail("wrong").setPassword(password), String.class));
@@ -69,7 +70,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testLoginWrongPassword() throws JsonProcessingException {
+    public void loginWithWrongPassword() throws JsonProcessingException {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail(email1).setPassword("wrong"), String.class));
@@ -79,16 +80,41 @@ public class LoginLogoutIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testLogoutOk() {
+    public void logoutOk() {
         HttpHeaders headers = login(email1);
         ResponseEntity<String> response = template.exchange(fullUrl(SESSIONS_URL), HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
         assertEquals(response.getStatusCodeValue(), 200);
     }
 
     @Test
-    public void testLogoutUnauthorized() {
+    public void logoutUnauthorized() {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, () -> template.delete(fullUrl(SESSIONS_URL)));
         assertEquals(401, exc.getRawStatusCode());
     }
+
+    @Test
+    public void loginWithProperRecaptchaToken() {
+        applicationProperties.setVerifyCaptcha(true);
+        ResponseEntity<String> response = template.postForEntity(fullUrl(SESSIONS_URL),
+                new LoginDtoRequest().setEmail(email1).setPassword(password).setToken(PROPER_TOKEN), String.class);
+        assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
+                () -> assertNotNull(response.getHeaders().get("Set-Cookie")));
+        // todo check db
+        applicationProperties.setVerifyCaptcha(false);
+    }
+
+    // todo
+//    @Test
+//    public void loginWithWrongRecaptchaToken() throws JsonProcessingException {
+//        applicationProperties.setVerifyCaptcha(true);
+//        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+//                () -> template.postForEntity(fullUrl(SESSIONS_URL),
+//                        new LoginDtoRequest().setEmail(email1).setPassword(password).setToken(WRONG_TOKEN), String.class));
+//        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+//        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+//                () -> assertEquals("RECAPTCHA_TOKEN_NOT_VERIFIED", error.getCode()),
+//                () -> assertEquals("token", error.getField()));
+//        applicationProperties.setVerifyCaptcha(false);
+//    }
 
 }

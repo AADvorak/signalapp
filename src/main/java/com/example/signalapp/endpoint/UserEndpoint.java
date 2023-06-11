@@ -22,7 +22,7 @@ public class UserEndpoint extends EndpointBase {
     private final UserService userService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserDtoResponse post(@Valid @RequestBody UserDtoRequest user, HttpServletResponse response) throws SignalAppDataException {
+    public UserDtoResponse post(@Valid @RequestBody UserDtoRequest user, HttpServletResponse response) throws Exception {
         ResponseWithToken<UserDtoResponse> responseWithToken = userService.register(user);
         setCookieWithTokenToResponse(responseWithToken.getToken(), response);
         return responseWithToken.getResponse();

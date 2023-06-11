@@ -1,6 +1,8 @@
 package com.example.signalapp.file;
 
+import com.example.signalapp.ApplicationProperties;
 import com.example.signalapp.SignalApplication;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
 
@@ -15,10 +17,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Component
+@RequiredArgsConstructor
 public class FileManager {
 
     private static final String MODULES_PATH = "modules/";
     private static final String SIGNALS_PATH = "signals/";
+
+    private final ApplicationProperties applicationProperties;
 
     public void writeModuleToFile(String module, String extension, String data) throws IOException {
         String moduleLowerCase = module.toLowerCase();
@@ -40,12 +45,6 @@ public class FileManager {
         return readBytesFromFile(wavFile);
     }
 
-    public void writeWavToFile(int userId, int signalId, byte[] data) throws IOException {
-        String wavDir = getWavDir(userId, signalId);
-        createDirIfNotExists(wavDir);
-        writeBytesToFile(data, wavDir + "/" + signalId + ".wav");
-    }
-
     public void writeBytesToWavFile(int userId, int signalId, AudioFormat format, byte[] bytes) throws IOException {
         String wavDir = getWavDir(userId, signalId);
         createDirIfNotExists(wavDir);
@@ -58,7 +57,7 @@ public class FileManager {
     }
 
     public void deleteAllUserData(int userId) {
-        deleteDirRecursively(new File(SignalApplication.DATA_PATH + SIGNALS_PATH + userId));
+        deleteDirRecursively(new File(applicationProperties.getDataPath() + SIGNALS_PATH + userId));
     }
 
     private void deleteDirRecursively(File dir) {
@@ -71,10 +70,6 @@ public class FileManager {
         }
     }
 
-    private void writeBytesToFile(byte[] bytes, String fileName) throws IOException {
-        Files.write(Paths.get(fileName), bytes);
-    }
-
     private String readStringFromFile(String fileName) throws IOException {
         return new String(readBytesFromFile(fileName), StandardCharsets.UTF_8);
     }
@@ -84,7 +79,7 @@ public class FileManager {
     }
 
     private String getWavDir(int userId, int signalId) {
-        return SignalApplication.DATA_PATH + SIGNALS_PATH + userId + "/" + signalId;
+        return applicationProperties.getDataPath() + SIGNALS_PATH + userId + "/" + signalId;
     }
 
     private void createDirIfNotExists(String dir) throws IOException {

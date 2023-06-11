@@ -16,7 +16,8 @@ public enum SignalAppDataErrorCode {
     WRONG_EMAIL_PASSWORD("Wrong email and password pair", List.of("email", "password")),
     WRONG_EMAIL("Email does not exist or is not confirmed", List.of("email")),
     WRONG_OLD_PASSWORD("Wrong old password", List.of("oldPassword")),
-    USER_TOKEN_NOT_FOUND("User token does not found", List.of());
+    USER_TOKEN_NOT_FOUND("User token does not found", List.of()),
+    RECAPTCHA_TOKEN_NOT_VERIFIED("Recaptcha token verification failed", List.of("token"));
 
     private final String description;
     private final List<String> fields;

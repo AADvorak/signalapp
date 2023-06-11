@@ -304,6 +304,7 @@ const en = {
     Size: 'Size violation',
     MaxLength: 'Max length violation',
     Email: 'Must be in the format of email',
+    RECAPTCHA_TOKEN_NOT_VERIFIED: 'Recaptcha verification failed',
     INTERNAL_SERVER_ERROR: 'Internal server error'
   },
   chart: {

@@ -11,6 +11,8 @@ import javax.validation.constraints.NotEmpty;
 @Accessors(chain = true)
 public class LoginDtoRequest {
 
+    private String token;
+
     @NotEmpty
     private String email;
 

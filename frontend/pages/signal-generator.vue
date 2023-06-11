@@ -11,7 +11,8 @@
                 v-for="numberInput in numberInputs"
                 :field="numberInput"
                 :parent-name="$options.name"
-                :field-obj="form[numberInput]"/>
+                :field-obj="form[numberInput]"
+                @update="v => form[numberInput].value = v"/>
             <v-select
                 v-model="form.form.value"
                 item-title="name"

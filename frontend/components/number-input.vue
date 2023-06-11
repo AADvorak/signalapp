@@ -1,17 +1,18 @@
 <template>
   <v-text-field
       v-if="type === 'text'"
-      v-model="fieldObj.value"
-      type="number"
+      :model-value="fieldObj.value"
       :step="fieldObj.params.step"
       :label="labelComputed"
       :error="!!fieldObj.validation?.length"
       :error-messages="fieldObj.validation"
+      @input="$emit('update', $event.target.value)"
+      type="number"
       required/>
   <div v-if="type === 'slider'">
     <div class="text-caption">{{ labelComputed }}</div>
     <v-slider
-        v-model="fieldObj.value"
+        :model-value="fieldObj.value"
         :min="fieldObj.params.min"
         :max="fieldObj.params.max"
         :step="fieldObj.params.step"
@@ -44,6 +45,7 @@ export default {
       required: true
     },
   },
+  emits: ['update'],
   computed: {
     labelComputed() {
       return this.label || this.$t(`${this.parentName}.${this.field}`)

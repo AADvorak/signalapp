@@ -304,6 +304,7 @@ const pl = {
     Size: 'Naruszenie rozmiaru',
     MaxLength: 'Naruszenie maksymalnej długości',
     Email: 'Musi być w formacie adresu e-mail',
+    RECAPTCHA_TOKEN_NOT_VERIFIED: 'Weryfikacja recaptcha nie udała się',
     INTERNAL_SERVER_ERROR: 'Wewnętrzny błąd serwera'
   },
   chart: {

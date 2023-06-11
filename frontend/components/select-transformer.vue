@@ -15,7 +15,7 @@
         <v-row>
           <v-col>
             <v-select
-                v-model="form.types.value"
+                :model-value="form.types.value"
                 item-title="name"
                 item-value="code"
                 :items="types"
@@ -24,7 +24,7 @@
           </v-col>
           <v-col>
             <v-text-field
-                v-model="form.filter.value"
+                :model-value="form.filter.value"
                 :label="_tc('fields.search')"/>
           </v-col>
         </v-row>

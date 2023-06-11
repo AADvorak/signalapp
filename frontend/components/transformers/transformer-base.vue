@@ -3,7 +3,8 @@
       v-for="field in formFields"
       :field="field"
       :label="_trp(field)"
-      :field-obj="form[field]"/>
+      :field-obj="form[field]"
+      @update="v => form[field].value = v"/>
 </template>
 
 <script>

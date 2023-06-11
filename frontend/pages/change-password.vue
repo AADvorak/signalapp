@@ -9,6 +9,7 @@
                 :field="field"
                 :field-obj="form[field]"
                 :show-password="showPassword"
+                @update="v => form[field].value = v"
                 @show="switchShowPassword"/>
             <div class="d-flex">
               <v-btn color="success" :loading="changePasswordRequestSent" @click="changePasswordRequest">

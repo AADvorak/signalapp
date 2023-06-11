@@ -16,6 +16,8 @@ import javax.validation.constraints.Size;
 @Accessors(chain = true)
 public class UserDtoRequest {
 
+    private String token;
+
     @MaxLength
     private String firstName;
 

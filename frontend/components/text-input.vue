@@ -1,12 +1,13 @@
 <template>
   <v-text-field
-      v-model="fieldObj.value"
+      :model-value="fieldObj.value"
       :append-icon="appendIcon"
       :type="(!isPasswordField || showPassword) ? 'text' : 'password'"
       :label="$t('common.fields.' + field)"
       @click:append="onClickAppend"
       :error="!!fieldObj.validation?.length"
       :error-messages="fieldObj.validation"
+      @input="$emit('update', $event.target.value)"
       required/>
 </template>
 
@@ -31,7 +32,7 @@ export default {
       default: false
     }
   },
-  emits: ['show'],
+  emits: ['show', 'update'],
   computed: {
     isPasswordField() {
       return PASSWORD_FIELDS.includes(this.field)

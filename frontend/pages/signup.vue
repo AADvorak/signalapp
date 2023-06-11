@@ -9,6 +9,7 @@
                 :field="field"
                 :field-obj="form[field]"
                 :show-password="showPassword"
+                @update="v => form[field].value = v"
                 @show="switchShowPassword"/>
             <div class="d-flex">
               <v-btn color="success" :loading="signUpRequestSent" @click="signUpRequest">
@@ -22,6 +23,7 @@
         </v-card-text>
       </v-card>
     </div>
+    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
   </NuxtLayout>
 </template>
 
@@ -34,12 +36,13 @@ import TextInput from "../components/text-input";
 import formValues from "../mixins/form-values";
 import showPassword from "../mixins/show-password";
 import filterPatronymicField from "../mixins/filter-patronymic-field";
+import recaptcha from "../mixins/recaptcha";
 
 export default {
   name: 'signup',
   components: {TextInput},
   extends: PageBase,
-  mixins: [formValidation, formValues, showPassword, filterPatronymicField],
+  mixins: [formValidation, formValues, showPassword, filterPatronymicField, recaptcha],
   data: () => ({
     form: {
       email: {value: ''},
@@ -61,7 +64,8 @@ export default {
         return
       }
       await this.loadWithFlag(async () => {
-        let response = await ApiProvider.postJson('/api/users/', this.formValues)
+        const token = await this.recaptcha()
+        let response = await ApiProvider.postJson('/api/users/', {...this.formValues, token})
         if (response.ok) {
           dataStore().setUserInfo(response.data)
           let waitingForAuthorization = dataStore().getWaitingForAuthorization
@@ -69,6 +73,7 @@ export default {
           waitingForAuthorization && dataStore().clearWaitingForAuthorization()
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
+          this.showRecaptchaValidationError(response.errors)
         } else {
           this.showErrorsFromResponse(response, this._t('signUpError'))
         }

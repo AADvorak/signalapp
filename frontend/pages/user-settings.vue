@@ -16,7 +16,8 @@
             <text-input
                 v-for="field in filteredFormFields"
                 :field="field"
-                :field-obj="form[field]"/>
+                :field-obj="form[field]"
+                @update="v => form[field].value = v"/>
             <div class="d-flex flex-wrap">
               <v-btn color="success" :loading="saveRequestSent" @click="save">
                 {{ _tc('buttons.save') }}

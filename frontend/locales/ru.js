@@ -304,6 +304,7 @@ const ru = {
     Size: 'Нарушение требований размера',
     MaxLength: 'Нарушение требования максимальной длины',
     Email: 'Должно быть в формате email',
+    RECAPTCHA_TOKEN_NOT_VERIFIED: 'Проверка Recaptcha не удалась',
     INTERNAL_SERVER_ERROR: 'Внутренняя ошибка сервера'
   },
   chart: {

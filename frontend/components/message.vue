@@ -1,7 +1,7 @@
 <template>
   <v-dialog
-      v-model="opened"
-      persistent
+      :model-value="opened"
+      :persistent="true"
       max-width="600px"
   >
     <v-card width="100%">

@@ -7,7 +7,8 @@
             <text-input
                 v-for="field in formFields"
                 :field="field"
-                :field-obj="form[field]"/>
+                :field-obj="form[field]"
+                @update="v => form[field].value = v"/>
             <div class="d-flex">
               <v-btn color="primary" :loading="restorePasswordRequestSent" @click="restorePasswordRequest">
                 {{ _t('name') }}

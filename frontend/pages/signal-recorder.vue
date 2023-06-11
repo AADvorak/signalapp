@@ -8,7 +8,8 @@
                 v-for="field in formFields"
                 :field="field"
                 :parent-name="$options.name"
-                :field-obj="form[field]"/>
+                :field-obj="form[field]"
+                @update="v => form[field].value = v"/>
           </v-form>
           <div>{{ info }}</div>
           <div>{{ _t('recordStatuses.' + recordStatus) }}</div>
