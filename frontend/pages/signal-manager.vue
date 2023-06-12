@@ -13,10 +13,14 @@
                   <number-input
                       field="pageSize"
                       :label="_t('pageSize')"
-                      :field-obj="form.pageSize"/>
+                      :field-obj="form.pageSize"
+                      @update="v => form.pageSize.value = v"/>
                 </v-col>
                 <v-col>
-                  <text-input field="search" :field-obj="form.search"/>
+                  <text-input
+                      field="search"
+                      :field-obj="form.search"
+                      @update="v => form.search.value = v"/>
                 </v-col>
               </v-row>
             </v-form>
@@ -27,60 +31,100 @@
               <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
             <h3 v-else>{{ _tc('messages.nothingIsFound') }}</h3>
           </fixed-width-wrapper>
-          <v-table v-else>
-            <thead>
-            <tr>
-              <th class="text-left">
-<!--                todo костыль-->
-                <div style="height: 58px">
-                  <v-checkbox v-model="selectSignals"/>
-                </div>
-              </th>
-              <th @click="setSortingName" class="text-left">
-                {{ _tc('fields.name') }} {{sortingNameSign}}
-              </th>
-              <th @click="setSortingDescription" class="text-left">
-                {{ _tc('fields.description') }} {{sortingDescriptionSign}}
-              </th>
-              <th class="text-left"></th>
-              <th class="text-left"></th>
-              <th class="text-left"></th>
-              <th class="text-left"></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="signal in signals">
-              <td>
-<!--                todo костыль-->
-                <div style="height: 58px">
-                  <v-checkbox @click.stop v-model="signal.selected"/>
-                </div>
-              </td>
-              <td>{{ signal.name }}</td>
-              <td>{{ signal.description }}</td>
-              <td class="text-right">
-                <v-icon color="primary" @click.stop="openSignal(signal)">
-                  {{ mdi.mdiFileEdit }}
-                </v-icon>
-              </td>
-              <td class="text-right">
-                <v-icon @click.stop="saveSignalToWavFile(signal)">
-                  {{ mdi.mdiFileImport }}
-                </v-icon>
-              </td>
-              <td class="text-right">
-                <v-icon v-if="signal.sampleRate >= 3000" @click.stop="playOrStopSignal(signal)">
-                  {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
-                </v-icon>
-              </td>
-              <td class="text-right">
-                <v-icon color="error" @click.stop="askConfirmDeleteSignal(signal)">
-                  {{ mdi.mdiDelete }}
-                </v-icon>
-              </td>
-            </tr>
-            </tbody>
-          </v-table>
+          <div v-else>
+            <div v-if="isMobile">
+              <div v-for="signal in signals">
+                <v-card >
+                  <v-card-item>
+                    <v-card-title>
+                      <div style="height: 48px" class="d-flex justify-start">
+                        <span><v-checkbox @click.stop v-model="signal.selected"/></span>
+                        <div style="margin: 13px 0;">{{ restrictSignalNameLength(signal) }}</div>
+                      </div>
+                    </v-card-title>
+                  </v-card-item>
+                  <v-card-text v-if="signal.description">{{ signal.description }}</v-card-text>
+                  <v-card-actions class="justify-center">
+                    <v-btn @click="openSignal(signal)">
+                      <v-icon color="primary">
+                        {{ mdi.mdiFileEdit }}
+                      </v-icon>
+                    </v-btn>
+                    <v-btn @click="saveSignalToWavFile(signal)">
+                      <v-icon>
+                        {{ mdi.mdiFileImport }}
+                      </v-icon>
+                    </v-btn>
+                    <v-btn v-if="signal.sampleRate >= 3000" @click="playOrStopSignal(signal)">
+                      <v-icon>
+                        {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
+                      </v-icon>
+                    </v-btn>
+                    <v-btn @click="askConfirmDeleteSignal(signal)">
+                      <v-icon color="error">
+                        {{ mdi.mdiDelete }}
+                      </v-icon>
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+                <v-divider/>
+              </div>
+            </div>
+            <v-table v-else>
+              <thead>
+              <tr>
+                <th class="text-left">
+                  <!--                todo костыль-->
+                  <div style="height: 58px">
+                    <v-checkbox v-model="selectSignals"/>
+                  </div>
+                </th>
+                <th @click="setSortingName" class="text-left">
+                  {{ _tc('fields.name') }} {{sortingNameSign}}
+                </th>
+                <th @click="setSortingDescription" class="text-left">
+                  {{ _tc('fields.description') }} {{sortingDescriptionSign}}
+                </th>
+                <th class="text-left"></th>
+                <th class="text-left"></th>
+                <th class="text-left"></th>
+                <th class="text-left"></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="signal in signals">
+                <td>
+                  <!--                todo костыль-->
+                  <div style="height: 58px">
+                    <v-checkbox @click.stop v-model="signal.selected"/>
+                  </div>
+                </td>
+                <td>{{ signal.name }}</td>
+                <td>{{ signal.description }}</td>
+                <td class="text-right">
+                  <v-icon color="primary" @click.stop="openSignal(signal)">
+                    {{ mdi.mdiFileEdit }}
+                  </v-icon>
+                </td>
+                <td class="text-right">
+                  <v-icon @click.stop="saveSignalToWavFile(signal)">
+                    {{ mdi.mdiFileImport }}
+                  </v-icon>
+                </td>
+                <td class="text-right">
+                  <v-icon v-if="signal.sampleRate >= 3000" @click.stop="playOrStopSignal(signal)">
+                    {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
+                  </v-icon>
+                </td>
+                <td class="text-right">
+                  <v-icon color="error" @click.stop="askConfirmDeleteSignal(signal)">
+                    {{ mdi.mdiDelete }}
+                  </v-icon>
+                </td>
+              </tr>
+              </tbody>
+            </v-table>
+          </div>
           <fixed-width-wrapper>
             <v-pagination
                 v-model="page"
@@ -184,6 +228,8 @@ import formValidation from "../mixins/form-validation";
 import actionWithTimeout from "../mixins/action-with-timeout";
 import formValuesSaving from "../mixins/form-values-saving";
 import TextInput from "../components/text-input";
+import DeviceUtils from "../utils/device-utils";
+import StringUtils from "../utils/string-utils";
 
 export default {
   name: "signal-manager",
@@ -236,7 +282,8 @@ export default {
       DESCRIPTION: 'description'
     },
     bus: new mitt(),
-    selectSignals: false
+    selectSignals: false,
+    isMobile: DeviceUtils.isMobile()
   }),
   computed: {
     sortingNameSign() {
@@ -473,6 +520,9 @@ export default {
         this.selectedSignals.forEach(signal => promiseArr.push(this.loadSignalData(signal)))
         await Promise.all(promiseArr)
       })
+    },
+    restrictSignalNameLength(signal) {
+      return StringUtils.restrictLength(signal.name, 22)
     }
   },
 }
