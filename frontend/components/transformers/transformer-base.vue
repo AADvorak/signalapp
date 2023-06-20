@@ -82,7 +82,13 @@ export default {
       }
     },
     changeSignalNameAndDescription(signal) {
-      signal.description += '\n' + this.makeTransformedWithText() + ' ' + this.makeParamsText()
+      if (!signal.description) {
+        signal.description = ''
+      }
+      if (signal.description) {
+        signal.description += '\n'
+      }
+      signal.description += this.makeTransformedWithText() + ' ' + this.makeParamsText()
     },
     makeTransformedWithText() {
       return this._tc('messages.transformed') + ' ' + this._tr('with' + this.$options.name)
