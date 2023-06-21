@@ -94,7 +94,7 @@ const Common = {
    * @param {Signal} signal1
    * @param {Signal} signal2
    */
-  estimateCorrelationFunction(signal1, signal2) {
+  calculateCorrelationFunction(signal1, signal2) {
     let step = signal1.params.step
     let tauMin = - signal2.params.xMax + signal1.params.xMin
     let tauMax = - signal2.params.xMin + signal1.params.xMax
@@ -426,7 +426,7 @@ const TransformFunctions = {
 
   selfCorrelator(signal) {
     Common.calculateSignalParams(signal)
-    let {data, xMin} = Common.estimateCorrelationFunction(signal, signal)
+    let {data, xMin} = Common.calculateCorrelationFunction(signal, signal)
     signal.data = data
     signal.xMin = xMin
     return signal
@@ -454,7 +454,7 @@ const DoubleTransformFunctions = {
   correlator(signal1, signal2) {
     return {
       sampleRate: signal1.sampleRate,
-      ...Common.estimateCorrelationFunction(signal1, signal2)
+      ...Common.calculateCorrelationFunction(signal1, signal2)
     }
   },
 
@@ -477,10 +477,7 @@ const DoubleTransformFunctions = {
 
 onmessage = msg => {
   try {
-    let signal = msg.data.signal ? JSON.parse(msg.data.signal) : null
-    let signal1 = msg.data.signal1 ? JSON.parse(msg.data.signal1) : null
-    let signal2 = msg.data.signal2 ? JSON.parse(msg.data.signal2) : null
-    let params = JSON.parse(msg.data.params)
+    let {signal, signal1, signal2, params} = msg.data
     if (signal) {
       signal = TransformFunctions[msg.data.transformFunctionName](signal, params)
     } else if (signal1 && signal2) {
@@ -488,7 +485,7 @@ onmessage = msg => {
     }
     signal.maxAbsY = Common.calculateMaxAbsY(signal)
     Common.calculateSignalParams(signal)
-    signal && postMessage({signal: JSON.stringify(signal)})
+    postMessage({signal})
   } catch (error) {
     postMessage({error})
   }

@@ -12,9 +12,9 @@ export default {
     makeWorkerMessage() {
       return {
         transformFunctionName: this.transformFunctionName,
-        signal1: JSON.stringify(this.signal1),
-        signal2: JSON.stringify(this.signal2),
-        params: JSON.stringify(this.formValues)
+        signal1: this.toRawDeep(this.signal1),
+        signal2: this.toRawDeep(this.signal2),
+        params: this.formValues
       }
     },
     changeSignalNameAndDescription(signal) {

@@ -15,6 +15,7 @@ import formNumberValues from "../../mixins/form-number-values";
 import ComponentBase from "../component-base";
 import actionWithTimeout from "../../mixins/action-with-timeout";
 import NumberInput from "../number-input";
+import {toRaw, isProxy} from "vue";
 
 export default {
   name: "TransformerBase",
@@ -77,9 +78,18 @@ export default {
     makeWorkerMessage() {
       return {
         transformFunctionName: this.transformFunctionName,
-        signal: JSON.stringify(this.signal),
-        params: JSON.stringify(this.formValues)
+        signal: this.toRawDeep(this.signal),
+        params: this.formValues
       }
+    },
+    toRawDeep(proxy) {
+      const obj = toRaw(proxy)
+      for (const key in obj) {
+        if (isProxy(obj[key])) {
+          obj[key] = toRaw(obj[key])
+        }
+      }
+      return obj
     },
     changeSignalNameAndDescription(signal) {
       if (!signal.description) {
@@ -122,7 +132,7 @@ export default {
       this.worker = new Worker('/transformers.js')
       this.worker.onmessage = e => {
         if (e.data.signal) {
-          let signal = JSON.parse(e.data.signal)
+          let signal = e.data.signal
           this.changeSignalNameAndDescription(signal)
           this.addSignalToHistoryAndOpen(signal)
         }
