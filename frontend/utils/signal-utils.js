@@ -23,15 +23,6 @@ const SignalUtils = {
   MAX_DRAWING_SIGNAL_LENGTH: 20000,
 
   /**
-   * @param {Signal[]} signals
-   */
-  calculateSignalsParams(signals) {
-    for (let signal of signals) {
-      this.calculateSignalParams(signal)
-    }
-  },
-
-  /**
    * @param {Signal} signal
    */
   calculateSignalParams(signal) {
@@ -116,7 +107,7 @@ const SignalUtils = {
         maxAbsY = absY
       }
     }
-    return maxAbsY
+    signal.maxAbsY = maxAbsY
   }
 
 }

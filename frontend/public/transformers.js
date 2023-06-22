@@ -168,17 +168,7 @@ const Common = {
   /**
    * @param {Signal} signal
    */
-  calculateSignalParams(signal) {
-    let xMin = signal.xMin
-    let step = Number.parseFloat((1 / signal.sampleRate).toFixed(10))
-    let length = signal.data.length * step
-    let xMax = xMin + length
-    signal.params = {
-      xMin, xMax, step, length
-    }
-  },
-
-  calculateMaxAbsY(signal) {
+  calculateMaxAbsYAndParams(signal) {
     let maxAbsY = 0
     Counter.init(signal.data.length, 'calculatingMaxAbsValue')
     for (let point of signal.data) {
@@ -188,7 +178,14 @@ const Common = {
       }
       Counter.increase()
     }
-    return maxAbsY
+    signal.maxAbsY = maxAbsY
+    const xMin = signal.xMin
+    const step = Number.parseFloat((1 / signal.sampleRate).toFixed(10))
+    const length = signal.data.length * step
+    const xMax = xMin + length
+    signal.params = {
+      xMin, xMax, step, length
+    }
   }
 
 }
@@ -425,7 +422,6 @@ const TransformFunctions = {
   },
 
   selfCorrelator(signal) {
-    Common.calculateSignalParams(signal)
     let {data, xMin} = Common.calculateCorrelationFunction(signal, signal)
     signal.data = data
     signal.xMin = xMin
@@ -476,17 +472,12 @@ const DoubleTransformFunctions = {
 }
 
 onmessage = msg => {
-  try {
-    let {signal, signal1, signal2, params} = msg.data
-    if (signal) {
-      signal = TransformFunctions[msg.data.transformFunctionName](signal, params)
-    } else if (signal1 && signal2) {
-      signal = DoubleTransformFunctions[msg.data.transformFunctionName](signal1, signal2, params)
-    }
-    signal.maxAbsY = Common.calculateMaxAbsY(signal)
-    Common.calculateSignalParams(signal)
-    postMessage({signal})
-  } catch (error) {
-    postMessage({error})
+  let {signal, signal1, signal2, params} = msg.data
+  if (signal) {
+    signal = TransformFunctions[msg.data.transformFunctionName](signal, params)
+  } else if (signal1 && signal2) {
+    signal = DoubleTransformFunctions[msg.data.transformFunctionName](signal1, signal2, params)
   }
+  Common.calculateMaxAbsYAndParams(signal)
+  postMessage({signal})
 }

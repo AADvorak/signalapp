@@ -14,7 +14,7 @@ export default {
       return true
     },
     saveSignalToHistoryAndOpen(signal) {
-      signal.maxAbsY = SignalUtils.calculateMaxAbsY(signal)
+      SignalUtils.calculateMaxAbsY(signal)
       SignalUtils.calculateSignalParams(signal)
       useRouter().push('/signal/0?history=' + dataStore().addSignalToHistory(signal))
     },

@@ -52,13 +52,12 @@ export default {
     }
   },
   mounted() {
-    this.initWorker()
     this.form && this.restoreFormValues()
     this.bus.on('transform', () => {
       this.doTransform()
     })
     this.bus.on('cancel', () => {
-      this.worker.terminate()
+      this.worker && this.worker.terminate()
     })
   },
   beforeUnmount() {
@@ -73,6 +72,23 @@ export default {
       return this.$t(`operationNames.${key}`)
     },
     doTransform() {
+      this.worker = new Worker('/transformers.js')
+      this.worker.onmessage = msg => {
+        if (msg.data.signal) {
+          let signal = msg.data.signal
+          this.changeSignalNameAndDescription(signal)
+          this.addSignalToHistoryAndOpen(signal)
+        }
+        if (msg.data.progress) {
+          this.bus.emit('progress', {
+            progress: msg.data.progress,
+            operation: msg.data.operation ? this._ton(msg.data.operation) : '',
+          })
+        }
+      }
+      this.worker.onerror = e => {
+        this.bus.emit('error', e.message)
+      }
       this.worker.postMessage(this.makeWorkerMessage())
     },
     makeWorkerMessage() {
@@ -127,25 +143,6 @@ export default {
         }
       }
       return validated
-    },
-    initWorker() {
-      this.worker = new Worker('/transformers.js')
-      this.worker.onmessage = e => {
-        if (e.data.signal) {
-          let signal = e.data.signal
-          this.changeSignalNameAndDescription(signal)
-          this.addSignalToHistoryAndOpen(signal)
-        }
-        if (e.data.progress) {
-          this.bus.emit('progress', {
-            progress: e.data.progress,
-            operation: e.data.operation ? this._ton(e.data.operation) : '',
-          })
-        }
-        if (e.data.error) {
-          this.bus.emit('error', e.data.error)
-        }
-      }
     },
   },
 }
