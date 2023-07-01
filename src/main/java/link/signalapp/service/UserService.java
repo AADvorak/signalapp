@@ -85,10 +85,7 @@ public class UserService extends ServiceBase {
             recaptchaVerifier.verify(request.getToken());
         }
         User user = userRepository.findByEmail(request.getEmail());
-        if (user == null) {
-            throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD);
-        }
-        if (!encoder.matches(request.getPassword(), user.getPassword())) {
+        if (user == null || !encoder.matches(request.getPassword(), user.getPassword())) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD);
         }
         return new ResponseWithToken<UserDtoResponse>()
