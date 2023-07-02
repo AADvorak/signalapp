@@ -18,14 +18,13 @@ import link.signalapp.model.UserToken;
 import link.signalapp.repository.UserConfirmRepository;
 import link.signalapp.repository.UserRepository;
 import link.signalapp.repository.UserTokenRepository;
+import link.signalapp.security.PasswordEncoder;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,9 +35,6 @@ import static java.util.UUID.randomUUID;
 public class UserService extends ServiceBase {
 
     public static final int MAX_PASSWORD_LENGTH = 72;
-
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(BCryptPasswordEncoder.BCryptVersion.$2A,
-            new SecureRandom("OjKotPaniMatko".getBytes()));
 
     public static final String EMAIL_CONFIRM_OK = "email-confirm-ok";
     public static final String EMAIL_CONFIRM_ERROR = "email-confirm-error";
@@ -53,15 +49,19 @@ public class UserService extends ServiceBase {
 
     private final RecaptchaVerifier recaptchaVerifier;
 
+    private final PasswordEncoder passwordEncoder;
+
     public UserService(UserTokenRepository userTokenRepository, ApplicationProperties applicationProperties,
                        UserRepository userRepository, UserConfirmRepository userConfirmRepository,
-                       MailTransport mailTransport, FileManager fileManager, RecaptchaVerifier recaptchaVerifier) {
+                       MailTransport mailTransport, FileManager fileManager, RecaptchaVerifier recaptchaVerifier,
+                       PasswordEncoder passwordEncoder) {
         super(userTokenRepository, applicationProperties);
         this.userRepository = userRepository;
         this.userConfirmRepository = userConfirmRepository;
         this.mailTransport = mailTransport;
         this.fileManager = fileManager;
         this.recaptchaVerifier = recaptchaVerifier;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public ResponseWithToken<UserDtoResponse> register(UserDtoRequest request) throws Exception {
@@ -69,7 +69,7 @@ public class UserService extends ServiceBase {
             recaptchaVerifier.verify(request.getToken());
         }
         User user = UserMapper.INSTANCE.dtoToUser(request);
-        user.setPassword(encoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         try {
             user = userRepository.save(user);
         } catch (DataIntegrityViolationException ex) {
@@ -85,7 +85,7 @@ public class UserService extends ServiceBase {
             recaptchaVerifier.verify(request.getToken());
         }
         User user = userRepository.findByEmail(request.getEmail());
-        if (user == null || !encoder.matches(request.getPassword(), user.getPassword())) {
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD);
         }
         return new ResponseWithToken<UserDtoResponse>()
@@ -131,10 +131,10 @@ public class UserService extends ServiceBase {
     public void changePasswordCurrentUser(String token, ChangePasswordDtoRequest request)
             throws SignalAppUnauthorizedException, SignalAppDataException {
         User user = getUserByToken(token);
-        if (!encoder.matches(request.getOldPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_OLD_PASSWORD);
         }
-        user.setPassword(encoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
     }
 
@@ -176,7 +176,7 @@ public class UserService extends ServiceBase {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL);
         }
         String newPassword = RandomStringUtils.randomAlphanumeric(applicationProperties.getMinPasswordLength());
-        user.setPassword(encoder.encode(newPassword));
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         mailTransport.send(user.getEmail(), request.getLocaleTitle(), request.getLocaleMsg()
                 .replace("$newPassword$", newPassword));

@@ -53,13 +53,13 @@ public class UserEndpoint extends EndpointBase {
 
     @PostMapping("/confirm")
     public void postMailConfirm(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                @RequestBody EmailConfirmDtoRequest request)
+                                @Valid @RequestBody EmailConfirmDtoRequest request)
             throws SignalAppUnauthorizedException, MessagingException, SignalAppDataException {
         userService.makeUserEmailConfirmation(sessionId, request);
     }
 
     @PostMapping(path = "/restore")
-    public void restorePassword(@RequestBody RestorePasswordDtoRequest request)
+    public void restorePassword(@Valid @RequestBody RestorePasswordDtoRequest request)
             throws MessagingException, SignalAppDataException {
         userService.restorePassword(request);
     }

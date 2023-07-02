@@ -3,17 +3,13 @@ package link.signalapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.EmailConfirmDtoRequest;
 import link.signalapp.dto.response.FieldErrorDtoResponse;
-import link.signalapp.mail.MailTransport;
 import link.signalapp.model.User;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,24 +23,13 @@ import javax.mail.MessagingException;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestPropertySource(locations = "/test.properties")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class EmailConfirmationIntegrationTest extends IntegrationTestBase {
+public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
 
     private static final String CONFIRM_URL = "/confirm";
-
-    @MockBean
-    private MailTransport mailTransport;
-
-    @Captor
-    private ArgumentCaptor<String> emailCaptor;
-    @Captor
-    private ArgumentCaptor<String> subjectCaptor;
-    @Captor
-    private ArgumentCaptor<String> bodyCaptor;
 
     @BeforeAll
     public void clearAndRegisterUsers() {
@@ -58,11 +43,10 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestBase {
         HttpHeaders headers = login(email1);
         ResponseEntity<String> response1 = template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                 HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest(), headers), String.class);
-        verify(mailTransport).send(emailCaptor.capture(), subjectCaptor.capture(), bodyCaptor.capture());
-        String confirmEmail = emailCaptor.getValue(), confirmUrl = bodyCaptor.getValue();
-        assertAll(() -> assertEquals(email1, confirmEmail),
+        CapturedEmailArguments arguments = captureEmailArguments();
+        assertAll(() -> assertEquals(email1, arguments.getEmail()),
                 () -> assertEquals(200, response1.getStatusCodeValue()));
-        ResponseEntity<String> response2 = restTemplateNoRedirect().getForEntity(confirmUrl, String.class);
+        ResponseEntity<String> response2 = restTemplateNoRedirect().getForEntity(arguments.getBody(), String.class);
         User user = userRepository.findByEmail(email1);
         assertAll(() -> assertEquals(302, response2.getStatusCodeValue()),
                 () -> assertEquals(origin() + "/user-settings",
@@ -90,11 +74,58 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestBase {
         assertEquals(401, exc.getRawStatusCode());
     }
 
-    private void setEmailConfirmed(boolean confirmed) {
+    @Test
+    public void confirmEmailWrongCode() throws MessagingException {
+        setEmailConfirmed(false);
+        HttpHeaders headers = login(email1);
+        ResponseEntity<String> response1 = template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
+                HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest(), headers), String.class);
+        CapturedEmailArguments arguments = captureEmailArguments();
+        assertAll(() -> assertEquals(email1, arguments.getEmail()),
+                () -> assertEquals(200, response1.getStatusCodeValue()));
+        String url = arguments.getBody().substring(0, arguments.getBody().length() - 2);
+        ResponseEntity<String> response2 = restTemplateNoRedirect().getForEntity(url, String.class);
         User user = userRepository.findByEmail(email1);
-        user.setEmailConfirmed(confirmed);
-        userRepository.save(user);
+        assertAll(() -> assertEquals(302, response2.getStatusCodeValue()),
+                () -> assertEquals(origin() + "/email-confirm-error",
+                        Objects.requireNonNull(response2.getHeaders().get("Location")).get(0)),
+                () -> assertFalse(user.isEmailConfirmed()));
     }
+
+    @Test
+    public void confirmEmailEmptyOrigin() throws JsonProcessingException {
+        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+                () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
+                        HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest().setOrigin("")), String.class));
+        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+                () -> assertEquals("origin", error.getField()),
+                () -> assertEquals("NotEmpty", error.getCode()));
+    }
+
+    @Test
+    public void confirmEmailEmptyLocaleTitle() throws JsonProcessingException {
+        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+                () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
+                        HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest().setLocaleTitle("")), String.class));
+        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+                () -> assertEquals("localeTitle", error.getField()),
+                () -> assertEquals("NotEmpty", error.getCode()));
+    }
+
+    @Test
+    public void confirmEmailEmptyLocaleMsg() throws JsonProcessingException {
+        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+                () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
+                        HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest().setLocaleMsg("")), String.class));
+        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+                () -> assertEquals("localeMsg", error.getField()),
+                () -> assertEquals("NotEmpty", error.getCode()));
+    }
+
+    // todo send email error test
 
     private RestTemplate restTemplateNoRedirect() {
         RestTemplate restTemplate = new RestTemplate();
