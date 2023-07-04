@@ -5,12 +5,18 @@ import link.signalapp.dto.request.UserDtoRequest;
 import link.signalapp.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
 
 import java.util.Objects;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@DirtiesContext
+@TestPropertySource(locations = "/test.properties")
 public class IntegrationTestBase {
 
     @Autowired

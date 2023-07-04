@@ -8,17 +8,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@TestPropertySource(locations = "/test.properties")
 public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
 
     @BeforeEach

@@ -7,20 +7,16 @@ import link.signalapp.dto.response.UserDtoResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@TestPropertySource(locations = "/test.properties")
 public class ManageUsersIntegrationTest extends IntegrationTestBase {
 
     private static final String ME_URL = "/me";

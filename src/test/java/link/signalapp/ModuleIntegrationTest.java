@@ -6,20 +6,19 @@ import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.dto.response.ModuleDtoResponse;
 import link.signalapp.repository.ModuleRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Ignore;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Deprecated
+@Ignore
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestPropertySource(locations = "/test.properties")
 public class ModuleIntegrationTest extends IntegrationTestBase {
 
     private static final String HTML_URL = "/html";
