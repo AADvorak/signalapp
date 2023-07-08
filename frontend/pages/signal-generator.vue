@@ -159,11 +159,7 @@ export default {
   }),
   computed: {
     signalForms() {
-      let forms = []
-      for (let code in SIGNAL_FORMS) {
-        forms.push({code, name: this._t('forms.' + code)})
-      }
-      return forms
+      return Object.keys(SIGNAL_FORMS).map(code => ({code, name: this._t('forms.' + code)}))
     },
     numberInputs() {
       return this.formFields.filter(field => field !== 'form')
