@@ -6,10 +6,12 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.mail.MessagingException;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 public class IntegrationTestWithEmail extends IntegrationTestBase {
@@ -36,6 +38,11 @@ public class IntegrationTestWithEmail extends IntegrationTestBase {
                 .setEmail(emailCaptor.getValue())
                 .setSubject(subjectCaptor.getValue())
                 .setBody(bodyCaptor.getValue());
+    }
+
+    protected void prepareMailTransportThrowMessagingException() throws MessagingException {
+        doThrow(new MessagingException()).when(mailTransport)
+                .send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
     }
 
     @Data

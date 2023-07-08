@@ -2,19 +2,23 @@ package link.signalapp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.EmailConfirmDtoRequest;
+import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.model.User;
+import link.signalapp.repository.UserConfirmRepository;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.mail.MessagingException;
@@ -26,6 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
 
     private static final String CONFIRM_URL = "/confirm";
+
+    @Autowired
+    private UserConfirmRepository userConfirmRepository;
 
     @BeforeAll
     public void clearAndRegisterUsers() {
@@ -121,7 +128,21 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
                 () -> assertEquals("NotEmpty", error.getCode()));
     }
 
-    // todo send email error test
+    @Test
+    public void confirmEmailThrowMessagingException() throws MessagingException, JsonProcessingException {
+        setEmailConfirmed(false);
+        prepareMailTransportThrowMessagingException();
+        HttpHeaders headers = login(email1);
+        HttpServerErrorException exc = assertThrows(HttpServerErrorException.class,
+                () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
+                        HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest(), headers), String.class));
+        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
+        boolean userConfirmExists = userConfirmRepository.findAll().stream()
+                .anyMatch(userConfirm -> email1.equals(userConfirm.getId().getUser().getEmail()));
+        assertAll(() -> assertEquals(500, exc.getRawStatusCode()),
+                () -> assertEquals("INTERNAL_SERVER_ERROR", error.getCode()),
+                () -> assertFalse(userConfirmExists));
+    }
 
     private RestTemplate restTemplateNoRedirect() {
         RestTemplate restTemplate = new RestTemplate();

@@ -2,6 +2,7 @@ package link.signalapp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.RestorePasswordDtoRequest;
+import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.model.User;
 import link.signalapp.security.PasswordEncoder;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import javax.mail.MessagingException;
 
@@ -119,7 +121,20 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 () -> assertEquals("NotEmpty", error.getCode()));
     }
 
-    // todo send email error test
+    @Test
+    public void restorePasswordThrowMessagingException() throws JsonProcessingException, MessagingException {
+        prepareMailTransportThrowMessagingException();
+        setEmailConfirmed(true);
+        String beforeRequestPassword = userRepository.findByEmail(email1).getPassword();
+        HttpServerErrorException exc = assertThrows(HttpServerErrorException.class,
+                () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
+                        restorePasswordDtoRequest(), String.class));
+        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
+        String afterRequestPassword = userRepository.findByEmail(email1).getPassword();
+        assertAll(() -> assertEquals(500, exc.getRawStatusCode()),
+                () -> assertEquals("INTERNAL_SERVER_ERROR", error.getCode()),
+                () -> assertEquals(beforeRequestPassword, afterRequestPassword));
+    }
 
     private RestorePasswordDtoRequest restorePasswordDtoRequest() {
         return new RestorePasswordDtoRequest()
