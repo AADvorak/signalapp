@@ -8,13 +8,7 @@ export default {
       return values
     },
     formFields() {
-      let fields = []
-      for (let field in this.form) {
-        if (this.form.hasOwnProperty(field)) {
-          fields.push(field)
-        }
-      }
-      return fields
+      return Object.keys(this.form)
     },
   },
   methods: {
@@ -32,6 +26,13 @@ export default {
         if (this.form.hasOwnProperty(field)) {
           this.formValue(field, '')
         }
+      }
+    },
+    focusFirstFormField() {
+      const inputRefs = this.$refs.inputRefs
+      if (inputRefs) {
+        const firstInputRef = inputRefs[0]
+        firstInputRef?.focus && firstInputRef.focus()
       }
     }
   }

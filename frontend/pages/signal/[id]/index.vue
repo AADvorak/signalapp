@@ -25,9 +25,10 @@
                 </v-btn>
               </v-col>
             </v-row>
-            <v-form @submit.prevent="saveSignal">
+            <v-form @submit.prevent>
               <v-text-field
                   v-model="signal.name"
+                  ref="nameInput"
                   :label="_tc('fields.name')"
                   :error="!!form.name.validation?.length"
                   :error-messages="form.name.validation"
@@ -115,6 +116,9 @@ export default {
     '$route.query.history'() {
       window.scrollTo(0,0)
       this.getSignalFromHistoryOrLoad()
+    },
+    signal() {
+      this.$refs.nameInput.focus()
     }
   },
   mounted() {

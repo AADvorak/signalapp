@@ -4,16 +4,17 @@
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
           <p v-if="waitingForAuthorization" class="mb-5">{{ _t('signInToContinue') }}</p>
-          <v-form @submit.prevent="signInRequest">
+          <v-form @submit.prevent>
             <text-input
                 v-for="field in formFields"
+                ref="inputRefs"
                 :field="field"
                 :field-obj="form[field]"
                 :show-password="showPassword"
                 @update="v => form[field].value = v"
                 @show="switchShowPassword"/>
             <div class="d-flex flex-wrap">
-              <v-btn color="success" :loading="signInRequestSent" @click="signInRequest">
+              <v-btn type="submit" color="success" :loading="signInRequestSent" @click="signInRequest">
                 {{ _tc('buttons.signIn') }}
               </v-btn>
               <v-btn color="secondary" to="/signup">
@@ -60,6 +61,7 @@ export default {
   },
   mounted() {
     this.formValue('email', dataStore().emailForPasswordRestore || '')
+    this.focusFirstFormField()
   },
   beforeUnmount() {
     dataStore().clearWaitingForAuthorization()

@@ -3,16 +3,17 @@
     <div class="d-flex align-center flex-column">
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
-          <v-form @submit.prevent="">
+          <v-form @submit.prevent>
             <text-input
                 v-for="field in formFields"
+                ref="inputRefs"
                 :field="field"
                 :field-obj="form[field]"
                 :show-password="showPassword"
                 @update="v => form[field].value = v"
                 @show="switchShowPassword"/>
             <div class="d-flex">
-              <v-btn color="success" :loading="changePasswordRequestSent" @click="changePasswordRequest">
+              <v-btn type="submit" color="success" :loading="changePasswordRequestSent" @click="changePasswordRequest">
                 {{ _tc('buttons.changePassword') }}
               </v-btn>
             </div>
@@ -44,6 +45,9 @@ export default {
     },
     changePasswordRequestSent: false
   }),
+  mounted() {
+    this.focusFirstFormField()
+  },
   methods: {
     async changePasswordRequest() {
       this.clearValidation()

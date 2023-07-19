@@ -6,6 +6,7 @@
   >
     <template v-slot:activator="{ props }">
       <v-btn
+          type="submit"
           color="primary"
           v-bind="props"
           :disabled="disabled"

@@ -1,5 +1,6 @@
 <template>
   <v-text-field
+      ref="input"
       :model-value="fieldObj.value"
       :append-icon="appendIcon"
       :type="(!isPasswordField || showPassword) ? 'text' : 'password'"
@@ -50,6 +51,9 @@ export default {
         return
       }
       this.$emit('show')
+    },
+    focus() {
+      this.$refs.input.focus()
     }
   }
 }

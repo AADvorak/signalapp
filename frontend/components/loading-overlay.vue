@@ -1,6 +1,7 @@
 <template>
   <v-overlay
       :model-value="show"
+      :persistent="true"
       class="align-center justify-center"
   >
     <v-progress-circular

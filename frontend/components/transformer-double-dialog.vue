@@ -8,7 +8,7 @@
         <v-toolbar-title>{{ titleWithRestrictedLength }}</v-toolbar-title>
       </v-toolbar>
       <v-card-text>
-        <v-form>
+        <v-form @submit.prevent>
           <div :hidden="processing">
             <div class="mb-5">{{ makeTransformWithQuestion('transformSignalsWith') }}?</div>
             <v-row>
@@ -38,7 +38,8 @@
             <component v-bind:is="selectedTransformer.code" :signal1="signal1" :signal2="signal2" :bus="bus"/>
           </div>
           <div class="d-flex">
-            <v-btn :disabled="processing || processingDisabled" color="primary" class="mr-4" @click="ok">
+            <v-btn type="submit" color="primary" class="mr-4"
+                   :disabled="processing || processingDisabled" @click="ok">
               {{ okButtonText }}
             </v-btn>
             <v-btn @click="cancel">

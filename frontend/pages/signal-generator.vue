@@ -6,9 +6,10 @@
           {{ _t('generate') }}
         </v-card-title>
         <v-card-text>
-          <v-form @submit.prevent="generateAndOpenSignal">
+          <v-form @submit.prevent>
             <number-input
                 v-for="numberInput in numberInputs"
+                ref="inputRefs"
                 :field="numberInput"
                 :parent-name="$options.name"
                 :field-obj="form[numberInput]"
@@ -20,7 +21,7 @@
                 :items="signalForms"
                 :label="_t('form')"/>
             <div class="d-flex">
-              <v-btn color="primary" :disabled="!signal" @click="generateAndOpenSignal">
+              <v-btn type="submit" color="primary" :disabled="!signal" @click="generateAndOpenSignal">
                 {{ _t('generate') }}
               </v-btn>
               <v-btn
@@ -172,6 +173,7 @@ export default {
     formValues: {
       handler(newValue, oldValue) {
         if (!this.onlyTypesChanged(newValue, oldValue)) {
+          this.signal = null
           this.actionWithTimeout(() => this.precalculateSignal())
         }
       },
@@ -181,13 +183,13 @@ export default {
   mounted() {
     this.restoreFormValues()
     this.precalculateSignal()
+    this.focusFirstFormField()
   },
   methods: {
     precalculateSignal() {
       this.clearValidation()
       this.parseFloatForm({exclude: ['form']})
       if (!this.validateForm()) {
-        this.signal = null
         return
       }
       this.saveFormValues()

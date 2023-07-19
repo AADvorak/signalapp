@@ -12,14 +12,15 @@
           <div v-if="emailConfirmed" class="mb-5">
             <p style="color: #4CAF50">{{ _t('emailConfirmed') }}</p>
           </div>
-          <v-form>
+          <v-form @submit.prevent>
             <text-input
                 v-for="field in filteredFormFields"
+                ref="inputRefs"
                 :field="field"
                 :field-obj="form[field]"
                 @update="v => form[field].value = v"/>
             <div class="d-flex flex-wrap">
-              <v-btn color="success" :loading="saveRequestSent" @click="save">
+              <v-btn type="submit" color="success" :loading="saveRequestSent" @click="save">
                 {{ _tc('buttons.save') }}
               </v-btn>
               <v-btn color="secondary" to="/change-password">
@@ -73,6 +74,7 @@ export default {
     dataStore().$subscribe((mutation, state) => {
       this.parseUserInfo(state.userInfo)
     })
+    this.focusFirstFormField()
   },
   methods: {
     async reloadUserInfo() {

@@ -1,6 +1,7 @@
 <template>
   <number-input
       v-for="field in formFields"
+      ref="inputRefs"
       :field="field"
       :label="_trp(field)"
       :field-obj="form[field]"
@@ -59,6 +60,7 @@ export default {
     this.bus.on('cancel', () => {
       this.worker && this.worker.terminate()
     })
+    setTimeout(() => this.focusFirstFormField())
   },
   beforeUnmount() {
     this.bus.off('transform')

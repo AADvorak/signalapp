@@ -3,14 +3,14 @@
     <div class="d-flex align-center flex-column">
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
-          <v-form @submit.prevent="restorePasswordRequest">
+          <v-form @submit.prevent>
             <text-input
                 v-for="field in formFields"
                 :field="field"
                 :field-obj="form[field]"
                 @update="v => form[field].value = v"/>
             <div class="d-flex">
-              <v-btn color="primary" :loading="restorePasswordRequestSent" @click="restorePasswordRequest">
+              <v-btn type="submit" color="primary" :loading="restorePasswordRequestSent" @click="restorePasswordRequest">
                 {{ _t('name') }}
               </v-btn>
             </div>

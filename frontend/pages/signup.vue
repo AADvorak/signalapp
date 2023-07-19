@@ -3,16 +3,17 @@
     <div class="d-flex align-center flex-column">
       <v-card width="100%" min-width="400" max-width="800">
         <v-card-text>
-          <v-form @submit.prevent="signUpRequest">
+          <v-form @submit.prevent>
             <text-input
                 v-for="field in filteredFormFields"
+                ref="inputRefs"
                 :field="field"
                 :field-obj="form[field]"
                 :show-password="showPassword"
                 @update="v => form[field].value = v"
                 @show="switchShowPassword"/>
             <div class="d-flex">
-              <v-btn color="success" :loading="signUpRequestSent" @click="signUpRequest">
+              <v-btn type="submit" color="success" :loading="signUpRequestSent" @click="signUpRequest">
                 {{ _tc('buttons.signUp') }}
               </v-btn>
               <v-btn color="secondary" @click="signIn">
@@ -54,6 +55,9 @@ export default {
     },
     signUpRequestSent: false
   }),
+  mounted() {
+    this.focusFirstFormField()
+  },
   methods: {
     async signUpRequest() {
       this.clearValidation()

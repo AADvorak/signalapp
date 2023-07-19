@@ -1,6 +1,7 @@
 <template>
   <v-text-field
       v-if="type === 'text'"
+      ref="input"
       :model-value="fieldObj.value"
       :step="fieldObj.params.step"
       :label="labelComputed"
@@ -52,6 +53,11 @@ export default {
     },
     type() {
       return dataStore().numberInputType
+    }
+  },
+  methods: {
+    focus() {
+      this.$refs.input?.focus()
     }
   }
 }
