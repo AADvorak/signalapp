@@ -15,7 +15,9 @@ const en = {
       changePassword: 'Change password',
       signIn: 'Sign in',
       signUp: 'Sign up',
-      signOut: 'Sign out'
+      signOut: 'Sign out',
+      play: 'Play',
+      stop: 'Stop',
     },
     validation: {
       required: 'This field is required',

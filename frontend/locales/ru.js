@@ -15,7 +15,9 @@ const ru = {
       changePassword: 'Изменить пароль',
       signIn: 'Войти',
       signUp: 'Зарегистрироваться',
-      signOut: 'Выйти'
+      signOut: 'Выйти',
+      play: 'Воспроизвести',
+      stop: 'Остановить',
     },
     validation: {
       required: 'Поле обязательно к заполнению',

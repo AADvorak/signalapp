@@ -15,7 +15,9 @@ const pl = {
       changePassword: 'Zmień hasło',
       signIn: 'Zaloguj się',
       signUp: 'Zarejestruj się',
-      signOut: 'Wyloguj się'
+      signOut: 'Wyloguj się',
+      play: 'Odtwórz',
+      stop: 'Stop',
     },
     validation: {
       required: 'To pole jest wymagane',

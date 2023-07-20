@@ -102,24 +102,34 @@
                 <td>{{ signal.name }}</td>
                 <td>{{ signal.description }}</td>
                 <td class="text-right">
-                  <v-icon color="primary" @click.stop="openSignal(signal)">
-                    {{ mdi.mdiFileEdit }}
-                  </v-icon>
+                  <btn-with-tooltip tooltip="open" @click="openSignal(signal)">
+                    <v-icon color="primary">
+                      {{ mdi.mdiFileEdit }}
+                    </v-icon>
+                  </btn-with-tooltip>
                 </td>
                 <td class="text-right">
-                  <v-icon @click.stop="saveSignalToWavFile(signal)">
-                    {{ mdi.mdiFileImport }}
-                  </v-icon>
+                  <btn-with-tooltip tooltip="exportWav" @click="saveSignalToWavFile(signal)">
+                    <v-icon>
+                      {{ mdi.mdiFileImport }}
+                    </v-icon>
+                  </btn-with-tooltip>
                 </td>
                 <td class="text-right">
-                  <v-icon v-if="signal.sampleRate >= 3000" @click.stop="playOrStopSignal(signal)">
-                    {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
-                  </v-icon>
+                  <btn-with-tooltip v-if="signal.sampleRate >= 3000"
+                                    :tooltip="isSignalPlayed(signal) ? 'stop' : 'play'"
+                                    @click="playOrStopSignal(signal)">
+                    <v-icon>
+                      {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
+                    </v-icon>
+                  </btn-with-tooltip>
                 </td>
                 <td class="text-right">
-                  <v-icon color="error" @click.stop="askConfirmDeleteSignal(signal)">
-                    {{ mdi.mdiDelete }}
-                  </v-icon>
+                  <btn-with-tooltip tooltip="delete" @click="askConfirmDeleteSignal(signal)">
+                    <v-icon color="error">
+                      {{ mdi.mdiDelete }}
+                    </v-icon>
+                  </btn-with-tooltip>
                 </td>
               </tr>
               </tbody>
@@ -230,10 +240,12 @@ import formValuesSaving from "../mixins/form-values-saving";
 import TextInput from "../components/text-input";
 import DeviceUtils from "../utils/device-utils";
 import StringUtils from "../utils/string-utils";
+import BtnWithTooltip from "../components/btn-with-tooltip";
 
 export default {
   name: "signal-manager",
   components: {
+    BtnWithTooltip,
     TextInput,
     NumberInput,
     SelectTransformer, TransformerDialog,
