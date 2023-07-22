@@ -11,6 +11,8 @@ const ru = {
       transform: 'Преобразовать',
       exportWav: 'Экспортировать wav',
       exportTxt: 'Экспортировать txt',
+      exportSignal: 'Экспортировать сигнал',
+      exportData: 'Экспортировать данные',
       working: 'Вычисление...',
       changePassword: 'Изменить пароль',
       signIn: 'Войти',
@@ -106,11 +108,11 @@ const ru = {
   },
   'signal-importer': {
     'import': 'Импортировать',
-    fromTxtOrWavFile: 'Из файла txt или wav',
+    fromTextOrWavFile: 'Из файла txt, csv, json, xml или wav',
     importedFromFile: 'Импортирован из файла {name}',
     selectAction: 'Выберите действие с импортируемым сигналом',
     selectChannel: 'Выберите аудиоканал для импорта',
-    wrongTxtFormat: 'Неверный формат txt файла'
+    wrongFileFormat: 'Неверный формат файла',
   },
   'signal-generator': {
     name: 'Генератор сигналов',

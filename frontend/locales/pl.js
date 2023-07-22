@@ -11,6 +11,8 @@ const pl = {
       transform: 'Przetwórz',
       exportWav: 'Eksportuj wav',
       exportTxt: 'Eksportuj txt',
+      exportSignal: 'Eksportuj sygnał',
+      exportData: 'Eksportuj dane',
       working: 'Trwa przetwarzanie...',
       changePassword: 'Zmień hasło',
       signIn: 'Zaloguj się',
@@ -106,11 +108,11 @@ const pl = {
   },
   'signal-importer': {
     'import': 'Importuj',
-    fromTxtOrWavFile: 'Z pliku txt lub wav',
+    fromTextOrWavFile: 'Z pliku txt, csv, json, xml lub wav',
     importedFromFile: 'Zaimportowano z pliku {name}',
     selectAction: 'Wybierz akcję z importowanym sygnałem',
     selectChannel: 'Wybierz kanał audio do zaimportowania',
-    wrongTxtFormat: 'Niewłaściwy format pliku txt'
+    wrongFileFormat: 'Niewłaściwy format pliku',
   },
   'signal-generator': {
     name: 'Generator sygnałów',

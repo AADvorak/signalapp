@@ -5,8 +5,8 @@
   <v-card-text>
     <v-file-input
         v-model="file"
-        accept=".txt,.wav"
-        :label="_t('fromTxtOrWavFile')"/>
+        accept=".txt,.csv,.json,.xml,.wav"
+        :label="_t('fromTextOrWavFile')"/>
   </v-card-text>
   <select-dialog :items="selectItems" :opened="select.opened" :text="select.text" @select="select.select" @cancel="select.cancel"/>
   <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
@@ -41,7 +41,10 @@ export default {
           this.importFromFile(file, this.openWav, this.saveWav)
           break
         case 'text/plain':
-          this.importFromFile(file, this.openTxt, this.saveTxt)
+        case 'text/csv':
+        case 'application/json':
+        case 'application/xml':
+          this.importFromFile(file, this.openText, this.saveText)
           break
       }
     },
@@ -101,12 +104,12 @@ export default {
         this.showErrorsFromResponse(response, this._tc('messages.fileSaveError'))
       }
     },
-    async openTxt(file) {
-      const signal = await this.tryReadSignalFromTxtFile(file)
+    async openText(file) {
+      const signal = await this.tryReadSignalFromTextFile(file)
       signal && this.$emit('signal', signal)
     },
-    async saveTxt(file) {
-      const signal = await this.tryReadSignalFromTxtFile(file)
+    async saveText(file) {
+      const signal = await this.tryReadSignalFromTextFile(file)
       if (!signal) {
         return
       }
@@ -126,13 +129,15 @@ export default {
         this.showErrorsFromResponse(response)
       }
     },
-    async tryReadSignalFromTxtFile(file) {
+    async tryReadSignalFromTextFile(file) {
       try {
-        const signal = await FileUtils.readSignalFromTxtFile(file)
+        const signal = await FileUtils.readSignalFromTextFile(file)
         if (!this.validateSignalLength(signal)) {
           return
         }
-        this.makeSignalNameAndDescriptionFromFile(signal, file)
+        if (!signal.name) {
+          this.makeSignalNameAndDescriptionFromFile(signal, file)
+        }
         return signal
       } catch (e) {
         this.showMessage({

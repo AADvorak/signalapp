@@ -46,8 +46,31 @@
                 <v-btn color="success" v-if="signal.id" @click="saveSignalAsNew">
                   {{ _t('saveAsNew') }}
                 </v-btn>
-                <v-btn color="secondary" @click="exportSignalToTxt">
-                  {{ _tc('buttons.exportTxt') }}
+                <v-btn color="secondary">
+                  {{ _tc('buttons.exportSignal') }}
+                  <v-menu activator="parent">
+                    <v-list>
+                      <v-list-item @click="exportSignalToJson">
+                        <v-list-item-title>JSON</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click="exportSignalToXml">
+                        <v-list-item-title>XML</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </v-btn>
+                <v-btn color="secondary">
+                  {{ _tc('buttons.exportData') }}
+                  <v-menu activator="parent">
+                    <v-list>
+                      <v-list-item @click="exportSignalToTxt">
+                        <v-list-item-title>TXT</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click="exportSignalToCsv">
+                        <v-list-item-title>CSV</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </v-btn>
                 <v-btn color="secondary" @click="exportSignalToWav">
                   {{ _tc('buttons.exportWav') }}
@@ -202,7 +225,16 @@ export default {
       })
     },
     exportSignalToTxt() {
-      FileUtils.saveSignalToTxtFile(this.signal)
+      FileUtils.exportSignal(this.signal, 'txt')
+    },
+    exportSignalToCsv() {
+      FileUtils.exportSignal(this.signal, 'csv')
+    },
+    exportSignalToJson() {
+      FileUtils.exportSignal(this.signal, 'json')
+    },
+    exportSignalToXml() {
+      FileUtils.exportSignal(this.signal, 'xml')
     },
     exportSignalToWav() {
       if (this.signalId !== '0' && this.historyKey === '0') {
