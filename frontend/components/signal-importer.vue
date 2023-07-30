@@ -36,16 +36,10 @@ export default {
   watch: {
     file(newValue) {
       let file = newValue[0]
-      switch (file.type) {
-        case 'audio/wav':
-          this.importFromFile(file, this.openWav, this.saveWav)
-          break
-        case 'text/plain':
-        case 'text/csv':
-        case 'application/json':
-        case 'application/xml':
-          this.importFromFile(file, this.openText, this.saveText)
-          break
+      if (file.type === 'audio/wav') {
+        this.importFromFile(file, this.openWav, this.saveWav)
+      } else if (Object.keys(FileUtils.EXTENSIONS_BY_TYPE).includes(file.type)) {
+        this.importFromFile(file, this.openText, this.saveText)
       }
     },
   },
@@ -147,6 +141,9 @@ export default {
     },
     makeSignalNameAndDescriptionFromFile(signal, file) {
       signal.name = file.name
+          .replaceAll('.wav', '')
+          .replaceAll('.txt', '')
+          .replaceAll('.csv', '')
       signal.description = this._t('importedFromFile', {name: file.name})
     }
   }

@@ -6,14 +6,14 @@ const FileUtils = {
     'txt': 'text/plain',
     'csv': 'text/csv',
     'json': 'application/json',
-    'xml': 'application/xml'
+    'xml': 'text/xml'
   },
 
   EXTENSIONS_BY_TYPE: {
     'text/plain': 'txt',
     'text/csv': 'csv',
     'application/json': 'json',
-    'application/xml': 'xml'
+    'text/xml': 'xml'
   },
 
   exportSignal(signal, extension) {
@@ -79,14 +79,31 @@ const FileUtils = {
       return JSON.stringify({
         name: signal.name,
         description: signal.description,
-        maxAbsY: signal.maxAbsY,
         xMin: signal.xMin,
         sampleRate: signal.sampleRate,
         data: signal.data
       })
     },
     xml(signal) {
-      return ''
+      const xml = document.implementation.createDocument('', '', null)
+      const createAndAppendChild = (parent, name, html) => {
+        const el = xml.createElement(name)
+        if (html !== undefined) {
+          el.innerHTML = html
+        }
+        parent.appendChild(el)
+        return el
+      }
+      const root = createAndAppendChild(xml,'Signal')
+      createAndAppendChild(root, 'name', signal.name)
+      createAndAppendChild(root, 'description', signal.description)
+      createAndAppendChild(root, 'xMin', signal.xMin)
+      createAndAppendChild(root, 'sampleRate', signal.sampleRate)
+      const data = createAndAppendChild(root, 'data')
+      for (const sample of signal.data) {
+        createAndAppendChild(data, 'sample', sample)
+      }
+      return new XMLSerializer().serializeToString(xml)
     },
     signalToDsv(signal, delimiter) {
       let text = ''
@@ -105,30 +122,89 @@ const FileUtils = {
       return this.signalFromDsv(str, ',')
     },
     json(str) {
-      return JSON.parse(str)
+      const validateNumber = (value, positive) => {
+        const number = parseFloat(value)
+        if (isNaN(number)) {
+          return false
+        }
+        return !(positive && number <= 0)
+      }
+      try {
+        const signal = JSON.parse(str)
+        if (!signal.name || !validateNumber(signal.xMin) || !validateNumber(signal.sampleRate, true)
+            || !signal.data || !signal.data.length) {
+          throw new Error()
+        }
+        for (const sample of signal.data) {
+          if (!validateNumber(sample)) {
+            throw new Error()
+          }
+        }
+        return signal
+      } catch (e) {
+        throw new Error('wrongFileFormat')
+      }
     },
     xml(str) {
-      return {}
+      try {
+        const parser = new DOMParser()
+        const signalXml = parser.parseFromString(str, 'application/xml')
+        const signalNode = signalXml.querySelector('Signal')
+        const signal = {
+          data: []
+        }
+        for (const field of ['name', 'description']) {
+          const node = signalNode.querySelector(field)
+          if (node) {
+            signal[field] = node.innerHTML
+          }
+        }
+        if (!signal.name) {
+          throw new Error()
+        }
+        for (const field of ['xMin', 'sampleRate']) {
+          const value = parseFloat(signalNode.querySelector(field).innerHTML)
+          if (isNaN(value)) {
+            throw new Error()
+          }
+          signal[field] = value
+        }
+        if (signal.sampleRate <= 0) {
+          throw new Error()
+        }
+        const sampleNodes = signalNode.querySelector('data').childNodes
+        if (!sampleNodes || !sampleNodes.length) {
+          throw new Error()
+        }
+        for (const sampleNode of sampleNodes) {
+          const sample = parseFloat(sampleNode.innerHTML || '0')
+          if (isNaN(sample)) {
+            throw new Error()
+          }
+          signal.data.push(sample)
+        }
+        return signal
+      } catch (e) {
+        throw new Error('wrongFileFormat')
+      }
     },
     signalFromDsv(str, delimiter) {
       try {
         let points = []
         let strArr = str.split('\r\n')
         for (let str of strArr) {
-          let values = str.split(delimiter)
-          let item = {
-            x: values[0],
-            y: values[1]
+          const values = str.split(delimiter)
+          if (values.length < 2) {
+            continue
           }
-          if (item.x && item.y) {
-            if (isNaN(item.x) || isNaN(item.y)) {
-              throw new Error()
-            }
-            points.push({
-              x: parseFloat(values[0]),
-              y: parseFloat(values[1])
-            })
+          const item = {
+            x: parseFloat(values[0]),
+            y: parseFloat(values[1])
           }
+          if (isNaN(item.x) || isNaN(item.y)) {
+            throw new Error()
+          }
+          points.push(item)
         }
         const xMin = points[0].x
         const step = points[1].x - xMin
