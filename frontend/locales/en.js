@@ -173,7 +173,8 @@ const en = {
     name: 'Sign in',
     signInToContinue: 'Please sign in to continue',
     forgotPassword: 'Forgot password',
-    signInError: 'Error while sign in'
+    signInError: 'Error while sign in',
+    alreadySignedIn: 'Already signed in'
   },
   'signup': {
     name: 'Sign up',

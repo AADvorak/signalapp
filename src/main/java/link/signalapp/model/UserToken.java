@@ -16,10 +16,7 @@ import java.time.LocalDateTime;
 public class UserToken {
 
     @EmbeddedId
-    private UserPK id;
-
-    @Column
-    private String token;
+    private UserTokenPK id;
 
     @Column
     private LocalDateTime lastActionTime;

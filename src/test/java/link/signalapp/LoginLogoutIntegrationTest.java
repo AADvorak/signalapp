@@ -15,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -129,7 +130,8 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
     private String getTokenFromRepository() {
         return userTokenRepository.findAll().stream()
                 .filter(userToken -> email1.equals(userToken.getId().getUser().getEmail()))
-                .findAny().map(UserToken::getToken).orElse("");
+                .max(Comparator.comparing(UserToken::getLastActionTime))
+                .map(userToken -> userToken.getId().getToken()).orElse("");
     }
 
 }

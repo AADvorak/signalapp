@@ -173,7 +173,8 @@ const ru = {
     name: 'Вход',
     signInToContinue: 'Пожалуйста, войдите для продолжения',
     forgotPassword: 'Не помню пароль',
-    signInError: 'Ошибка при входе'
+    signInError: 'Ошибка при входе',
+    alreadySignedIn: 'Вход уже выполнен'
   },
   'signup': {
     name: 'Регистрация',

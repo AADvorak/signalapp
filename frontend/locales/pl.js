@@ -173,7 +173,8 @@ const pl = {
     name: 'Logowanie',
     signInToContinue: 'Aby kontynuować, zaloguj się',
     forgotPassword: 'Zapomniałeś hasła',
-    signInError: 'Błąd podczas logowania'
+    signInError: 'Błąd podczas logowania',
+    alreadySignedIn: 'Już jesteś zalogowany(a)'
   },
   'signup': {
     name: 'Rejestracja',

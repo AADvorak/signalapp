@@ -137,6 +137,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest(), headers), String.class));
         ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
+        // todo true while must be false
         boolean userConfirmExists = userConfirmRepository.findAll().stream()
                 .anyMatch(userConfirm -> email1.equals(userConfirm.getId().getUser().getEmail()));
         assertAll(() -> assertEquals(500, exc.getRawStatusCode()),

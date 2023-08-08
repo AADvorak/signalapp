@@ -11,10 +11,7 @@ import link.signalapp.error.SignalAppUnauthorizedException;
 import link.signalapp.file.FileManager;
 import link.signalapp.mail.MailTransport;
 import link.signalapp.mapper.UserMapper;
-import link.signalapp.model.User;
-import link.signalapp.model.UserConfirm;
-import link.signalapp.model.UserPK;
-import link.signalapp.model.UserToken;
+import link.signalapp.model.*;
 import link.signalapp.repository.UserConfirmRepository;
 import link.signalapp.repository.UserRepository;
 import link.signalapp.repository.UserTokenRepository;
@@ -27,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.MessagingException;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
 import static java.util.UUID.randomUUID;
 
@@ -80,6 +76,7 @@ public class UserService extends ServiceBase {
                 .setToken(generateAndSaveToken(user));
     }
 
+    @Transactional
     public ResponseWithToken<UserDtoResponse> login(LoginDtoRequest request) throws Exception {
         if (applicationProperties.isVerifyCaptcha()) {
             recaptchaVerifier.verify(request.getToken());
@@ -88,6 +85,8 @@ public class UserService extends ServiceBase {
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL_PASSWORD);
         }
+        userTokenRepository.deleteOldTokens(user.getId(), LocalDateTime.now(),
+                applicationProperties.getUserIdleTimeout());
         return new ResponseWithToken<UserDtoResponse>()
                 .setResponse(UserMapper.INSTANCE.userToDto(user))
                 .setToken(generateAndSaveToken(user));
@@ -150,7 +149,7 @@ public class UserService extends ServiceBase {
             throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_CONFIRMED);
         }
         UserConfirm userConfirm = new UserConfirm()
-                .setId(new UserPK().setUser(user))
+                .setId(new UserConfirmPK().setUser(user))
                 .setCode(String.valueOf(randomUUID()))
                 .setCreateTime(LocalDateTime.now());
         userConfirmRepository.save(userConfirm);
@@ -184,18 +183,9 @@ public class UserService extends ServiceBase {
 
     private String generateAndSaveToken(User user) {
         String token = String.valueOf(randomUUID());
-        UserPK userPK = new UserPK().setUser(user);
-        Optional<UserToken> optionalUserToken = userTokenRepository.findById(userPK);
-        if (optionalUserToken.isPresent()) {
-            userTokenRepository.save(optionalUserToken.get()
-                    .setToken(token)
-                    .setLastActionTime(LocalDateTime.now()));
-        } else {
-            userTokenRepository.save(new UserToken()
-                    .setId(userPK)
-                    .setToken(token)
-                    .setLastActionTime(LocalDateTime.now()));
-        }
+        userTokenRepository.save(new UserToken()
+                .setId(new UserTokenPK().setUser(user).setToken(token))
+                .setLastActionTime(LocalDateTime.now()));
         return token;
     }
 

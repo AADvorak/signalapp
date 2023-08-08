@@ -13,7 +13,7 @@ import link.signalapp.error.SignalAppUnauthorizedException;
 import link.signalapp.file.FileManager;
 import link.signalapp.mail.MailTransport;
 import link.signalapp.model.User;
-import link.signalapp.model.UserPK;
+import link.signalapp.model.UserTokenPK;
 import link.signalapp.model.UserToken;
 import link.signalapp.repository.UserConfirmRepository;
 import link.signalapp.repository.UserRepository;
@@ -24,8 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
-
-import java.util.Optional;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -72,7 +70,6 @@ public class UserServiceTest {
     @Test
     public void registerOk() throws Exception {
         when(applicationProperties.isVerifyCaptcha()).thenReturn(true);
-        when(userTokenRepository.findById(any())).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).then(returnsFirstArg());
         UserDtoRequest request = data.userDtoRequest();
         ResponseWithToken<UserDtoResponse> response = userService.register(request);
@@ -85,7 +82,7 @@ public class UserServiceTest {
         UserToken capturedUserToken = userTokenCaptor.getValue();
         String rawPassword = rawPasswordCaptor.getValue();
         assertAll(
-                () -> assertEquals(capturedUserToken.getToken(), response.getToken()),
+                () -> assertEquals(capturedUserToken.getId().getToken(), response.getToken()),
                 () -> assertEquals(request.getEmail(), response.getResponse().getEmail()),
                 () -> assertEquals(request.getFirstName(), response.getResponse().getFirstName()),
                 () -> assertEquals(request.getLastName(), response.getResponse().getLastName()),
@@ -126,14 +123,13 @@ public class UserServiceTest {
         LoginDtoRequest request = data.loginDtoRequest();
         User user = data.userWithUnconfirmedEmail();
         when(userRepository.findByEmail(Data.EMAIL)).thenReturn(user);
-        when(userTokenRepository.findById(any())).thenReturn(Optional.empty());
         ResponseWithToken<UserDtoResponse> response = userService.login(request);
         verify(recaptchaVerifier).verify(tokenCaptor.capture());
         verify(userTokenRepository).save(userTokenCaptor.capture());
         String capturedToken = tokenCaptor.getValue();
         UserToken capturedUserToken = userTokenCaptor.getValue();
         assertAll(
-                () -> assertEquals(capturedUserToken.getToken(), response.getToken()),
+                () -> assertEquals(capturedUserToken.getId().getToken(), response.getToken()),
                 () -> assertEquals(user.getEmail(), response.getResponse().getEmail()),
                 () -> assertEquals(user.isEmailConfirmed(), response.getResponse().isEmailConfirmed()),
                 () -> assertEquals(user.getFirstName(), response.getResponse().getFirstName()),
@@ -342,8 +338,7 @@ public class UserServiceTest {
 
         private UserToken userToken(User user, String token) {
             return new UserToken()
-                    .setToken(token)
-                    .setId(new UserPK().setUser(user));
+                    .setId(new UserTokenPK().setUser(user).setToken(token));
         }
     }
 

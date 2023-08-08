@@ -19,7 +19,8 @@ public class ServiceBase {
     protected final ApplicationProperties applicationProperties;
 
     protected User getUserByToken(String token) throws SignalAppUnauthorizedException {
-        UserToken userToken = findActiveToken(token);
+        UserToken userToken = userTokenRepository.findActiveToken(token, LocalDateTime.now(),
+                applicationProperties.getUserIdleTimeout());
         if (userToken == null) {
             throw new SignalAppUnauthorizedException();
         } else {
@@ -27,10 +28,6 @@ public class ServiceBase {
             userTokenRepository.save(userToken);
         }
         return userToken.getId().getUser();
-    }
-
-    protected UserToken findActiveToken(String token) {
-        return userTokenRepository.findActiveToken(token, LocalDateTime.now(), applicationProperties.getUserIdleTimeout());
     }
 
 }

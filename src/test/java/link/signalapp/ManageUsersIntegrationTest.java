@@ -127,6 +127,7 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
         ResponseEntity<String> response = template.exchange(fullUrl(USERS_URL + ME_URL),
                 HttpMethod.DELETE, new HttpEntity<>(login(email1)), String.class);
         assertEquals(200, response.getStatusCodeValue());
+        // todo check all user data is deleted
     }
 
     @Test

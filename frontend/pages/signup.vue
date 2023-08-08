@@ -73,7 +73,7 @@ export default {
         if (response.ok) {
           dataStore().setUserInfo(response.data)
           let waitingForAuthorization = dataStore().getWaitingForAuthorization
-          useRouter().push(waitingForAuthorization ? waitingForAuthorization : '/')
+          await useRouter().push(waitingForAuthorization ? waitingForAuthorization : '/')
           waitingForAuthorization && dataStore().clearWaitingForAuthorization()
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
