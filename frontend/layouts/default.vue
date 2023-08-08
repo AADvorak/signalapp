@@ -96,7 +96,7 @@
 
 <script>
 
-import {dataStore} from "../stores/data-store";
+import {dataStore} from "~/stores/data-store";
 import ApiProvider from "../api/api-provider";
 import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
@@ -183,16 +183,31 @@ export default {
   },
   mounted() {
     window.history.scrollRestoration = 'manual'
-    dataStore().loadUserInfo()
     this.setHeaderByRoute()
     this.detectLocale()
     this.makeChartLang()
+    this.loadUserInfo()
+    this.loadSettings()
   },
   methods: {
     async signOut() {
       await ApiProvider.del('/api/sessions/')
       dataStore().clearUserInfo()
       this.toMainPage()
+    },
+    async loadUserInfo() {
+      if (dataStore().userInfo !== undefined) {
+        return
+      }
+      const response = await ApiProvider.get('/api/users/me/', true)
+      dataStore().setUserInfo(response.ok ? response.data : null)
+    },
+    async loadSettings() {
+      if (dataStore().settings !== undefined) {
+        return
+      }
+      const response = await ApiProvider.get('/api/settings/', true)
+      dataStore().setSettings(response.ok ? response.data : null)
     },
     toMainPage() {
       this.toPage('/')

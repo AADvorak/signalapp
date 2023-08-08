@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+
+  signalapp-postgres:
+    image: postgres:14.4-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    networks:
+      signalapp-net:
+
+  signalapp-postgres-test:
+    image: postgres:14.4-alpine
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    networks:
+      signalapp-net:
+
+  signalapp-nginx:
+    image: nginx:1.23-alpine
+    ports:
+      - '80:80'
+    volumes:
+      - ../../nginx/nginx-dev.conf:/etc/nginx/nginx.conf
+      - ../../nginx/mime.types:/etc/nginx/mime.types
+      - ../../frontend-old/:/usr/share/nginx/static
+    networks:
+      signalapp-net:
+
+networks:
+  signalapp-net:

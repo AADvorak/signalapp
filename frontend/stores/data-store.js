@@ -1,10 +1,10 @@
 import {defineStore} from 'pinia'
-import UserUtils from "~/utils/user-utils";
 
 export const dataStore = defineStore('dataStore', {
   state: () => {
     return {
       userInfo: undefined,
+      settings: undefined,
       modules: [
         {code: 'signal-generator', forMenu: true, icon: 'sineWave'},
         {code: 'signal-recorder', forMenu: true, icon: 'microphone'},
@@ -105,11 +105,11 @@ export const dataStore = defineStore('dataStore', {
     }
   },
   actions: {
-    async loadUserInfo() {
-      this.userInfo === undefined && this.setUserInfo(await UserUtils.loadUserInfo())
-    },
     setUserInfo(userInfo) {
       this.userInfo = userInfo
+    },
+    setSettings(settings) {
+      this.settings = settings
     },
     clearUserInfo() {
       this.userInfo = null
