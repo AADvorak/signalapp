@@ -8,11 +8,11 @@
         <version>2.6.3</version>
         <relativePath/>
     </parent>
-    <groupId>com.example</groupId>
+    <groupId>link.signalapp</groupId>
     <artifactId>signalapp</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>signalapp</name>
-    <description>Demo project for Spring Boot</description>
+    <version>1.0.0</version>
+    <name>SignalApp application</name>
+    <description>SignalApp application</description>
 
     <properties>
         <java.version>17</java.version>
