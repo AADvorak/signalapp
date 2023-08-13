@@ -52,20 +52,26 @@ export default {
       email: {value: ''},
       password: {value: ''},
     },
-    signInRequestSent: false
+    signInRequestSent: false,
+    signInRequestSuccess: false
   }),
   computed: {
     waitingForAuthorization() {
       return dataStore().getWaitingForAuthorization
+    },
+    userInfo() {
+      return dataStore().userInfo
+    }
+  },
+  watch: {
+    userInfo() {
+      this.redirectToStartPageIfSignedIn()
     }
   },
   mounted() {
     this.formValue('email', dataStore().emailForPasswordRestore || '')
     this.focusFirstFormField()
     this.redirectToStartPageIfSignedIn()
-    dataStore().$subscribe(() => {
-      this.redirectToStartPageIfSignedIn()
-    })
   },
   beforeUnmount() {
     dataStore().clearWaitingForAuthorization()
@@ -77,6 +83,7 @@ export default {
         const token = await this.recaptcha()
         const response = await ApiProvider.postJson('/api/sessions/', {...this.formValues, token})
         if (response.ok) {
+          this.signInRequestSuccess = true
           dataStore().setUserInfo(response.data)
           await useRouter().push(this.waitingForAuthorization ? this.waitingForAuthorization : '/')
         } else if (response.status === 400) {
@@ -92,7 +99,7 @@ export default {
       useRouter().push('/restore-password')
     },
     redirectToStartPageIfSignedIn() {
-      if (dataStore().userInfo) {
+      if (this.userInfo && !this.signInRequestSuccess) {
         this.showMessage({
           text: this._t('alreadySignedIn'),
           onHide: () => {
