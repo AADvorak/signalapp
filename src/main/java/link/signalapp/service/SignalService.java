@@ -3,6 +3,7 @@ package link.signalapp.service;
 import link.signalapp.ApplicationProperties;
 import link.signalapp.audio.AudioBytesCoder;
 import link.signalapp.audio.AudioSampleReader;
+import link.signalapp.dto.request.SignalFilterDto;
 import link.signalapp.dto.response.IdDtoResponse;
 import link.signalapp.dto.request.SignalDtoRequest;
 import link.signalapp.dto.response.ResponseWithTotalCounts;
@@ -48,15 +49,20 @@ public class SignalService extends ServiceBase {
         this.fileManager = fileManager;
     }
 
-    public ResponseWithTotalCounts<SignalDtoResponse> get(String token, String filter, int page, int size,
-                                                          String sortBy, String sortDir)
+    public ResponseWithTotalCounts<SignalDtoResponse> filter(String token, SignalFilterDto filter)
             throws SignalAppUnauthorizedException {
         int userId = getUserByToken(token).getId();
-        Pageable pageable = PageRequest.of(page, size > MAX_USER_STORED_SIGNALS_NUMBER || size <= 0
-                ? MAX_USER_STORED_SIGNALS_NUMBER : size, getSort(sortBy, sortDir, filter));
-        Page<Signal> signalPage = filter != null && !filter.isEmpty()
-                ? signalRepository.findByUserIdAndFilter(userId, pageable, "%" + filter + "%")
-                : signalRepository.findByUserId(userId, pageable);
+        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize() > MAX_USER_STORED_SIGNALS_NUMBER
+                || filter.getSize() <= 0
+                ? MAX_USER_STORED_SIGNALS_NUMBER
+                : filter.getSize(), getSort(filter));
+        String search = filter.getSearch() == null || filter.getSearch().isEmpty() ? "" : "%" + filter.getSearch() + "%";
+        List<BigDecimal> sampleRates = filter.getSampleRates() == null || filter.getSampleRates().isEmpty()
+                ? List.of(BigDecimal.ZERO)
+                : filter.getSampleRates();
+        Page<Signal> signalPage = filter.getFolderIds() == null || filter.getFolderIds().isEmpty()
+                ? signalRepository.findByUserIdAndFilter(userId, search, sampleRates, pageable)
+                : signalRepository.findByUserIdAndFilter(userId, search, sampleRates, filter.getFolderIds(), pageable);
         return new ResponseWithTotalCounts<SignalDtoResponse>()
                 .setData(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList())
                 .setPages(signalPage.getTotalPages())
@@ -106,7 +112,7 @@ public class SignalService extends ServiceBase {
 
     public List<BigDecimal> getData(String token, int id) throws SignalAppUnauthorizedException,
             SignalAppNotFoundException, IOException, UnsupportedAudioFileException {
-        return getDataForSignal(getSignalByUserTokenAndId(token,id));
+        return getDataForSignal(getSignalByUserTokenAndId(token, id));
     }
 
     public byte[] getWav(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
@@ -126,16 +132,20 @@ public class SignalService extends ServiceBase {
         User user = getUserByToken(token);
         checkStoredByUserSignalsNumber(user.getId());
         if (asr.getFormat().getChannels() == 1) {
-            double [] samples = new double[(int)sampleCount];
+            double[] samples = new double[(int) sampleCount];
             asr.getMonoSamples(samples);
             makeAndSaveSignal(fileName, samples, asr.getFormat(), user);
         } else {
-            double [] rightSamples = new double[(int)sampleCount];
-            double [] leftSamples = new double[(int)sampleCount];
+            double[] rightSamples = new double[(int) sampleCount];
+            double[] leftSamples = new double[(int) sampleCount];
             asr.getStereoSamples(leftSamples, rightSamples);
             makeAndSaveSignal(fileName + "(r)", rightSamples, asr.getFormat(), user);
             makeAndSaveSignal(fileName + "(l)", leftSamples, asr.getFormat(), user);
         }
+    }
+
+    public List<BigDecimal> getSampleRates(String token) throws SignalAppUnauthorizedException {
+        return signalRepository.sampleRatesByUserId(getUserByToken(token).getId());
     }
 
     private Signal getSignalByUserTokenAndId(String token, int id)
@@ -150,7 +160,7 @@ public class SignalService extends ServiceBase {
     private List<BigDecimal> getDataForSignal(Signal signal) throws IOException, UnsupportedAudioFileException {
         byte[] bytes = fileManager.readWavFromFile(signal.getUserId(), signal.getId());
         AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(bytes));
-        double[] samples = new double[(int)asr.getSampleCount() / 2];
+        double[] samples = new double[(int) asr.getSampleCount() / 2];
         asr.getMonoSamples(samples);
         List<BigDecimal> data = new ArrayList<>();
         for (double sample : samples) {
@@ -189,11 +199,10 @@ public class SignalService extends ServiceBase {
         fileManager.writeBytesToWavFile(signal.getUserId(), signal.getId(), format, bytes);
     }
 
-    private Sort getSort(String sortBy, String sortDir, String filter) {
-        String sortColumn = sortBy != null && !sortBy.isEmpty() ? sortBy : "createTime";
-        sortColumn = filter == null || filter.isEmpty() ? sortColumn : camelToSnake(sortColumn);
-        Sort sort = Sort.by(sortColumn);
-        return sortDir != null && sortDir.equals("asc") ? sort : sort.descending();
+    private Sort getSort(SignalFilterDto filter) {
+        Sort sort = Sort.by(camelToSnake(filter.getSortBy() != null && !filter.getSortBy().isEmpty()
+                ? filter.getSortBy() : "createTime"));
+        return filter.getSortDir() != null && filter.getSortDir().equals("asc") ? sort : sort.descending();
     }
 
     private void checkStoredByUserSignalsNumber(int userId) throws SignalAppConflictException {
@@ -215,8 +224,7 @@ public class SignalService extends ServiceBase {
             if (Character.isUpperCase(ch)) {
                 result.append('_');
                 result.append(Character.toLowerCase(ch));
-            }
-            else {
+            } else {
                 result.append(ch);
             }
         }

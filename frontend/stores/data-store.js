@@ -5,6 +5,7 @@ export const dataStore = defineStore('dataStore', {
     return {
       userInfo: undefined,
       settings: undefined,
+      folders: [],
       modules: [
         {code: 'signal-generator', forMenu: true, icon: 'sineWave'},
         {code: 'signal-recorder', forMenu: true, icon: 'microphone'},

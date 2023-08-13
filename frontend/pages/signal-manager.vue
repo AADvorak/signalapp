@@ -23,9 +23,27 @@
                       @update="v => form.search.value = v"/>
                 </v-col>
               </v-row>
+              <v-row>
+                <v-col>
+                  <v-select
+                      :model-value="form.sampleRates.value"
+                      :items="sampleRates"
+                      label="Частоты дискретизации"
+                      multiple/>
+                </v-col>
+                <v-col>
+                  <v-select
+                      :model-value="form.folderIds.value"
+                      item-title="name"
+                      item-value="id"
+                      :items="folders"
+                      label="Папки"
+                      multiple/>
+                </v-col>
+              </v-row>
             </v-form>
           </fixed-width-wrapper>
-          <fixed-width-wrapper v-if="signalsEmpty">
+          <fixed-width-wrapper v-if="signalsEmpty && !loadingOverlay">
             <h3 v-if="!formValues.search">{{ _t('youHaveNoStoredSignals') }}.
               <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
               <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
@@ -89,6 +107,7 @@
                 <th class="text-left"></th>
                 <th class="text-left"></th>
                 <th class="text-left"></th>
+                <th class="text-left"></th>
               </tr>
               </thead>
               <tbody>
@@ -130,6 +149,12 @@
                       {{ mdi.mdiDelete }}
                     </v-icon>
                   </btn-with-tooltip>
+                </td>
+                <td class="text-right">
+                  <v-btn class="btn-with-icon" variant="text">
+                    <v-icon>{{ mdi.mdiFolder }}</v-icon>
+                    <signal-folders-menu :signal-id="signal.id"/>
+                  </v-btn>
                 </td>
               </tr>
               </tbody>
@@ -216,12 +241,7 @@
 </template>
 
 <script>
-import {mdiDelete} from "@mdi/js";
-import {mdiPlay} from "@mdi/js";
-import {mdiStop} from "@mdi/js";
-import {mdiFileImport} from "@mdi/js";
-import {mdiClose} from "@mdi/js";
-import {mdiFileEdit} from "@mdi/js";
+import {mdiDelete, mdiPlay, mdiStop, mdiFileImport, mdiClose, mdiFileEdit, mdiFolder} from "@mdi/js";
 import SignalPlayer from "../audio/signal-player";
 import FileUtils from "../utils/file-utils";
 import PageBase from "../components/page-base";
@@ -241,6 +261,8 @@ import TextInput from "../components/text-input";
 import DeviceUtils from "../utils/device-utils";
 import StringUtils from "../utils/string-utils";
 import BtnWithTooltip from "../components/btn-with-tooltip";
+import {dataStore} from "~/stores/data-store";
+import FolderRequests from "~/api/folder-requests";
 
 export default {
   name: "signal-manager",
@@ -257,8 +279,9 @@ export default {
   data: () => ({
     viewDialog: false,
     transformDialog: false,
+    sampleRates: [],
     signals: [],
-    signalsLoadedFrom: '',
+    signalsLastLoadFilter: '',
     signalsEmpty: false,
     elements: 0,
     pages: 0,
@@ -272,7 +295,8 @@ export default {
       mdiStop,
       mdiFileImport,
       mdiClose,
-      mdiFileEdit
+      mdiFileEdit,
+      mdiFolder
     },
     form: {
       pageSize: {
@@ -283,7 +307,9 @@ export default {
           step: 1
         }
       },
-      search: {value: ''}
+      search: {value: ''},
+      sampleRates: {value: []},
+      folderIds: {value: []}
     },
     SORT_DIRS: {
       DESC: 'desc',
@@ -323,6 +349,9 @@ export default {
     },
     selectedSignalsDataLoaded() {
       return this.selectedSignals.length === this.selectedSignals.filter(signal => signal.data).length
+    },
+    folders() {
+      return dataStore().folders
     }
   },
   watch: {
@@ -364,6 +393,8 @@ export default {
       this.setUrlParams()
     }
     this.loadSignals()
+    this.loadSampleRates()
+    FolderRequests.loadFolders()
   },
   methods: {
     validatePageSize() {
@@ -375,18 +406,19 @@ export default {
       return !validationMsg
     },
     async loadSignals() {
-      const url = `/api/signals${this.makeUrlParams(true)}`
-      if (this.loadingOverlay || this.signalsLoadedFrom === url || !this.validatePageSize()) {
+      const filter = this.makeSignalFilter()
+      const filterJson = JSON.stringify(filter)
+      if (this.loadingOverlay || this.signalsLastLoadFilter === filterJson || !this.validatePageSize()) {
         return
       }
       await this.loadWithOverlay(async () => {
-        const response = await this.getApiProvider().get(url)
+        const response = await this.getApiProvider().postJson('/api/signals/filter', filter)
         if (response.ok) {
           this.signals = response.data.data
           this.elements = response.data.elements
           this.pages = response.data.pages
           this.signalsEmpty = this.elements === 0
-          this.signalsLoadedFrom = url
+          this.signalsLastLoadFilter = filterJson
         } else {
           this.showErrorsFromResponse(response, this._t('loadSignalsError'))
         }
@@ -400,6 +432,12 @@ export default {
       if (response.ok) {
         signal.data = response.data
         SignalUtils.calculateSignalParams(signal)
+      }
+    },
+    async loadSampleRates() {
+      const response = await this.getApiProvider().get('/api/signals/sample-rates')
+      if (response.ok) {
+        this.sampleRates = response.data
       }
     },
     setSortingName() {
@@ -440,9 +478,13 @@ export default {
       if (size.value) {
         this.formValue('pageSize', parseInt(size.value))
       }
-      const filter = ref(route.query.filter)
-      if (filter.value) {
-        this.formValue('search', filter.value)
+      const search = ref(route.query.search)
+      if (search.value) {
+        this.formValue('search', search.value)
+      }
+      const folderIds = ref(route.query.folderIds)
+      if (folderIds.value) {
+        this.formValue('folderIds', this.readFolderIdsFromUrlParam(folderIds.value))
       }
       const sortBy = ref(route.query.sortBy)
       if (sortBy.value) {
@@ -452,16 +494,22 @@ export default {
       if (sortDir.value) {
         this.sortDir = sortDir.value
       }
-      return page.value || size.value || filter.value || sortBy.value || sortDir.value
+      return page.value || size.value || search.value || sortBy.value || sortDir.value
+    },
+    readFolderIdsFromUrlParam(str) {
+      return str.split(',').map(v => parseInt(v)).filter(number => !isNaN(number))
     },
     setUrlParams() {
       let url = `/signal-manager${this.makeUrlParams()}`
       useRouter().push(url)
     },
-    makeUrlParams(pageMinus1) {
-      let params = `?page=${pageMinus1 ? this.page - 1 : this.page}&size=${this.formValue('pageSize')}`
+    makeUrlParams() {
+      let params = `?page=${this.page}&size=${this.formValue('pageSize')}`
       if (this.formValues.search) {
-        params += `&filter=${this.formValues.search}`
+        params += `&search=${this.formValues.search}`
+      }
+      if (this.formValues.folderIds.length) {
+        params += `&folderIds=${this.makeUrlParamFromArr(this.formValues.folderIds)}`
       }
       if (this.sortBy) {
         params += `&sortBy=${this.sortBy}`
@@ -470,6 +518,32 @@ export default {
         params += `&sortDir=${this.sortDir}`
       }
       return params
+    },
+    makeUrlParamFromArr(arr) {
+      let str = ''
+      arr.forEach(item => {
+        str += (str ? ',' : '') + item
+      })
+      return str
+    },
+    makeSignalFilter() {
+      const filter = {
+        page: this.page - 1,
+        size: this.formValue('pageSize')
+      }
+      if (this.formValues.search) {
+        filter.search = this.formValues.search
+      }
+      if (this.formValues.folderIds.length) {
+        filter.folderIds = this.formValues.folderIds
+      }
+      if (this.sortBy) {
+        filter.sortBy = this.sortBy
+      }
+      if (this.sortDir) {
+        filter.sortDir = this.sortDir
+      }
+      return filter
     },
     openSignal(signal) {
       useRouter().push(`/signal/${signal.id}?history=0`)
@@ -504,7 +578,7 @@ export default {
     async deleteSignal(signal) {
       let response = await this.deleteSignalRequest(signal)
       if (response.ok) {
-        this.signalsLoadedFrom = ''
+        this.signalsLastLoadFilter = ''
         await this.loadSignals()
       }
     },
@@ -520,7 +594,7 @@ export default {
       let promiseArr = []
       this.selectedSignals.forEach(signal => promiseArr.push(this.deleteSignalRequest(signal)))
       await Promise.all(promiseArr)
-      this.signalsLoadedFrom = ''
+      this.signalsLastLoadFilter = ''
       await this.loadSignals()
     },
     deleteSignalRequest(signal) {
@@ -539,3 +613,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.btn-with-icon {
+  width: 36px;
+  min-width: 36px;
+}
+</style>

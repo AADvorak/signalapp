@@ -11,6 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 /**
  *
  * @author anton
@@ -21,13 +24,35 @@ public interface SignalRepository extends PagingAndSortingRepository<Signal, Int
             "where user_id = :userId", nativeQuery = true)
     int countByUserId(int userId);
 
-    Page<Signal> findByUserId(int userId, Pageable pageable);
+    @Query(value = "select distinct sample_rate from signal " +
+            "where user_id = :userId", nativeQuery = true)
+    List<BigDecimal> sampleRatesByUserId(int userId);
 
     @Query(value = "select * from signal " +
             "where user_id = :userId " +
-            "and (upper(name) like upper(:filter) " +
-            "or upper(description) like upper(:filter))", nativeQuery = true)
-    Page<Signal> findByUserIdAndFilter(int userId, Pageable pageable, String filter);
+            "and (:filter = '' or upper(name) like upper(:filter) " +
+            "or upper(description) like upper(:filter)) " +
+            "and (0 in :sampleRates or sample_rate in :sampleRates)", nativeQuery = true)
+    Page<Signal> findByUserIdAndFilter(
+            int userId,
+            String filter,
+            List<BigDecimal> sampleRates,
+            Pageable pageable
+    );
+
+    @Query(value = "select s.* from signal s " +
+            "join signal_in_folder sif on s.id = sif.signal_id and folder_id in :folderIds " +
+            "where user_id = :userId " +
+            "and (:filter = '' or upper(name) like upper(:filter) " +
+            "or upper(description) like upper(:filter)) " +
+            "and (0 in :sampleRates or sample_rate in :sampleRates)", nativeQuery = true)
+    Page<Signal> findByUserIdAndFilter(
+            int userId,
+            String filter,
+            List<BigDecimal> sampleRates,
+            List<Integer> folderIds,
+            Pageable pageable
+    );
 
     Signal findByIdAndUserId(int id, int userId);
 

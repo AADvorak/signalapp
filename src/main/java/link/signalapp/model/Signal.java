@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 import javax.persistence.*;
 
 /**
@@ -48,6 +49,14 @@ public class Signal {
 
     @Column(name = "x_min")
     private BigDecimal xMin;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "signal_in_folder",
+            joinColumns = @JoinColumn(name = "signal_id"),
+            inverseJoinColumns = @JoinColumn(name = "folder_id")
+    )
+    private Set<Folder> folders;
 
     public Signal(SignalDtoRequest dtoRequest, int userId) {
         name = dtoRequest.getName();
