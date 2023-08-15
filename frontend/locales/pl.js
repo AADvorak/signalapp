@@ -51,7 +51,8 @@ const pl = {
       firstName: 'Imię',
       lastName: 'Nazwisko',
       patronymic: 'Patronimik',
-      search: 'Szukaj'
+      search: 'Szukaj',
+      sampleRate: 'Częstotliwość próbkowania'
     },
   },
   'confirm-dialog': {
@@ -141,6 +142,8 @@ const pl = {
     name: 'Menadżer sygnałów',
     total: 'Razem: {pages} stron, {elements} wpisów',
     pageSize: 'Rozmiar strony',
+    sampleRates: 'Częstotliwośći próbkowania',
+    folders: 'Foldery',
     youHaveNoStoredSignals: 'Nie masz zapisanych sygnałów',
     generate: 'Generuj',
     or: 'lub',

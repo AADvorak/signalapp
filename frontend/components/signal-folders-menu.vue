@@ -2,7 +2,10 @@
   <v-menu v-model="model" activator="parent" width="200px">
     <v-list>
       <v-list-item v-for="folder in folders" height="40px">
-        <v-checkbox @click.stop="checkBoxStateChanged(folder)" v-model="folder.includes" :label="folder.name"/>
+        <v-checkbox
+            v-model="folder.includes"
+            :label="folder.name"
+            @click.stop="checkBoxStateChanged(folder)"/>
       </v-list-item>
     </v-list>
   </v-menu>
@@ -23,14 +26,19 @@ export default {
       required: true
     }
   },
+  emits: ['changed'],
   data: () => ({
     model: false,
-    folders: []
+    folders: [],
+    changed: false
   }),
   watch: {
     model(newValue) {
       if (newValue) {
+        this.changed = false
         this.loadSignalFolderIds()
+      } else {
+        this.changed && this.$emit('changed')
       }
     }
   },
@@ -42,6 +50,7 @@ export default {
       }
     },
     async checkBoxStateChanged(folder) {
+      this.changed = true
       if (folder.includes) {
         await FolderRequests.deleteSignalFromFolder(this.signalId, folder.id)
       } else {

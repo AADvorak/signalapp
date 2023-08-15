@@ -51,7 +51,8 @@ const en = {
       firstName: 'First name',
       lastName: 'Last name',
       patronymic: 'Patronymic',
-      search: 'Search'
+      search: 'Search',
+      sampleRate: 'Sample rate'
     },
   },
   'confirm-dialog': {
@@ -141,6 +142,8 @@ const en = {
     name: 'Signal manager',
     total: 'Total: {pages} pages, {elements} entries',
     pageSize: 'Page size',
+    sampleRates: 'Sample rates',
+    folders: 'Folders',
     youHaveNoStoredSignals: 'You have no stored signals',
     generate: 'Generate',
     or: 'or',

@@ -7,7 +7,7 @@
             <p>
               {{ _t('total', {pages, elements}) }}
             </p>
-            <v-form>
+            <v-form class="mt-5">
               <v-row>
                 <v-col>
                   <number-input
@@ -26,18 +26,20 @@
               <v-row>
                 <v-col>
                   <v-select
-                      :model-value="form.sampleRates.value"
+                      v-model="form.sampleRates.value"
+                      item-title="reduced"
+                      item-value="value"
                       :items="sampleRates"
-                      label="Частоты дискретизации"
+                      :label="_t('sampleRates')"
                       multiple/>
                 </v-col>
                 <v-col>
                   <v-select
-                      :model-value="form.folderIds.value"
+                      v-model="form.folderIds.value"
                       item-title="name"
                       item-value="id"
                       :items="folders"
-                      label="Папки"
+                      :label="_t('folders')"
                       multiple/>
                 </v-col>
               </v-row>
@@ -68,15 +70,16 @@
                         {{ mdi.mdiFileEdit }}
                       </v-icon>
                     </v-btn>
-                    <v-btn @click="saveSignalToWavFile(signal)">
-                      <v-icon>
-                        {{ mdi.mdiFileImport }}
-                      </v-icon>
-                    </v-btn>
                     <v-btn v-if="signal.sampleRate >= 3000" @click="playOrStopSignal(signal)">
                       <v-icon>
                         {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
                       </v-icon>
+                    </v-btn>
+                    <v-btn v-if="folders.length">
+                      <v-icon>
+                        {{ mdi.mdiFolder }}
+                      </v-icon>
+                      <signal-folders-menu :signal-id="signal.id" @changed="onSignalFoldersChanged"/>
                     </v-btn>
                     <v-btn @click="askConfirmDeleteSignal(signal)">
                       <v-icon color="error">
@@ -103,10 +106,12 @@
                 <th @click="setSortingDescription" class="text-left">
                   {{ _tc('fields.description') }} {{sortingDescriptionSign}}
                 </th>
+                <th @click="setSortingSampleRate" class="text-left">
+                  {{ _tc('fields.sampleRate') }} {{sortingSampleRateSign}}
+                </th>
                 <th class="text-left"></th>
                 <th class="text-left"></th>
-                <th class="text-left"></th>
-                <th class="text-left"></th>
+                <th v-if="folders.length" class="text-left"></th>
                 <th class="text-left"></th>
               </tr>
               </thead>
@@ -120,17 +125,11 @@
                 </td>
                 <td>{{ signal.name }}</td>
                 <td>{{ signal.description }}</td>
+                <td>{{ this.reduceFractionDigitsByValue(signal.sampleRate) }}</td>
                 <td class="text-right">
                   <btn-with-tooltip tooltip="open" @click="openSignal(signal)">
                     <v-icon color="primary">
                       {{ mdi.mdiFileEdit }}
-                    </v-icon>
-                  </btn-with-tooltip>
-                </td>
-                <td class="text-right">
-                  <btn-with-tooltip tooltip="exportWav" @click="saveSignalToWavFile(signal)">
-                    <v-icon>
-                      {{ mdi.mdiFileImport }}
                     </v-icon>
                   </btn-with-tooltip>
                 </td>
@@ -143,18 +142,18 @@
                     </v-icon>
                   </btn-with-tooltip>
                 </td>
+                <td v-if="folders.length" class="text-right">
+                  <v-btn class="btn-with-icon" variant="text">
+                    <v-icon>{{ mdi.mdiFolder }}</v-icon>
+                    <signal-folders-menu :signal-id="signal.id" @changed="onSignalFoldersChanged"/>
+                  </v-btn>
+                </td>
                 <td class="text-right">
                   <btn-with-tooltip tooltip="delete" @click="askConfirmDeleteSignal(signal)">
                     <v-icon color="error">
                       {{ mdi.mdiDelete }}
                     </v-icon>
                   </btn-with-tooltip>
-                </td>
-                <td class="text-right">
-                  <v-btn class="btn-with-icon" variant="text">
-                    <v-icon>{{ mdi.mdiFolder }}</v-icon>
-                    <signal-folders-menu :signal-id="signal.id"/>
-                  </v-btn>
                 </td>
               </tr>
               </tbody>
@@ -241,9 +240,8 @@
 </template>
 
 <script>
-import {mdiDelete, mdiPlay, mdiStop, mdiFileImport, mdiClose, mdiFileEdit, mdiFolder} from "@mdi/js";
+import {mdiDelete, mdiPlay, mdiStop, mdiClose, mdiFileEdit, mdiFolder} from "@mdi/js";
 import SignalPlayer from "../audio/signal-player";
-import FileUtils from "../utils/file-utils";
 import PageBase from "../components/page-base";
 import ChartDrawer from "../components/chart-drawer";
 import mitt from "mitt";
@@ -263,6 +261,7 @@ import StringUtils from "../utils/string-utils";
 import BtnWithTooltip from "../components/btn-with-tooltip";
 import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
+import NumberUtils from "~/utils/number-utils";
 
 export default {
   name: "signal-manager",
@@ -293,7 +292,6 @@ export default {
       mdiDelete,
       mdiPlay,
       mdiStop,
-      mdiFileImport,
       mdiClose,
       mdiFileEdit,
       mdiFolder
@@ -317,7 +315,8 @@ export default {
     },
     SORT_COLS: {
       NAME: 'name',
-      DESCRIPTION: 'description'
+      DESCRIPTION: 'description',
+      SAMPLE_RATE: 'sampleRate'
     },
     bus: new mitt(),
     selectSignals: false,
@@ -332,6 +331,12 @@ export default {
     },
     sortingDescriptionSign() {
       if (this.sortBy === this.SORT_COLS.DESCRIPTION) {
+        return this.getSortDirSign()
+      }
+      return ''
+    },
+    sortingSampleRateSign() {
+      if (this.sortBy === this.SORT_COLS.SAMPLE_RATE) {
         return this.getSortDirSign()
       }
       return ''
@@ -389,9 +394,8 @@ export default {
   },
   mounted() {
     this.restoreFormValues()
-    if (!this.readUrlParams()) {
-      this.setUrlParams()
-    }
+    this.readUrlParams()
+    this.setUrlParams()
     this.loadSignals()
     this.loadSampleRates()
     FolderRequests.loadFolders()
@@ -437,7 +441,7 @@ export default {
     async loadSampleRates() {
       const response = await this.getApiProvider().get('/api/signals/sample-rates')
       if (response.ok) {
-        this.sampleRates = response.data
+        this.sampleRates = response.data.map(value => ({value, reduced: this.reduceFractionDigitsByValue(value)}))
       }
     },
     setSortingName() {
@@ -445,6 +449,9 @@ export default {
     },
     setSortingDescription() {
       this.setSorting(this.SORT_COLS.DESCRIPTION)
+    },
+    setSortingSampleRate() {
+      this.setSorting(this.SORT_COLS.SAMPLE_RATE)
     },
     setSorting(col) {
       if (this.sortBy !== col) {
@@ -484,7 +491,11 @@ export default {
       }
       const folderIds = ref(route.query.folderIds)
       if (folderIds.value) {
-        this.formValue('folderIds', this.readFolderIdsFromUrlParam(folderIds.value))
+        this.formValue('folderIds', this.readNumberArrFromUrlParam(folderIds.value, parseInt))
+      }
+      const sampleRates = ref(route.query.sampleRates)
+      if (sampleRates.value) {
+        this.formValue('sampleRates', this.readNumberArrFromUrlParam(sampleRates.value, parseFloat))
       }
       const sortBy = ref(route.query.sortBy)
       if (sortBy.value) {
@@ -494,10 +505,9 @@ export default {
       if (sortDir.value) {
         this.sortDir = sortDir.value
       }
-      return page.value || size.value || search.value || sortBy.value || sortDir.value
     },
-    readFolderIdsFromUrlParam(str) {
-      return str.split(',').map(v => parseInt(v)).filter(number => !isNaN(number))
+    readNumberArrFromUrlParam(str, parseFunc) {
+      return str.split(',').map(v => parseFunc(v)).filter(number => !isNaN(number))
     },
     setUrlParams() {
       let url = `/signal-manager${this.makeUrlParams()}`
@@ -510,6 +520,9 @@ export default {
       }
       if (this.formValues.folderIds.length) {
         params += `&folderIds=${this.makeUrlParamFromArr(this.formValues.folderIds)}`
+      }
+      if (this.formValues.sampleRates.length) {
+        params += `&sampleRates=${this.makeUrlParamFromArr(this.formValues.sampleRates)}`
       }
       if (this.sortBy) {
         params += `&sortBy=${this.sortBy}`
@@ -537,6 +550,9 @@ export default {
       if (this.formValues.folderIds.length) {
         filter.folderIds = this.formValues.folderIds
       }
+      if (this.formValues.sampleRates.length) {
+        filter.folderIds = this.formValues.sampleRates
+      }
       if (this.sortBy) {
         filter.sortBy = this.sortBy
       }
@@ -547,9 +563,6 @@ export default {
     },
     openSignal(signal) {
       useRouter().push(`/signal/${signal.id}?history=0`)
-    },
-    saveSignalToWavFile(signal) {
-      FileUtils.saveSignalToWavFile(signal)
     },
     async playOrStopSignal(signal) {
       if (this.isSignalPlayed(signal)) {
@@ -607,8 +620,17 @@ export default {
         await Promise.all(promiseArr)
       })
     },
+    onSignalFoldersChanged() {
+      if (this.formValues.folderIds.length) {
+        this.signalsLastLoadFilter = ''
+        this.loadSignals()
+      }
+    },
     restrictSignalNameLength(signal) {
       return StringUtils.restrictLength(signal.name, 22)
+    },
+    reduceFractionDigitsByValue(value) {
+      return NumberUtils.reduceFractionDigitsByValue(value)
     }
   },
 }
@@ -618,5 +640,9 @@ export default {
 .btn-with-icon {
   width: 36px;
   min-width: 36px;
+}
+.v-col {
+  padding-bottom: 0;
+  padding-top: 0;
 }
 </style>

@@ -52,6 +52,7 @@ const ru = {
       lastName: 'Фамилия',
       patronymic: 'Отчество',
       search: 'Поиск',
+      sampleRate: 'Частота дискретизации'
     },
   },
   'confirm-dialog': {
@@ -141,6 +142,8 @@ const ru = {
     name: 'Менеджер сигналов',
     total: 'Всего: {pages} страниц, {elements} записей',
     pageSize: 'Размер страницы',
+    sampleRates: 'Частоты дискретизации',
+    folders: 'Папки',
     youHaveNoStoredSignals: 'У вас нет сохраненных сигналов',
     generate: 'Сгенерируйте',
     or: 'или',
