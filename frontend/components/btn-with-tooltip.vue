@@ -1,9 +1,13 @@
 <template>
-  <v-btn variant="text" @click="click">
+  <v-btn
+      :class="small ? 'v-btn-small' : 'v-btn-large'"
+      variant="text"
+      @click="click">
     <slot/>
-    <v-tooltip activator="parent"
-               location="top"
-               open-delay="1000">
+    <v-tooltip
+        activator="parent"
+        location="top"
+        open-delay="1000">
       {{ $t('common.buttons.' + tooltip) }}
     </v-tooltip>
   </v-btn>
@@ -16,6 +20,10 @@ export default {
     tooltip: {
       type: String,
       required: true
+    },
+    small: {
+      type: Boolean,
+      default: true
     }
   },
   emits: ['click'],
@@ -28,8 +36,11 @@ export default {
 </script>
 
 <style scoped>
-.v-btn {
+.v-btn-small {
   width: 36px;
   min-width: 36px;
+}
+.v-btn-large {
+  height: 55px;
 }
 </style>

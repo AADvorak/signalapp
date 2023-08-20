@@ -5,7 +5,10 @@ const ru = {
     buttons: {
       open: 'Открыть',
       save: 'Сохранить',
+      create: 'Создать',
+      edit: 'Редактировать',
       delete: 'Удалить',
+      deleteWithSignals: 'Удалить вместе с сигналами',
       ok: 'OK',
       cancel: 'Отмена',
       transform: 'Преобразовать',
@@ -58,6 +61,9 @@ const ru = {
   'confirm-dialog': {
     title: 'Подтверждение'
   },
+  'folder-editor': {
+    title: 'Редактор папок'
+  },
   'message': {
     title: 'Сообщение'
   },
@@ -90,6 +96,13 @@ const ru = {
   'email-confirm-error': {
     name: 'Ошибка подтверждения эл. почты',
     goToUserSettings: 'Перейти в настройки пользователя'
+  },
+  'folder-manager': {
+    name: 'Менеджер папок',
+    confirmDeleteFolder: 'Удалить папку {name}?',
+    saveError: 'Ошибка при сохранении папки',
+    deleteError: 'Ошибка при удалении папки',
+    noFolders: 'У вас нет папок'
   },
   'restore-password': {
     name: 'Восстановление пароля',

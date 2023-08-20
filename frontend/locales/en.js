@@ -5,7 +5,10 @@ const en = {
     buttons: {
       open: 'Open',
       save: 'Save',
+      create: 'Create',
+      edit: 'Edit',
       delete: 'Delete',
+      deleteWithSignals: 'Delete with signals',
       ok: 'OK',
       cancel: 'Cancel',
       transform: 'Transform',
@@ -58,6 +61,9 @@ const en = {
   'confirm-dialog': {
     title: 'Confirmation'
   },
+  'folder-editor': {
+    title: 'Folder editor'
+  },
   'message': {
     title: 'Message'
   },
@@ -90,6 +96,13 @@ const en = {
   'email-confirm-error': {
     name: 'Email confirm error',
     goToUserSettings: 'Go to user settings'
+  },
+  'folder-manager': {
+    name: 'Folder manager',
+    confirmDeleteFolder: 'Are you sure to delete folder {name}?',
+    saveError: 'Error while saving folder',
+    deleteError: 'Error while deleting folder',
+    noFolders: 'You have no folders'
   },
   'restore-password': {
     name: 'Restore password',

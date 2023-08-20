@@ -33,23 +33,34 @@
                       :label="_t('sampleRates')"
                       multiple/>
                 </v-col>
-                <v-col>
+                <v-col class="d-flex justify-start">
                   <v-select
                       v-model="form.folderIds.value"
                       item-title="name"
                       item-value="id"
                       :items="folders"
+                      :disabled="!folders.length"
                       :label="_t('folders')"
                       multiple/>
+                  <span>
+                    <btn-with-tooltip
+                        tooltip="edit"
+                        :small="false"
+                        @click="openFolderManager">
+                    <v-icon style="width: 22px; height: 22px;">
+                      {{ folders.length ? mdi.mdiFileEdit : mdi.mdiFilePlus }}
+                    </v-icon>
+                  </btn-with-tooltip>
+                  </span>
                 </v-col>
               </v-row>
             </v-form>
           </fixed-width-wrapper>
           <fixed-width-wrapper v-if="signalsEmpty && !loadingOverlay">
-            <h3 v-if="!formValues.search">{{ _t('youHaveNoStoredSignals') }}.
+            <h3 v-if="!formValues.search" style="text-align: center;">{{ _t('youHaveNoStoredSignals') }}.
               <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
               <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
-            <h3 v-else>{{ _tc('messages.nothingIsFound') }}</h3>
+            <h3 v-else style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
           </fixed-width-wrapper>
           <div v-else>
             <div v-if="isMobile">
@@ -240,7 +251,7 @@
 </template>
 
 <script>
-import {mdiDelete, mdiPlay, mdiStop, mdiClose, mdiFileEdit, mdiFolder} from "@mdi/js";
+import {mdiDelete, mdiPlay, mdiStop, mdiClose, mdiFileEdit, mdiFolder, mdiFilePlus} from "@mdi/js";
 import SignalPlayer from "../audio/signal-player";
 import PageBase from "../components/page-base";
 import ChartDrawer from "../components/chart-drawer";
@@ -262,10 +273,12 @@ import BtnWithTooltip from "../components/btn-with-tooltip";
 import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
 import NumberUtils from "~/utils/number-utils";
+import SignalFoldersMenu from "~/components/signal-folders-menu.vue";
 
 export default {
   name: "signal-manager",
   components: {
+    SignalFoldersMenu,
     BtnWithTooltip,
     TextInput,
     NumberInput,
@@ -294,7 +307,8 @@ export default {
       mdiStop,
       mdiClose,
       mdiFileEdit,
-      mdiFolder
+      mdiFolder,
+      mdiFilePlus
     },
     form: {
       pageSize: {
@@ -398,7 +412,7 @@ export default {
     this.setUrlParams()
     this.loadSignals()
     this.loadSampleRates()
-    FolderRequests.loadFolders()
+    this.loadFolders()
   },
   methods: {
     validatePageSize() {
@@ -441,8 +455,18 @@ export default {
     async loadSampleRates() {
       const response = await this.getApiProvider().get('/api/signals/sample-rates')
       if (response.ok) {
-        this.sampleRates = response.data.map(value => ({value, reduced: this.reduceFractionDigitsByValue(value)}))
+        const loadedSampleRateValues = response.data
+        this.sampleRates = loadedSampleRateValues.map(value =>
+            ({value, reduced: this.reduceFractionDigitsByValue(value)}))
+        this.formValue('sampleRates', this.formValues.sampleRates.filter(sampleRate =>
+            loadedSampleRateValues.includes(sampleRate)))
       }
+    },
+    async loadFolders() {
+      await FolderRequests.loadFolders()
+      const loadedFolderIds = this.folders.map(folder => folder.id)
+      this.formValue('folderIds', this.formValues.folderIds.filter(folderId =>
+          loadedFolderIds.includes(folderId)))
     },
     setSortingName() {
       this.setSorting(this.SORT_COLS.NAME)
@@ -551,7 +575,7 @@ export default {
         filter.folderIds = this.formValues.folderIds
       }
       if (this.formValues.sampleRates.length) {
-        filter.folderIds = this.formValues.sampleRates
+        filter.sampleRates = this.formValues.sampleRates
       }
       if (this.sortBy) {
         filter.sortBy = this.sortBy
@@ -563,6 +587,9 @@ export default {
     },
     openSignal(signal) {
       useRouter().push(`/signal/${signal.id}?history=0`)
+    },
+    openFolderManager() {
+      useRouter().push('/folder-manager')
     },
     async playOrStopSignal(signal) {
       if (this.isSignalPlayed(signal)) {

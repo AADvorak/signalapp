@@ -5,7 +5,10 @@ const pl = {
     buttons: {
       open: 'Otwórz',
       save: 'Zapisz',
+      create: 'Stwórz',
+      edit: 'Edytuj',
       delete: 'Usuń',
+      deleteWithSignals: 'Usuń razem z sygnałami',
       ok: 'OK',
       cancel: 'Anuluj',
       transform: 'Przetwórz',
@@ -58,6 +61,9 @@ const pl = {
   'confirm-dialog': {
     title: 'Potwierdzenie'
   },
+  'folder-editor': {
+    title: 'Edytuj folder'
+  },
   'message': {
     title: 'Wiadomość'
   },
@@ -90,6 +96,13 @@ const pl = {
   'email-confirm-error': {
     name: 'Błąd potwierdzenia e-maila',
     goToUserSettings: 'Przejdź do ustawień użytkownika'
+  },
+  'folder-manager': {
+    name: 'Menadżer folderów',
+    confirmDeleteFolder: 'Czy na pewno chcesz usunąć folder {name}?',
+    saveError: 'Błąd podczas zapisywania folderu',
+    deleteError: 'Błąd podczas usuwania folderu',
+    noFolders: 'Nie masz folderów'
   },
   'restore-password': {
     name: 'Przywrócenie hasła',

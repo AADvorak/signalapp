@@ -192,7 +192,7 @@ export default {
   methods: {
     async signOut() {
       await ApiProvider.del('/api/sessions/')
-      dataStore().clearUserInfo()
+      dataStore().clearPersonalData()
       this.toMainPage()
     },
     async loadUserInfo() {

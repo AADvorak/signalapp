@@ -7,6 +7,7 @@ import link.signalapp.error.*;
 import link.signalapp.file.FileManager;
 import link.signalapp.mapper.FolderMapper;
 import link.signalapp.model.Folder;
+import link.signalapp.model.Signal;
 import link.signalapp.repository.FolderRepository;
 import link.signalapp.repository.SignalRepository;
 import link.signalapp.repository.UserTokenRepository;
@@ -72,11 +73,14 @@ public class FolderService extends ServiceBase {
                 .orElseThrow(SignalAppNotFoundException::new);
         folderRepository.delete(folder);
         if (deleteSignals) {
-            folder.getSignals().forEach(signal -> {
-                if (signalRepository.deleteByIdAndUserId(signal.getId(), userId) > 0) {
-                    fileManager.deleteSignalData(userId, id);
-                }
-            });
+            folder.getSignals().forEach(signal -> deleteSignal(userId, signal.getId()));
         }
+    }
+
+    private void deleteSignal(int userId, int signalId) {
+        try {
+            signalRepository.deleteByIdAndUserId(signalId, userId);
+            fileManager.deleteSignalData(userId, signalId);
+        } catch (Exception ignore) {}
     }
 }

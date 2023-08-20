@@ -93,7 +93,7 @@ const ApiProvider = {
       return {...result, data}
     }
     if (response.status === 401 && !noHandleUnauthorized) {
-      dataStore().clearUserInfo()
+      dataStore().clearPersonalData()
       this.route && dataStore().setWaitingForAuthorization(this.route.fullPath)
       this.router && this.router.push('/signin')
     }

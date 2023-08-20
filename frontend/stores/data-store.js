@@ -17,6 +17,7 @@ export const dataStore = defineStore('dataStore', {
         {code: 'restore-password', forMenu: false},
         {code: 'signal', forMenu: false},
         {code: 'index', forMenu: false},
+        {code: 'folder-manager', forMenu: false},
           // transformers
           // amplifiers
         {code: 'LinearAmp', forMenu: false, transformer: true, type: 'amplifier'},
@@ -113,7 +114,11 @@ export const dataStore = defineStore('dataStore', {
       this.settings = settings
     },
     clearUserInfo() {
-      this.userInfo = null
+      this.userInfo = undefined
+    },
+    clearPersonalData() {
+      this.clearUserInfo()
+      this.folders = []
     },
     setWaitingForAuthorization(waitingForAuthorization) {
       this.waitingForAuthorization = waitingForAuthorization
