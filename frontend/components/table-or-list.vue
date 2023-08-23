@@ -22,7 +22,7 @@
       <v-divider/>
     </div>
   </div>
-  <table v-else>
+  <v-table v-else>
     <thead>
      <tr>
        <th v-if="select" class="text-left">
@@ -55,7 +55,7 @@
         </td>
       </tr>
     </tbody>
-  </table>
+  </v-table>
 </template>
 
 <script>

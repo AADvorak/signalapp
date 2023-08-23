@@ -6,18 +6,21 @@
           <fixed-width-wrapper v-if="!folders.length && !loadingOverlay">
             <h3 style="text-align: center">{{ _t('noFolders') }}</h3>
           </fixed-width-wrapper>
-          <table-or-list
-              v-else
-              caption="name"
-              :items="folders"
-              :columns="tableOrListConfig.columns"
-              :buttons="tableOrListConfig.buttons"
-              @click="onTableButtonClick"/>
-          <div class="d-flex justify-start flex-wrap">
-            <v-btn @click="createFolder">
-              {{ _tc('buttons.create') }}
-            </v-btn>
+          <div v-else>
+            <table-or-list
+                caption="name"
+                :items="folders"
+                :columns="tableOrListConfig.columns"
+                :buttons="tableOrListConfig.buttons"
+                @click="onTableButtonClick"/>
           </div>
+          <fixed-width-wrapper>
+            <div class="d-flex justify-center flex-wrap">
+              <v-btn @click="createFolder">
+                {{ _tc('buttons.create') }}
+              </v-btn>
+            </div>
+          </fixed-width-wrapper>
         </v-card-text>
       </v-card>
     </div>
@@ -97,6 +100,8 @@ export default {
     onEditorResponse(response) {
       if (response.ok) {
         this.loadFolders(true)
+      } else if (response.status !== 400) {
+        this.showErrorsFromResponse(response)
       }
     },
     async askConfirmDeleteFolder(folder) {

@@ -167,7 +167,8 @@ const en = {
     viewSignals: 'View signals',
     loadSignalsError: 'Error while loading signals',
     confirmDeleteSignal: 'Are you sure to delete {name}?',
-    confirmDeleteSignals: 'Are you sure to delete selected {length} signals?'
+    confirmDeleteSignals: 'Are you sure to delete selected {length} signals?',
+    loadParams: 'Load parameters'
   },
   'signal-recorder': {
     name: 'Signal recorder',
@@ -313,6 +314,7 @@ const en = {
   serverMessages: {
     SIGNAL_DOES_NOT_EXIST: 'Signal does not exist',
     EMAIL_ALREADY_EXISTS: 'Email already exists',
+    FOLDER_NAME_ALREADY_EXISTS: 'Folder name already exists',
     EMAIL_ALREADY_CONFIRMED: 'Email is already confirmed',
     WRONG_EMAIL_PASSWORD: 'Wrong email and password pair',
     WRONG_EMAIL: 'Email does not exist or is not confirmed',
@@ -320,6 +322,7 @@ const en = {
     TOO_LONG_FILE: 'Too long file. Max size is {maxSize} bytes.',
     TOO_LONG_SIGNAL: 'Too long signal. Max size is {maxSize} samples.',
     TOO_MANY_SIGNALS_STORED: 'Too many signals are stored. Max number is {maxNumber} signals.',
+    TOO_MANY_FOLDERS_CREATED: 'Too many folders are created. Max number is {maxNumber} folders.',
     NotEmpty: 'This field is required',
     MinLength: 'Min length violation',
     Size: 'Size violation',

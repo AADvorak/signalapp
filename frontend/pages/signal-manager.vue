@@ -7,42 +7,45 @@
             <p>
               {{ _t('total', {pages, elements}) }}
             </p>
-            <v-form class="mt-5">
-              <v-row>
-                <v-col>
-                  <number-input
-                      field="pageSize"
-                      :label="_t('pageSize')"
-                      :field-obj="form.pageSize"
-                      @update="v => form.pageSize.value = v"/>
-                </v-col>
-                <v-col>
-                  <text-input
-                      field="search"
-                      :field-obj="form.search"
-                      @update="v => form.search.value = v"/>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-select
-                      v-model="form.sampleRates.value"
-                      item-title="reduced"
-                      item-value="value"
-                      :items="sampleRates"
-                      :label="_t('sampleRates')"
-                      multiple/>
-                </v-col>
-                <v-col class="d-flex justify-start">
-                  <v-select
-                      v-model="form.folderIds.value"
-                      item-title="name"
-                      item-value="id"
-                      :items="folders"
-                      :disabled="!folders.length"
-                      :label="_t('folders')"
-                      multiple/>
-                  <span>
+            <v-expansion-panels v-model="uiParams.openedPanels">
+              <v-expansion-panel value="loadParams" :title="_t('loadParams')">
+                <v-expansion-panel-text>
+                  <v-form class="mt-5">
+                    <v-row>
+                      <v-col>
+                        <number-input
+                            field="pageSize"
+                            :label="_t('pageSize')"
+                            :field-obj="form.pageSize"
+                            @update="v => form.pageSize.value = v"/>
+                      </v-col>
+                      <v-col>
+                        <text-input
+                            field="search"
+                            :field-obj="form.search"
+                            @update="v => form.search.value = v"/>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-select
+                            v-model="form.sampleRates.value"
+                            item-title="reduced"
+                            item-value="value"
+                            :items="sampleRates"
+                            :label="_t('sampleRates')"
+                            multiple/>
+                      </v-col>
+                      <v-col class="d-flex justify-start">
+                        <v-select
+                            v-model="form.folderIds.value"
+                            item-title="name"
+                            item-value="id"
+                            :items="folders"
+                            :disabled="!folders.length"
+                            :label="_t('folders')"
+                            multiple/>
+                        <span>
                     <btn-with-tooltip
                         tooltip="edit"
                         :small="false"
@@ -52,9 +55,12 @@
                     </v-icon>
                   </btn-with-tooltip>
                   </span>
-                </v-col>
-              </v-row>
-            </v-form>
+                      </v-col>
+                    </v-row>
+                  </v-form>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
           </fixed-width-wrapper>
           <fixed-width-wrapper v-if="signalsEmpty && !loadingOverlay">
             <h3 v-if="!formValues.search" style="text-align: center;">{{ _t('youHaveNoStoredSignals') }}.
@@ -274,6 +280,7 @@ import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
 import NumberUtils from "~/utils/number-utils";
 import SignalFoldersMenu from "~/components/signal-folders-menu.vue";
+import uiParamsSaving from "~/mixins/ui-params-saving";
 
 export default {
   name: "signal-manager",
@@ -287,7 +294,7 @@ export default {
     FixedWidthWrapper
   },
   extends: PageBase,
-  mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout],
+  mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving],
   data: () => ({
     viewDialog: false,
     transformDialog: false,
@@ -334,7 +341,10 @@ export default {
     },
     bus: new mitt(),
     selectSignals: false,
-    isMobile: DeviceUtils.isMobile()
+    isMobile: DeviceUtils.isMobile(),
+    uiParams: {
+      openedPanels: []
+    }
   }),
   computed: {
     sortingNameSign() {
@@ -408,6 +418,7 @@ export default {
   },
   mounted() {
     this.restoreFormValues()
+    this.restoreUiParams()
     this.readUrlParams()
     this.setUrlParams()
     this.loadSignals()

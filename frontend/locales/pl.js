@@ -167,7 +167,8 @@ const pl = {
     viewSignals: 'Przegląd sygnałów',
     loadSignalsError: 'Błąd podczas ładowania sygnałów',
     confirmDeleteSignal: 'Czy na pewno chcesz usunąć {name}?',
-    confirmDeleteSignals: 'Czy na pewno chcesz usunąć wybrane sygnały (liczba: {length})?'
+    confirmDeleteSignals: 'Czy na pewno chcesz usunąć wybrane sygnały (liczba: {length})?',
+    loadParams: 'Parametry ładowania'
   },
   'signal-recorder': {
     name: 'Nagrywarka sygnałów',
@@ -313,6 +314,7 @@ const pl = {
   serverMessages: {
     SIGNAL_DOES_NOT_EXIST: 'Nie znaleziono sygnału',
     EMAIL_ALREADY_EXISTS: 'Adres e-mail już istnieje',
+    FOLDER_NAME_ALREADY_EXISTS: 'Imię folderu już istnieje',
     EMAIL_ALREADY_CONFIRMED: 'Adres e-mail jest już potwierdzony',
     WRONG_EMAIL_PASSWORD: 'Nieprawidłowa para adres e-mail i hasło',
     WRONG_EMAIL: 'Adres e-mail nie istnieje lub nie jest potwierdzony',
@@ -320,6 +322,7 @@ const pl = {
     TOO_LONG_FILE: 'Plik jest zbyt długi. Maksymalny rozmiar wynosi {maxSize} bajtów.',
     TOO_LONG_SIGNAL: 'Sygnał jest zbyt długi. Maksymalny rozmiar wynosi {maxSize} próbek.',
     TOO_MANY_SIGNALS_STORED: 'Masz zbyt wiele przechowywanych sygnałów. Maksymalna ich liczba to {maxNumber}.',
+    TOO_MANY_FOLDERS_CREATED: 'Masz zbyt wiele stworzonych folderów. Maksymalna ich liczba to {maxNumber}.',
     NotEmpty: 'To pole jest wymagane',
     MinLength: 'Naruszenie minimalnej długości',
     Size: 'Naruszenie rozmiaru',

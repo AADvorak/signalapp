@@ -5,7 +5,7 @@
       max-height="500px"
   >
     <v-card width="100%">
-      <toolbar-with-close-btn :title="_t('title')" @close="close"/>
+      <toolbar-with-close-btn :title="title" @close="close"/>
       <v-card-text>
         <v-form @submit.prevent>
           <v-text-field
@@ -61,24 +61,21 @@ export default {
     },
     saveFolderRequestSent: false
   }),
+  computed: {
+    title() {
+      const actionKey = this.folder.id ? 'edit' : 'create'
+      return `${this._t('title')} - ${this._tc('buttons.' + actionKey)}`
+    }
+  },
   watch: {
     folder() {
-      this.formValue('name', this.folder.name)
-      this.formValue('description', this.folder.description)
+      this.formValue('name', this.folder.name || '')
+      this.formValue('description', this.folder.description || '')
     }
   },
   methods: {
-    validateForm() {
-      if (!this.formValues.name) {
-        this.pushValidationMsg('name', this._tc('validation.required'))
-        return false
-      }
-      return true
-    },
     async saveFolder() {
-      if (!this.validateForm()) {
-        return
-      }
+      this.clearValidation()
       await this.loadWithFlag(async () => {
         let response
         if (this.folder.id) {
@@ -86,9 +83,13 @@ export default {
         } else {
           response = await FolderRequests.saveFolder(this.formValues)
         }
+        if (response.status === 400) {
+          this.parseValidation(response.errors)
+        } else {
+          this.close()
+        }
         this.$emit('response', response)
       }, 'saveFolderRequestSent')
-      this.close()
     },
     close() {
       this.$emit('close')

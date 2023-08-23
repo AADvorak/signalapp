@@ -167,7 +167,8 @@ const ru = {
     viewSignals: 'Просмотр сигналов',
     loadSignalsError: 'Ошибка при загрузке сигналов',
     confirmDeleteSignal: 'Удалить {name}?',
-    confirmDeleteSignals: 'Удалить выбранные сигналы (количество: {length})?'
+    confirmDeleteSignals: 'Удалить выбранные сигналы (количество: {length})?',
+    loadParams: 'Параметры загрузки'
   },
   'signal-recorder': {
     name: 'Запись сигналов',
@@ -313,6 +314,7 @@ const ru = {
   serverMessages: {
     SIGNAL_DOES_NOT_EXIST: 'Сигнал не нейден',
     EMAIL_ALREADY_EXISTS: 'Данный email уже зарегистрирован',
+    FOLDER_NAME_ALREADY_EXISTS: 'Папка с таким именем уже существует',
     EMAIL_ALREADY_CONFIRMED: 'Email уже подтвержден',
     WRONG_EMAIL_PASSWORD: 'Неверная пара email и пароль',
     WRONG_EMAIL: 'Email не существует или не подтвержден',
@@ -320,6 +322,7 @@ const ru = {
     TOO_LONG_FILE: 'Слишком большой файл. Максимальный размер файла {maxSize} байт.',
     TOO_LONG_SIGNAL: 'Слишком длинный сигнал. Максимальный размер сигнала {maxSize} отсчетов.',
     TOO_MANY_SIGNALS_STORED: 'Слишком много сохраненных сигналов. Максимальное число сигналов - {maxNumber}.',
+    TOO_MANY_FOLDERS_CREATED: 'Создано слишком много папок. Максимальное число папок - {maxNumber}.',
     NotEmpty: 'Поле обязательно к заполнению',
     MinLength: 'Нарушение требования минимальной длины',
     Size: 'Нарушение требований размера',
