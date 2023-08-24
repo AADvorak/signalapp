@@ -4,8 +4,14 @@
       <v-list-item v-for="folder in folders" height="40px">
         <v-checkbox
             v-model="folder.includes"
-            :label="folder.name"
-            @click.stop="checkBoxStateChanged(folder)"/>
+            @click.stop="checkBoxStateChanged(folder)"
+        >
+          <template v-slot:label>
+            <div @click.stop="checkBoxStateChanged(folder)">
+              {{ folder.name }}
+            </div>
+          </template>
+        </v-checkbox>
       </v-list-item>
     </v-list>
   </v-menu>
