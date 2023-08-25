@@ -24,3 +24,5 @@ create table public.signal_in_folder
             references "signal"
             on update cascade on delete cascade
 );
+
+create unique index signal_in_folder_unique_idx on public.signal_in_folder (folder_id, signal_id);
