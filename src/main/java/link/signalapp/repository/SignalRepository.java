@@ -28,24 +28,13 @@ public interface SignalRepository extends PagingAndSortingRepository<Signal, Int
             "where user_id = :userId", nativeQuery = true)
     List<BigDecimal> sampleRatesByUserId(int userId);
 
-    @Query(value = "select * from signal " +
-            "where user_id = :userId " +
-            "and (:filter = '' or upper(name) like upper(:filter) " +
-            "or upper(description) like upper(:filter)) " +
-            "and (0 in :sampleRates or sample_rate in :sampleRates)", nativeQuery = true)
-    Page<Signal> findByUserIdAndFilter(
-            int userId,
-            String filter,
-            List<BigDecimal> sampleRates,
-            Pageable pageable
-    );
-
     @Query(value = "select s.* from signal s " +
-            "join signal_in_folder sif on s.id = sif.signal_id and folder_id in :folderIds " +
             "where user_id = :userId " +
             "and (:filter = '' or upper(name) like upper(:filter) " +
             "or upper(description) like upper(:filter)) " +
-            "and (0 in :sampleRates or sample_rate in :sampleRates)", nativeQuery = true)
+            "and (0 in :sampleRates or sample_rate in :sampleRates) " +
+            "and (0 in :folderIds or exists(select 1 from signal_in_folder sif " +
+            "where sif.signal_id = s.id and sif.folder_id in :folderIds))", nativeQuery = true)
     Page<Signal> findByUserIdAndFilter(
             int userId,
             String filter,

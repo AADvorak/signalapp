@@ -47,7 +47,7 @@
                             multiple/>
                         <span>
                     <btn-with-tooltip
-                        tooltip="edit"
+                        :tooltip="folders.length ? 'edit' : 'create'"
                         :small="false"
                         @click="openFolderManager">
                     <v-icon style="width: 22px; height: 22px;">
@@ -63,7 +63,7 @@
             </v-expansion-panels>
           </fixed-width-wrapper>
           <fixed-width-wrapper v-if="signalsEmpty && !loadingOverlay">
-            <h3 v-if="!formValues.search" style="text-align: center;">{{ _t('youHaveNoStoredSignals') }}.
+            <h3 v-if="filterIsEmpty" style="text-align: center;">{{ _t('youHaveNoStoredSignals') }}.
               <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
               <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
             <h3 v-else style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
@@ -381,6 +381,9 @@ export default {
     },
     folders() {
       return dataStore().folders
+    },
+    filterIsEmpty() {
+      return !this.formValues.search && !this.formValues.sampleRates.length && !this.formValues.folderIds.length
     }
   },
   watch: {

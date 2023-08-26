@@ -71,6 +71,7 @@ export default {
     folder() {
       this.formValue('name', this.folder.name || '')
       this.formValue('description', this.folder.description || '')
+      setTimeout(() => this.$refs.nameInput.focus())
     }
   },
   methods: {

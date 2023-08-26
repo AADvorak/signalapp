@@ -57,12 +57,9 @@ public class SignalService extends ServiceBase {
                 ? MAX_USER_STORED_SIGNALS_NUMBER
                 : filter.getSize(), getSort(filter));
         String search = filter.getSearch() == null || filter.getSearch().isEmpty() ? "" : "%" + filter.getSearch() + "%";
-        List<BigDecimal> sampleRates = filter.getSampleRates() == null || filter.getSampleRates().isEmpty()
-                ? List.of(BigDecimal.ZERO)
-                : filter.getSampleRates();
-        Page<Signal> signalPage = filter.getFolderIds() == null || filter.getFolderIds().isEmpty()
-                ? signalRepository.findByUserIdAndFilter(userId, search, sampleRates, pageable)
-                : signalRepository.findByUserIdAndFilter(userId, search, sampleRates, filter.getFolderIds(), pageable);
+        Page<Signal> signalPage = signalRepository.findByUserIdAndFilter(userId, search,
+                listWithDefaultValue(filter.getSampleRates(), BigDecimal.ZERO),
+                listWithDefaultValue(filter.getFolderIds(), 0), pageable);
         return new ResponseWithTotalCounts<SignalDtoResponse>()
                 .setData(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList())
                 .setPages(signalPage.getTotalPages())
@@ -210,6 +207,10 @@ public class SignalService extends ServiceBase {
             throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_SIGNALS_STORED,
                     new MaxNumberExceptionParams(SignalService.MAX_USER_STORED_SIGNALS_NUMBER));
         }
+    }
+
+    private <T> List<T> listWithDefaultValue(List<T> list, T defaultValue) {
+        return list == null || list.isEmpty() ? List.of(defaultValue) : list;
     }
 
     private String camelToSnake(String str) {
