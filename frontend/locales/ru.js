@@ -23,6 +23,7 @@ const ru = {
       signOut: 'Выйти',
       play: 'Воспроизвести',
       stop: 'Остановить',
+      folders: 'Добавить в папки'
     },
     validation: {
       required: 'Поле обязательно к заполнению',

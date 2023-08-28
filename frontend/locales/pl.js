@@ -23,6 +23,7 @@ const pl = {
       signOut: 'Wyloguj się',
       play: 'Odtwórz',
       stop: 'Stop',
+      folders: 'Dodaj do folderów'
     },
     validation: {
       required: 'To pole jest wymagane',

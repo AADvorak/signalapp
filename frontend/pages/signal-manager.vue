@@ -69,112 +69,18 @@
             <h3 v-else style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
           </fixed-width-wrapper>
           <div v-else>
-            <div v-if="isMobile">
-              <div v-for="signal in signals">
-                <v-card >
-                  <v-card-item>
-                    <v-card-title>
-                      <div style="height: 48px" class="d-flex justify-start">
-                        <span><v-checkbox @click.stop v-model="signal.selected"/></span>
-                        <div style="margin: 13px 0;">{{ restrictSignalNameLength(signal) }}</div>
-                      </div>
-                    </v-card-title>
-                  </v-card-item>
-                  <v-card-text v-if="signal.description">{{ signal.description }}</v-card-text>
-                  <v-card-actions class="justify-center">
-                    <v-btn @click="openSignal(signal)">
-                      <v-icon color="primary">
-                        {{ mdi.mdiFileEdit }}
-                      </v-icon>
-                    </v-btn>
-                    <v-btn v-if="signal.sampleRate >= 3000" @click="playOrStopSignal(signal)">
-                      <v-icon>
-                        {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
-                      </v-icon>
-                    </v-btn>
-                    <v-btn v-if="folders.length">
-                      <v-icon>
-                        {{ mdi.mdiFolder }}
-                      </v-icon>
-                      <signal-folders-menu :signal-id="signal.id" @changed="onSignalFoldersChanged"/>
-                    </v-btn>
-                    <v-btn @click="askConfirmDeleteSignal(signal)">
-                      <v-icon color="error">
-                        {{ mdi.mdiDelete }}
-                      </v-icon>
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-                <v-divider/>
-              </div>
-            </div>
-            <v-table v-else>
-              <thead>
-              <tr>
-                <th class="text-left">
-                  <!--                todo костыль-->
-                  <div style="height: 58px">
-                    <v-checkbox v-model="selectSignals"/>
-                  </div>
-                </th>
-                <th @click="setSortingName" class="text-left">
-                  {{ _tc('fields.name') }} {{sortingNameSign}}
-                </th>
-                <th @click="setSortingDescription" class="text-left">
-                  {{ _tc('fields.description') }} {{sortingDescriptionSign}}
-                </th>
-                <th @click="setSortingSampleRate" class="text-left">
-                  {{ _tc('fields.sampleRate') }} {{sortingSampleRateSign}}
-                </th>
-                <th class="text-left"></th>
-                <th class="text-left"></th>
-                <th v-if="folders.length" class="text-left"></th>
-                <th class="text-left"></th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="signal in signals">
-                <td>
-                  <!--                todo костыль-->
-                  <div style="height: 58px">
-                    <v-checkbox @click.stop v-model="signal.selected"/>
-                  </div>
-                </td>
-                <td>{{ signal.name }}</td>
-                <td>{{ signal.description }}</td>
-                <td>{{ this.reduceFractionDigitsByValue(signal.sampleRate) }}</td>
-                <td class="text-right">
-                  <btn-with-tooltip tooltip="open" @click="openSignal(signal)">
-                    <v-icon color="primary">
-                      {{ mdi.mdiFileEdit }}
-                    </v-icon>
-                  </btn-with-tooltip>
-                </td>
-                <td class="text-right">
-                  <btn-with-tooltip v-if="signal.sampleRate >= 3000"
-                                    :tooltip="isSignalPlayed(signal) ? 'stop' : 'play'"
-                                    @click="playOrStopSignal(signal)">
-                    <v-icon>
-                      {{ isSignalPlayed(signal) ? mdi.mdiStop : mdi.mdiPlay }}
-                    </v-icon>
-                  </btn-with-tooltip>
-                </td>
-                <td v-if="folders.length" class="text-right">
-                  <v-btn class="btn-with-icon" variant="text">
-                    <v-icon>{{ mdi.mdiFolder }}</v-icon>
-                    <signal-folders-menu :signal-id="signal.id" @changed="onSignalFoldersChanged"/>
-                  </v-btn>
-                </td>
-                <td class="text-right">
-                  <btn-with-tooltip tooltip="delete" @click="askConfirmDeleteSignal(signal)">
-                    <v-icon color="error">
-                      {{ mdi.mdiDelete }}
-                    </v-icon>
-                  </btn-with-tooltip>
-                </td>
-              </tr>
-              </tbody>
-            </v-table>
+            <table-or-list
+                caption="name"
+                :select="true"
+                :items="signals"
+                :columns="tableOrListConfig.columns"
+                :buttons="tableOrListConfig.buttons"
+                :sort-cols="['name', 'description', 'sampleRate']"
+                :sort-prop="{by: this.sortBy, dir: this.sortDir}"
+                @click="onTableButtonClick"
+                @change="onTableChange"
+                @select="onTableSelect"
+                @sort="onTableSort"/>
           </div>
           <fixed-width-wrapper>
             <v-pagination
@@ -274,7 +180,6 @@ import actionWithTimeout from "../mixins/action-with-timeout";
 import formValuesSaving from "../mixins/form-values-saving";
 import TextInput from "../components/text-input";
 import DeviceUtils from "../utils/device-utils";
-import StringUtils from "../utils/string-utils";
 import BtnWithTooltip from "../components/btn-with-tooltip";
 import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
@@ -300,6 +205,7 @@ export default {
     transformDialog: false,
     sampleRates: [],
     signals: [],
+    selectedIds: [],
     signalsLastLoadFilter: '',
     signalsEmpty: false,
     elements: 0,
@@ -330,43 +236,49 @@ export default {
       sampleRates: {value: []},
       folderIds: {value: []}
     },
-    SORT_DIRS: {
-      DESC: 'desc',
-      ASC: 'asc'
-    },
-    SORT_COLS: {
-      NAME: 'name',
-      DESCRIPTION: 'description',
-      SAMPLE_RATE: 'sampleRate'
-    },
     bus: new mitt(),
-    selectSignals: false,
     isMobile: DeviceUtils.isMobile(),
     uiParams: {
       openedPanels: []
     }
   }),
   computed: {
-    sortingNameSign() {
-      if (this.sortBy === this.SORT_COLS.NAME) {
-        return this.getSortDirSign()
+    tableOrListConfig() {
+      const buttons = [
+        {
+          name: 'open',
+          icon: mdiFileEdit,
+          color: 'primary'
+        },
+        {
+          name: 'play',
+          icon: signal => this.isSignalPlayed(signal) ? mdiStop : mdiPlay,
+          tooltip: signal => this.isSignalPlayed(signal) ? 'stop' : 'play',
+          condition: signal => signal.sampleRate >= 3000
+        }
+      ]
+      if (this.folders.length) {
+        buttons.push({
+          name: 'folders',
+          icon: mdiFolder,
+          component: 'signal-folders-menu'
+        })
       }
-      return ''
-    },
-    sortingDescriptionSign() {
-      if (this.sortBy === this.SORT_COLS.DESCRIPTION) {
-        return this.getSortDirSign()
+      buttons.push({
+        name: 'delete',
+        icon: mdiDelete,
+        color: 'error'
+      })
+      return  {
+        columns: ['description', {
+          name: 'sampleRate',
+          formatter: value => this.reduceFractionDigitsByValue(value)
+        }],
+        buttons
       }
-      return ''
-    },
-    sortingSampleRateSign() {
-      if (this.sortBy === this.SORT_COLS.SAMPLE_RATE) {
-        return this.getSortDirSign()
-      }
-      return ''
     },
     selectedSignals() {
-      return this.signals.filter(signal => signal.selected)
+      return this.signals.filter(signal => this.selectedIds.includes(signal.id))
     },
     viewSignalsAvailable() {
       const selectedSignalsNumber = this.selectedSignals.length
@@ -402,22 +314,6 @@ export default {
         this.loadSignals()
       })
     },
-    sortBy() {
-      this.page = 1
-      this.setUrlParams()
-      this.loadSignals()
-    },
-    sortDir() {
-      this.page = 1
-      this.setUrlParams()
-      this.loadSignals()
-    },
-    selectedSignals() {
-      this.selectSignals = this.signals.length && this.selectedSignals.length === this.signals.length
-    },
-    selectSignals(newValue) {
-      this.signals.forEach(signal => signal.selected = newValue)
-    }
   },
   mounted() {
     this.restoreFormValues()
@@ -481,37 +377,6 @@ export default {
       const loadedFolderIds = this.folders.map(folder => folder.id)
       this.formValue('folderIds', this.formValues.folderIds.filter(folderId =>
           loadedFolderIds.includes(folderId)))
-    },
-    setSortingName() {
-      this.setSorting(this.SORT_COLS.NAME)
-    },
-    setSortingDescription() {
-      this.setSorting(this.SORT_COLS.DESCRIPTION)
-    },
-    setSortingSampleRate() {
-      this.setSorting(this.SORT_COLS.SAMPLE_RATE)
-    },
-    setSorting(col) {
-      if (this.sortBy !== col) {
-        this.sortBy = col
-        this.sortDir = this.SORT_DIRS.DESC
-      } else {
-        if (this.sortDir === this.SORT_DIRS.DESC) {
-          this.sortDir = this.SORT_DIRS.ASC
-        } else {
-          this.sortDir = ''
-          this.sortBy = ''
-        }
-      }
-    },
-    getSortDirSign() {
-      if (this.sortDir === this.SORT_DIRS.ASC) {
-        return '(^)'
-      }
-      if (this.sortDir === this.SORT_DIRS.DESC) {
-        return '(v)'
-      }
-      return ''
     },
     readUrlParams() {
       const route = useRoute()
@@ -667,8 +532,29 @@ export default {
         this.loadSignals()
       }
     },
-    restrictSignalNameLength(signal) {
-      return StringUtils.restrictLength(signal.name, 22)
+    onTableButtonClick({button, item}) {
+      if (button === 'open') {
+        this.openSignal(item)
+      } else if (button === 'play') {
+        this.playOrStopSignal(item)
+      } else if (button === 'delete') {
+        this.askConfirmDeleteSignal(item)
+      }
+    },
+    onTableChange(component) {
+      if (component === 'signal-folders-menu') {
+        this.onSignalFoldersChanged()
+      }
+    },
+    onTableSelect(selectedIds) {
+      this.selectedIds = selectedIds
+    },
+    onTableSort(sort) {
+      this.sortBy = sort.by
+      this.sortDir = sort.dir
+      this.page = 1
+      this.setUrlParams()
+      this.loadSignals()
     },
     reduceFractionDigitsByValue(value) {
       return NumberUtils.reduceFractionDigitsByValue(value)
@@ -678,10 +564,6 @@ export default {
 </script>
 
 <style scoped>
-.btn-with-icon {
-  width: 36px;
-  min-width: 36px;
-}
 .v-col {
   padding-bottom: 0;
   padding-top: 0;

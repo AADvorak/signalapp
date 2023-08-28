@@ -23,6 +23,7 @@ const en = {
       signOut: 'Sign out',
       play: 'Play',
       stop: 'Stop',
+      folders: 'Add to folders'
     },
     validation: {
       required: 'This field is required',
