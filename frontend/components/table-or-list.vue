@@ -91,6 +91,10 @@ export default {
   extends: ComponentBase,
   components: {BtnWithTooltip},
   props: {
+    dataName: {
+      type: String,
+      required: true
+    },
     items: {
       type: Array,
       required: true
@@ -135,6 +139,9 @@ export default {
     },
     allItemsSelected() {
       return this.items.length && this.selectedIds.length === this.items.length
+    },
+    sortingKey() {
+      return this.dataName + 'Sorting'
     }
   },
   watch: {
@@ -150,19 +157,25 @@ export default {
       }
     },
     sortProp: {
-      handler(newValue) {
-        if (newValue.by && newValue.dir) {
+      handler(newValue, oldValue) {
+        if (this.validateSorting(newValue) && this.sortingIsChanged(newValue, oldValue)) {
           this.sort = newValue
         }
       },
       deep: true
     },
     sort: {
-      handler(newValue) {
-        this.$emit('sort', newValue)
+      handler(newValue, oldValue) {
+        // if (this.sortingIsChanged(newValue, oldValue)) {
+          this.saveSorting()
+          this.$emit('sort', newValue)
+        // }
       },
       deep: true
     },
+  },
+  mounted() {
+    setTimeout(() => this.restoreSorting())
   },
   methods: {
     restrictCaptionLength(item) {
@@ -262,6 +275,26 @@ export default {
       }
       return ''
     },
+    saveSorting() {
+      localStorage.setItem(this.sortingKey, JSON.stringify(this.sort))
+    },
+    restoreSorting() {
+      const sortJson = localStorage.getItem(this.sortingKey)
+      if (sortJson) {
+        const sort = JSON.parse(sortJson)
+        if (sort.by && sort.dir) {
+          this.sort = sort
+        }
+      }
+    },
+    sortingIsChanged(newValue, oldValue) {
+      return newValue.by !== oldValue.by || newValue.dir !== oldValue.dir
+    },
+    validateSorting(sort) {
+      return sort.by && sort.dir
+          && [SORT_DIRS.DESC, SORT_DIRS.ASC].includes(sort.dir)
+          && this.sortCols.includes(sort.by)
+    }
   }
 }
 </script>

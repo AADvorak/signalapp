@@ -8,6 +8,7 @@
           </fixed-width-wrapper>
           <div v-else>
             <table-or-list
+                data-name="folders"
                 caption="name"
                 :items="folders"
                 :columns="tableOrListConfig.columns"

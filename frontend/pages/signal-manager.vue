@@ -70,6 +70,7 @@
           </fixed-width-wrapper>
           <div v-else>
             <table-or-list
+                data-name="signals"
                 caption="name"
                 :select="true"
                 :items="signals"
@@ -320,9 +321,9 @@ export default {
     this.restoreUiParams()
     this.readUrlParams()
     this.setUrlParams()
-    this.loadSignals()
     this.loadSampleRates()
     this.loadFolders()
+    this.actionWithTimeout(() => this.loadSignals())
   },
   methods: {
     validatePageSize() {
