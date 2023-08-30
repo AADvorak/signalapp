@@ -37,10 +37,10 @@
          </div>
        </th>
        <th class="text-left" @click="setSorting(caption)">
-         {{ columnHeader(caption) }} {{ getSortDirSign(caption) }}
+         {{ columnHeader(caption) }} {{ sortDirSigns[caption] }}
        </th>
        <th v-for="column in columns" class="text-left" @click="setSorting(column)">
-         {{ columnHeader(column) }} {{ getSortDirSign(column) }}
+         {{ columnHeader(column) }} {{ sortDirSigns[columnName(column)] }}
        </th>
        <th v-for="_ in buttons" class="text-left"></th>
      </tr>
@@ -132,6 +132,7 @@ export default {
       by: '',
       dir: ''
     },
+    sortDirSigns: {}
   }),
   computed: {
     isMobile() {
@@ -156,26 +157,23 @@ export default {
         this.selectedIds = []
       }
     },
-    sortProp: {
-      handler(newValue, oldValue) {
-        if (this.validateSorting(newValue) && this.sortingIsChanged(newValue, oldValue)) {
-          this.sort = newValue
-        }
-      },
-      deep: true
-    },
     sort: {
-      handler(newValue, oldValue) {
-        // if (this.sortingIsChanged(newValue, oldValue)) {
-          this.saveSorting()
-          this.$emit('sort', newValue)
-        // }
+      handler(newValue) {
+        this.recalculateSortDirSigns()
+        this.saveSorting()
+        this.$emit('sort', newValue)
       },
       deep: true
     },
   },
   mounted() {
-    setTimeout(() => this.restoreSorting())
+    setTimeout(() => {
+      if (this.validateSorting(this.sortProp)) {
+        this.sort = this.sortProp
+      } else {
+        this.restoreSorting()
+      }
+    })
   },
   methods: {
     restrictCaptionLength(item) {
@@ -262,11 +260,14 @@ export default {
         }
       }
     },
-    getSortDirSign(column) {
-      const columnName = this.columnName(column)
-      if (!this.isSortable(columnName) || this.sort.by !== columnName) {
-        return ''
+    recalculateSortDirSigns() {
+      this.sortDirSigns = {}
+      if (!this.sort.by) {
+        return
       }
+      this.sortDirSigns[this.sort.by] = this.getSortDirSign()
+    },
+    getSortDirSign() {
       if (this.sort.dir === SORT_DIRS.ASC) {
         return '(^)'
       }
@@ -286,9 +287,6 @@ export default {
           this.sort = sort
         }
       }
-    },
-    sortingIsChanged(newValue, oldValue) {
-      return newValue.by !== oldValue.by || newValue.dir !== oldValue.dir
     },
     validateSorting(sort) {
       return sort.by && sort.dir
