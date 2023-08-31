@@ -1,15 +1,6 @@
 <template>
   <v-card width="100%">
-    <v-toolbar>
-      <v-toolbar-title>{{ _t('title') }}</v-toolbar-title>
-      <v-spacer/>
-      <v-btn
-          icon
-          @click="close"
-      >
-        <v-icon>{{mdiClose}}</v-icon>
-      </v-btn>
-    </v-toolbar>
+    <toolbar-with-close-btn :title="_t('title')" @close="close"/>
     <v-card-text>
       <v-form>
         <v-row>
@@ -51,8 +42,7 @@
 <script>
 import ComponentBase from "./component-base";
 import formValuesSaving from "../mixins/form-values-saving";
-import {mdiClose} from "@mdi/js";
-import {dataStore} from "../stores/data-store";
+import {dataStore} from "~/stores/data-store";
 
 const TRANSFORMER_TYPES = ['amplifier', 'modulator', 'filter', 'oscillator', 'math']
 
@@ -69,7 +59,6 @@ export default {
   },
   emits: ['close'],
   data: () => ({
-    mdiClose,
     form: {
       types: {value: []},
       filter: {value: ''}

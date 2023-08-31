@@ -16,7 +16,7 @@
                 @click="onTableButtonClick"/>
           </div>
           <fixed-width-wrapper>
-            <div class="d-flex justify-center flex-wrap">
+            <div class="mt-5 d-flex justify-center flex-wrap">
               <v-btn @click="createFolder">
                 {{ _tc('buttons.create') }}
               </v-btn>

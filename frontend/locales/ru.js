@@ -23,7 +23,9 @@ const ru = {
       signOut: 'Выйти',
       play: 'Воспроизвести',
       stop: 'Остановить',
-      folders: 'Добавить в папки'
+      folders: 'Добавить в папки',
+      clear: 'Очистить',
+      change: 'Поменять'
     },
     validation: {
       required: 'Поле обязательно к заполнению',
@@ -115,7 +117,7 @@ const ru = {
   'signal': {
     name: 'Сигнал',
     saveAsNew: 'Сохранить как новый',
-    sampleRate: 'Частота дискретизации = {sampleRate}',
+    sampleRate: 'Частота дискретизации: {sampleRate} Гц',
     transformSignalError: 'Ошибка при преобразовании сигнала',
     signalDataSaveError: 'Ошибка при сохранении данных сигнала',
     signalSaveError: 'Ошибка при сохранении сигнала',

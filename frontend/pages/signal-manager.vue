@@ -8,35 +8,42 @@
               {{ _t('total', {pages, elements}) }}
             </p>
             <v-expansion-panels v-model="uiParams.openedPanels">
-              <v-expansion-panel value="loadParams" :title="_t('loadParams')">
+              <v-expansion-panel value="loadParams">
+                <v-expansion-panel-title>
+                  {{ _t('loadParams') }}
+                  <btn-with-tooltip
+                      :disabled="filterIsEmpty"
+                      tooltip="clear"
+                      @click="clearFilter"
+                  >
+                    <v-icon>
+                      {{ mdi.mdiFilterOff }}
+                    </v-icon>
+                  </btn-with-tooltip>
+                </v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <v-form class="mt-5">
-                    <v-row>
-                      <v-col>
-                        <number-input
-                            field="pageSize"
-                            :label="_t('pageSize')"
-                            :field-obj="form.pageSize"
-                            @update="v => form.pageSize.value = v"/>
-                      </v-col>
-                      <v-col>
-                        <text-input
-                            field="search"
-                            :field-obj="form.search"
-                            @update="v => form.search.value = v"/>
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                      <v-col>
-                        <v-select
-                            v-model="form.sampleRates.value"
-                            item-title="reduced"
-                            item-value="value"
-                            :items="sampleRates"
-                            :label="_t('sampleRates')"
-                            multiple/>
-                      </v-col>
-                      <v-col class="d-flex justify-start">
+                    <div class="d-flex justify-center flex-wrap">
+                      <number-input
+                          class="param-input"
+                          field="pageSize"
+                          :label="_t('pageSize')"
+                          :field-obj="form.pageSize"
+                          @update="v => form.pageSize.value = v"/>
+                      <text-input
+                          class="param-input"
+                          field="search"
+                          :field-obj="form.search"
+                          @update="v => form.search.value = v"/>
+                      <v-select
+                          class="param-input"
+                          v-model="form.sampleRates.value"
+                          item-title="reduced"
+                          item-value="value"
+                          :items="sampleRates"
+                          :label="_t('sampleRates')"
+                          multiple/>
+                      <div class="param-input d-flex justify-start">
                         <v-select
                             v-model="form.folderIds.value"
                             item-title="name"
@@ -46,17 +53,18 @@
                             :label="_t('folders')"
                             multiple/>
                         <span>
-                    <btn-with-tooltip
-                        :tooltip="folders.length ? 'edit' : 'create'"
-                        :small="false"
-                        @click="openFolderManager">
-                    <v-icon style="width: 22px; height: 22px;">
-                      {{ folders.length ? mdi.mdiFileEdit : mdi.mdiFilePlus }}
-                    </v-icon>
-                  </btn-with-tooltip>
-                  </span>
-                      </v-col>
-                    </v-row>
+                          <btn-with-tooltip
+                              :tooltip="folders.length ? 'edit' : 'create'"
+                              :small="false"
+                              @click="openFolderManager"
+                          >
+                            <v-icon style="width: 22px; height: 22px;">
+                              {{ folders.length ? mdi.mdiFileEdit : mdi.mdiFilePlus }}
+                            </v-icon>
+                          </btn-with-tooltip>
+                        </span>
+                      </div>
+                    </div>
                   </v-form>
                 </v-expansion-panel-text>
               </v-expansion-panel>
@@ -125,16 +133,7 @@
                   </v-btn>
                 </template>
                 <v-card width="100%">
-                  <v-toolbar>
-                    <v-toolbar-title>{{ _t('viewSignals') }}</v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        icon
-                        @click="viewDialog = false"
-                    >
-                      <v-icon>{{ mdi.mdiClose }}</v-icon>
-                    </v-btn>
-                  </v-toolbar>
+                  <toolbar-with-close-btn :title="_t('viewSignals')" @close="viewDialog = false"/>
                   <v-card-text>
                     <chart-drawer :signals="viewDialog && selectedSignalsDataLoaded ? selectedSignals : []"/>
                   </v-card-text>
@@ -164,7 +163,7 @@
 </template>
 
 <script>
-import {mdiDelete, mdiPlay, mdiStop, mdiClose, mdiFileEdit, mdiFolder, mdiFilePlus} from "@mdi/js";
+import {mdiDelete, mdiPlay, mdiStop, mdiFileEdit, mdiFolder, mdiFilePlus, mdiFilterOff} from "@mdi/js";
 import SignalPlayer from "../audio/signal-player";
 import PageBase from "../components/page-base";
 import ChartDrawer from "../components/chart-drawer";
@@ -185,13 +184,11 @@ import BtnWithTooltip from "../components/btn-with-tooltip";
 import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
 import NumberUtils from "~/utils/number-utils";
-import SignalFoldersMenu from "~/components/signal-folders-menu.vue";
 import uiParamsSaving from "~/mixins/ui-params-saving";
 
 export default {
   name: "signal-manager",
   components: {
-    SignalFoldersMenu,
     BtnWithTooltip,
     TextInput,
     NumberInput,
@@ -219,10 +216,10 @@ export default {
       mdiDelete,
       mdiPlay,
       mdiStop,
-      mdiClose,
       mdiFileEdit,
       mdiFolder,
-      mdiFilePlus
+      mdiFilePlus,
+      mdiFilterOff
     },
     form: {
       pageSize: {
@@ -465,6 +462,11 @@ export default {
       }
       return filter
     },
+    clearFilter() {
+      this.formValue('search', '')
+      this.formValue('folderIds', [])
+      this.formValue('sampleRates', [])
+    },
     openSignal(signal) {
       useRouter().push(`/signal/${signal.id}?history=0`)
     },
@@ -564,9 +566,17 @@ export default {
 }
 </script>
 
+<style>
+.v-expansion-panel-text__wrapper {
+  padding: 0 0 0 0;
+}
+</style>
+
 <style scoped>
-.v-col {
-  padding-bottom: 0;
-  padding-top: 0;
+.param-input {
+  min-width: 300px;
+  max-width: 800px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 </style>

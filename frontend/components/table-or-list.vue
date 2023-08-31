@@ -10,7 +10,13 @@
             </div>
           </v-card-title>
         </v-card-item>
-        <v-card-text v-if="cardDescriptionExists(item)">{{ makeCardDescription(item) }}</v-card-text>
+        <v-card-text v-if="cardDescriptionExists(item)">
+          <template v-for="column in columns">
+            <div v-if="columnValue(column, item)">
+              {{ columnHeader(column) }}: {{ columnValue(column, item) }}
+            </div>
+          </template>
+        </v-card-text>
         <v-card-actions v-if="buttons.length" class="justify-center">
           <template v-for="button in buttons">
             <v-btn v-if="checkCondition(button, item)" @click="buttonClick(button.name, item)">
@@ -28,7 +34,7 @@
       <v-divider/>
     </div>
   </div>
-  <v-table v-else>
+  <v-table v-else fixed-header>
     <thead>
      <tr>
        <th v-if="select" class="text-left">
@@ -181,24 +187,11 @@ export default {
     },
     cardDescriptionExists(item) {
       for (const column of this.columns) {
-        if (item[column]) {
+        if (item[this.columnName(column)]) {
           return true
         }
       }
       return false
-    },
-    makeCardDescription(item) {
-      let description = ''
-      for (const column of this.columns) {
-        const value = this.columnValue(column, item)
-        if (value) {
-          if (description) {
-            description += ', '
-          }
-          description += value
-        }
-      }
-      return description
     },
     columnName(column) {
       if (typeof column === 'object') {

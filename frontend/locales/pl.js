@@ -23,7 +23,9 @@ const pl = {
       signOut: 'Wyloguj się',
       play: 'Odtwórz',
       stop: 'Stop',
-      folders: 'Dodaj do folderów'
+      folders: 'Dodaj do folderów',
+      clear: 'Wyczyść',
+      change: 'Zmień'
     },
     validation: {
       required: 'To pole jest wymagane',
@@ -115,7 +117,7 @@ const pl = {
   'signal': {
     name: 'Sygnał',
     saveAsNew: 'Zapisz jako nowy',
-    sampleRate: 'Częstotliwość próbkowania = {sampleRate}',
+    sampleRate: 'Częstotliwość próbkowania: {sampleRate} Hz',
     transformSignalError: 'Błąd podczas przetwarzania sygnału',
     signalDataSaveError: 'Błąd podczas zapisywania danych sygnału',
     signalSaveError: 'Błąd podczas zapisywania sygnału',

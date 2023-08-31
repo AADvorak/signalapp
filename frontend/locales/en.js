@@ -23,7 +23,9 @@ const en = {
       signOut: 'Sign out',
       play: 'Play',
       stop: 'Stop',
-      folders: 'Add to folders'
+      folders: 'Add to folders',
+      clear: 'Clear',
+      change: 'Change'
     },
     validation: {
       required: 'This field is required',
@@ -115,7 +117,7 @@ const en = {
   'signal': {
     name: 'Signal',
     saveAsNew: 'Save as new',
-    sampleRate: 'Sample rate = {sampleRate}',
+    sampleRate: 'Sample rate: {sampleRate} Hz',
     transformSignalError: 'Error while transforming signal',
     signalDataSaveError: 'Error while saving signal data',
     signalSaveError: 'Error while saving signal',

@@ -10,7 +10,7 @@
       @input="$emit('update', $event.target.value)"
       type="number"
       required/>
-  <div v-if="type === 'slider'">
+  <div v-else>
     <div class="text-caption">{{ labelComputed }}</div>
     <v-slider
         :model-value="fieldObj.value"
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import {dataStore} from "../stores/data-store";
+import {dataStore} from "~/stores/data-store";
 
 export default {
   name: "number-input",

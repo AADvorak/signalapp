@@ -89,7 +89,7 @@
 
 <script>
 import ChartDrawer from "../../../components/chart-drawer";
-import {dataStore} from "../../../stores/data-store";
+import {dataStore} from "~/stores/data-store";
 import TransformerDialog from "../../../components/transformer-dialog";
 import mitt from 'mitt'
 import formValidation from "../../../mixins/form-validation";
@@ -101,6 +101,7 @@ import FixedWidthWrapper from "../../../components/fixed-width-wrapper";
 import WavCoder from "../../../audio/wav-coder";
 import SignalPlayer from "../../../audio/signal-player";
 import {mdiPlay, mdiStop} from "@mdi/js";
+import NumberUtils from "~/utils/number-utils";
 
 export default {
   name: "signal",
@@ -132,7 +133,8 @@ export default {
       if (!this.signal.sampleRate) {
         return ''
       }
-      return this._t('sampleRate', {sampleRate: this.signal.sampleRate})
+      return this._t('sampleRate',
+         {sampleRate: NumberUtils.reduceFractionDigitsByValue(this.signal.sampleRate)})
     }
   },
   watch: {

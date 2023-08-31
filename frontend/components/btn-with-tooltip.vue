@@ -1,8 +1,9 @@
 <template>
   <v-btn
       :class="small ? 'v-btn-small' : 'v-btn-large'"
+      :disabled="disabled"
       variant="text"
-      @click="click">
+      @click.stop="click">
     <slot/>
     <v-tooltip
         activator="parent"
@@ -24,6 +25,10 @@ export default {
     small: {
       type: Boolean,
       default: true
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['click'],

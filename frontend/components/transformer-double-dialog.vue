@@ -18,15 +18,12 @@
                     :label="_tsn(selectedTransformer.signal1 || 'signal1')"
                     readonly/>
               </v-col>
-              <v-col :cols="2">
-                <v-btn
-                    color="secondary"
-                    @click="changeSignals"
-                >
+              <v-col :cols="2" class="d-flex justify-center">
+                <btn-with-tooltip tooltip="change" @click="changeSignals">
                   <v-icon>
                     {{ mdiRotate360 }}
                   </v-icon>
-                </v-btn>
+                </btn-with-tooltip>
               </v-col>
               <v-col :cols="5">
                 <v-text-field
@@ -61,10 +58,11 @@ import TransformerDialogBase from "./transformer-dialog-base";
 import Adder from "./transformers/adder";
 import Correlator from "./transformers/correlator";
 import TwoSignalAmplitudeModulator from "./transformers/two-signal-amplitude-modulator";
+import BtnWithTooltip from "~/components/btn-with-tooltip.vue";
 
 export default {
   name: "transformer-double-dialog",
-  components: {Adder, Correlator, TwoSignalAmplitudeModulator},
+  components: {BtnWithTooltip, Adder, Correlator, TwoSignalAmplitudeModulator},
   extends: TransformerDialogBase,
   props: {
     signals: Array
