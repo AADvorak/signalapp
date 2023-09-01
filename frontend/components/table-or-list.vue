@@ -5,7 +5,7 @@
         <v-card-item>
           <v-card-title>
             <div style="height: 48px" class="d-flex justify-start">
-              <span v-if="select"><v-checkbox :model-value="item.selected" @click.stop/></span>
+              <span v-if="select"><v-checkbox v-model="selectedIds" :value="item.id" @click.stop/></span>
               <div style="margin: 13px 0;">{{ restrictCaptionLength(item) }}</div>
             </div>
           </v-card-title>
