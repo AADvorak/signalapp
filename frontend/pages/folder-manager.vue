@@ -4,7 +4,7 @@
       <v-card width="100%">
         <v-card-text>
           <fixed-width-wrapper v-if="!folders.length && !loadingOverlay">
-            <h3 style="text-align: center">{{ _t('noFolders') }}</h3>
+            <h3 style="text-align: center">{{ _tc('messages.noFolders') }}</h3>
           </fixed-width-wrapper>
           <div v-else>
             <table-or-list

@@ -45,6 +45,8 @@ const pl = {
       nothingIsFound: 'Nic nie znaleziono. Zmień kryteria wyszukiwania.',
       error: 'Błąd',
       wrongSignalSamplesNumber: 'Liczba próbek importowanego sygnału nie może być większa niż {maxSamplesNumber}. W wybranym pliku wynosi {samplesNumber}',
+      noFolders: 'Nie masz folderów',
+      noData: 'Nie ma danych'
     },
     fields: {
       name: 'Nazwa',
@@ -105,7 +107,6 @@ const pl = {
     confirmDeleteFolder: 'Czy na pewno chcesz usunąć folder {name}?',
     saveError: 'Błąd podczas zapisywania folderu',
     deleteError: 'Błąd podczas usuwania folderu',
-    noFolders: 'Nie masz folderów'
   },
   'restore-password': {
     name: 'Przywrócenie hasła',

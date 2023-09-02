@@ -37,23 +37,33 @@
   <v-table v-else fixed-header>
     <thead>
      <tr>
-       <th v-if="select" class="text-left">
+       <th v-if="select" class="text-left no-padding">
          <div style="height: 58px">
            <v-checkbox v-model="selectAllItems"/>
          </div>
        </th>
        <th class="text-left" @click="setSorting(caption)">
-         {{ columnHeader(caption) }} {{ sortDirSigns[caption] }}
+         <span v-if="sortDirIcons[caption]">
+           <v-icon>
+            {{ sortDirIcons[caption] }}
+           </v-icon>
+         </span>
+         {{ columnHeader(caption) }}
        </th>
-       <th v-for="column in columns" class="text-left" @click="setSorting(column)">
-         {{ columnHeader(column) }} {{ sortDirSigns[columnName(column)] }}
+       <th v-for="column in columns" @click="setSorting(column)">
+         <span v-if="sortDirIcons[columnName(column)]">
+           <v-icon>
+            {{ sortDirIcons[columnName(column)] }}
+           </v-icon>
+         </span>
+         {{ columnHeader(column) }}
        </th>
        <th v-for="_ in buttons" class="text-left"></th>
      </tr>
     </thead>
     <tbody>
       <tr v-for="item in items">
-        <td v-if="select">
+        <td v-if="select" class="no-padding">
           <div style="height: 58px">
             <v-checkbox v-model="selectedIds" :value="item.id" @click.stop/>
           </div>
@@ -81,7 +91,7 @@
 </template>
 
 <script>
-
+import {mdiSortAscending, mdiSortDescending} from "@mdi/js";
 import DeviceUtils from "~/utils/device-utils";
 import StringUtils from "~/utils/string-utils";
 import ComponentBase from "~/components/component-base.vue";
@@ -138,7 +148,7 @@ export default {
       by: '',
       dir: ''
     },
-    sortDirSigns: {}
+    sortDirIcons: {}
   }),
   computed: {
     isMobile() {
@@ -165,7 +175,7 @@ export default {
     },
     sort: {
       handler(newValue) {
-        this.recalculateSortDirSigns()
+        this.recalculateSortDirIcons()
         this.saveSorting()
         this.$emit('sort', newValue)
       },
@@ -253,19 +263,19 @@ export default {
         }
       }
     },
-    recalculateSortDirSigns() {
-      this.sortDirSigns = {}
+    recalculateSortDirIcons() {
+      this.sortDirIcons = {}
       if (!this.sort.by) {
         return
       }
-      this.sortDirSigns[this.sort.by] = this.getSortDirSign()
+      this.sortDirIcons[this.sort.by] = this.getSortDirIcon()
     },
-    getSortDirSign() {
+    getSortDirIcon() {
       if (this.sort.dir === SORT_DIRS.ASC) {
-        return '(^)'
+        return mdiSortAscending
       }
       if (this.sort.dir === SORT_DIRS.DESC) {
-        return '(v)'
+        return mdiSortDescending
       }
       return ''
     },
@@ -289,3 +299,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.no-padding {
+  padding: 0 20px 0 0 !important;
+}
+</style>

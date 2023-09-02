@@ -42,28 +42,36 @@
                           item-value="value"
                           :items="sampleRates"
                           :label="_t('sampleRates')"
-                          multiple/>
-                      <div class="param-input d-flex justify-start">
-                        <v-select
-                            v-model="form.folderIds.value"
-                            item-title="name"
-                            item-value="id"
-                            :items="folders"
-                            :disabled="!folders.length"
-                            :label="_t('folders')"
-                            multiple/>
-                        <span>
+                          multiple
+                      >
+                        <template v-slot:no-data>
+                          {{ _tc('messages.noData') }}
+                        </template>
+                      </v-select>
+                      <v-select
+                          class="param-input"
+                          v-model="form.folderIds.value"
+                          item-title="name"
+                          item-value="id"
+                          :items="folders"
+                          :label="_t('folders')"
+                          multiple
+                      >
+                        <template v-slot:append-inner>
                           <btn-with-tooltip
                               :tooltip="folders.length ? 'edit' : 'create'"
                               :small="false"
                               @click="openFolderManager"
                           >
                             <v-icon style="width: 22px; height: 22px;">
-                              {{ folders.length ? mdi.mdiFileEdit : mdi.mdiFilePlus }}
+                              {{ folders.length ? mdi.mdiFolderEdit : mdi.mdiFolderPlus }}
                             </v-icon>
                           </btn-with-tooltip>
-                        </span>
-                      </div>
+                        </template>
+                        <template v-slot:no-data>
+                          {{ _tc('messages.noFolders') }}
+                        </template>
+                      </v-select>
                     </div>
                   </v-form>
                 </v-expansion-panel-text>
@@ -163,7 +171,7 @@
 </template>
 
 <script>
-import {mdiDelete, mdiPlay, mdiStop, mdiFileEdit, mdiFolder, mdiFilePlus, mdiFilterOff} from "@mdi/js";
+import {mdiDelete, mdiPlay, mdiStop, mdiFileEdit, mdiFolder, mdiFolderEdit, mdiFolderPlus, mdiFilterOff} from "@mdi/js";
 import SignalPlayer from "../audio/signal-player";
 import PageBase from "../components/page-base";
 import ChartDrawer from "../components/chart-drawer";
@@ -218,7 +226,8 @@ export default {
       mdiStop,
       mdiFileEdit,
       mdiFolder,
-      mdiFilePlus,
+      mdiFolderEdit,
+      mdiFolderPlus,
       mdiFilterOff
     },
     form: {

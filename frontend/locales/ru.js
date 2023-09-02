@@ -45,6 +45,8 @@ const ru = {
       nothingIsFound: 'Ничего не найдено. Измените критерии поиска.',
       error: 'Ошибка',
       wrongSignalSamplesNumber: 'Количество отсчетов импортируемого сигнала должно быть не более {maxSamplesNumber}. В выбранном файле оно равно {samplesNumber}',
+      noFolders: 'У вас нет папок',
+      noData: 'Нет данных'
     },
     fields: {
       name: 'Имя',
@@ -105,7 +107,6 @@ const ru = {
     confirmDeleteFolder: 'Удалить папку {name}?',
     saveError: 'Ошибка при сохранении папки',
     deleteError: 'Ошибка при удалении папки',
-    noFolders: 'У вас нет папок'
   },
   'restore-password': {
     name: 'Восстановление пароля',

@@ -45,6 +45,8 @@ const en = {
       nothingIsFound: 'Nothing is found. Change search criteria.',
       error: 'Error',
       wrongSignalSamplesNumber: 'Number of imported signal samples must be not greater than {maxSamplesNumber}. In selected file it is {samplesNumber}',
+      noFolders: 'You have no folders',
+      noData: 'No data'
     },
     fields: {
       name: 'Name',
@@ -105,7 +107,6 @@ const en = {
     confirmDeleteFolder: 'Are you sure to delete folder {name}?',
     saveError: 'Error while saving folder',
     deleteError: 'Error while deleting folder',
-    noFolders: 'You have no folders'
   },
   'restore-password': {
     name: 'Restore password',
