@@ -7,7 +7,7 @@
             @click.stop="checkBoxStateChanged(folder)"
         >
           <template v-slot:label>
-            <div @click.stop="checkBoxStateChanged(folder)">
+            <div @click.stop>
               {{ folder.name }}
             </div>
           </template>

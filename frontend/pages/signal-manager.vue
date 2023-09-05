@@ -207,6 +207,7 @@ export default {
   extends: PageBase,
   mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving],
   data: () => ({
+    mounted: false,
     viewDialog: false,
     transformDialog: false,
     sampleRates: [],
@@ -323,6 +324,7 @@ export default {
     },
   },
   mounted() {
+    this.mounted = true
     this.restoreFormValues()
     this.restoreUiParams()
     this.readUrlParams()
@@ -330,6 +332,9 @@ export default {
     this.loadSampleRates()
     this.loadFolders()
     this.actionWithTimeout(() => this.loadSignals())
+  },
+  beforeUnmount() {
+    this.mounted = false
   },
   methods: {
     validatePageSize() {
@@ -343,7 +348,9 @@ export default {
     async loadSignals() {
       const filter = this.makeSignalFilter()
       const filterJson = JSON.stringify(filter)
-      if (this.loadingOverlay || this.signalsLastLoadFilter === filterJson || !this.validatePageSize()) {
+      if (!this.mounted || this.loadingOverlay
+          || this.signalsLastLoadFilter === filterJson
+          || !this.validatePageSize()) {
         return
       }
       await this.loadWithOverlay(async () => {
@@ -420,8 +427,10 @@ export default {
       return str.split(',').map(v => parseFunc(v)).filter(number => !isNaN(number))
     },
     setUrlParams() {
-      let url = `/signal-manager${this.makeUrlParams()}`
-      useRouter().push(url)
+      if (!this.mounted) {
+        return
+      }
+      useRouter().push(`/signal-manager${this.makeUrlParams()}`)
     },
     makeUrlParams() {
       let params = `?page=${this.page}&size=${this.formValue('pageSize')}`
