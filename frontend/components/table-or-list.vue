@@ -159,6 +159,9 @@ export default {
     },
     sortingKey() {
       return this.dataName + 'Sorting'
+    },
+    allItemIds() {
+      return this.items.map(item => item.id)
     }
   },
   watch: {
@@ -168,7 +171,7 @@ export default {
     },
     selectAllItems(newValue) {
       if (newValue) {
-        this.selectedIds = this.items.map(item => item.id)
+        this.selectedIds = this.allItemIds
       } else if (this.allItemsSelected) {
         this.selectedIds = []
       }
@@ -181,6 +184,9 @@ export default {
       },
       deep: true
     },
+    items() {
+      this.selectedIds = this.selectedIds.filter(id => this.allItemIds.includes(id))
+    }
   },
   mounted() {
     setTimeout(() => {

@@ -3,22 +3,33 @@
     <toolbar-with-close-btn :title="_t('title')" @close="close"/>
     <v-card-text>
       <v-form>
-        <v-row>
-          <v-col>
-            <v-select
-                v-model="form.types.value"
-                item-title="name"
-                item-value="code"
-                :items="types"
-                :label="_t('filterByTypes')"
-                multiple/>
-          </v-col>
-          <v-col>
-            <v-text-field
-                v-model="form.filter.value"
-                :label="_tc('fields.search')"/>
-          </v-col>
-        </v-row>
+        <div class="d-flex justify-center flex-wrap">
+          <v-select
+              class="filter-input"
+              v-model="form.types.value"
+              item-title="name"
+              item-value="code"
+              :items="types"
+              :label="_t('filterByTypes')"
+              multiple/>
+          <v-text-field
+              class="filter-input"
+              v-model="form.filter.value"
+              :label="_tc('fields.search')"
+          >
+            <template v-slot:append-inner>
+              <btn-with-tooltip
+                  :disabled="filterIsEmpty"
+                  tooltip="clear"
+                  @click="clearFilter"
+              >
+                <v-icon>
+                  {{ mdiFilterOff }}
+                </v-icon>
+              </btn-with-tooltip>
+            </template>
+          </v-text-field>
+        </div>
       </v-form>
       <h3 style="height: 300px" v-if="!filteredTransformers.length">{{ _tc('messages.nothingIsFound') }}</h3>
       <v-table v-else fixed-header height="300px">
@@ -40,15 +51,18 @@
 </template>
 
 <script>
+import {mdiFilterOff} from "@mdi/js";
 import ComponentBase from "./component-base";
 import formValuesSaving from "../mixins/form-values-saving";
 import {dataStore} from "~/stores/data-store";
+import BtnWithTooltip from "~/components/btn-with-tooltip.vue";
 
 const TRANSFORMER_TYPES = ['amplifier', 'modulator', 'filter', 'oscillator', 'math']
 
 export default {
   name: "select-transformer",
   extends: ComponentBase,
+  components: [BtnWithTooltip],
   mixins: [formValuesSaving],
   props: {
     bus: Object,
@@ -63,7 +77,8 @@ export default {
       types: {value: []},
       filter: {value: ''}
     },
-    selectedTypes: []
+    selectedTypes: [],
+    mdiFilterOff
   }),
   computed: {
     transformers() {
@@ -86,6 +101,9 @@ export default {
       return TRANSFORMER_TYPES
           .filter((value, index, self) => self.indexOf(value) === index)
           .map(code => ({code, name: this._trt(code)}))
+    },
+    filterIsEmpty() {
+      return !this.formValues.filter && !this.formValues.types.length
     }
   },
   watch: {
@@ -106,7 +124,20 @@ export default {
     },
     close() {
       this.$emit('close')
+    },
+    clearFilter() {
+      this.formValue('filter', '')
+      this.formValue('types', [])
     }
   },
 }
 </script>
+
+<style scoped>
+.filter-input {
+  min-width: 300px;
+  max-width: 800px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+</style>

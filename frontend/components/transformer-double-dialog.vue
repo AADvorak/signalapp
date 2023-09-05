@@ -11,27 +11,23 @@
         <v-form @submit.prevent>
           <div :hidden="processing">
             <div class="mb-5">{{ makeTransformWithQuestion('transformSignalsWith') }}?</div>
-            <v-row>
-              <v-col :cols="5">
-                <v-text-field
-                    v-model="signal1.name"
-                    :label="_tsn(selectedTransformer.signal1 || 'signal1')"
-                    readonly/>
-              </v-col>
-              <v-col :cols="2" class="d-flex justify-center">
-                <btn-with-tooltip tooltip="change" @click="changeSignals">
-                  <v-icon>
-                    {{ mdiRotate360 }}
-                  </v-icon>
-                </btn-with-tooltip>
-              </v-col>
-              <v-col :cols="5">
-                <v-text-field
-                    v-model="signal2.name"
-                    :label="_tsn(selectedTransformer.signal2 || 'signal2')"
-                    readonly/>
-              </v-col>
-            </v-row>
+            <div class="d-flex justify-center flex-wrap">
+              <v-text-field
+                  class="signal-name-input"
+                  v-model="signal1.name"
+                  :label="_tsn(selectedTransformer.signal1 || 'signal1')"
+                  readonly/>
+              <btn-with-tooltip tooltip="change" :small="false" @click="changeSignals">
+                <v-icon>
+                  {{ mdiRotate360 }}
+                </v-icon>
+              </btn-with-tooltip>
+              <v-text-field
+                  class="signal-name-input"
+                  v-model="signal2.name"
+                  :label="_tsn(selectedTransformer.signal2 || 'signal2')"
+                  readonly/>
+            </div>
             <component v-bind:is="selectedTransformer.code" :signal1="signal1" :signal2="signal2" :bus="bus"/>
           </div>
           <div class="d-flex">
@@ -92,3 +88,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.signal-name-input {
+  min-width: 300px;
+  max-width: 800px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+</style>
