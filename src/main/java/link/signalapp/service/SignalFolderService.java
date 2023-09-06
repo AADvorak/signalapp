@@ -8,6 +8,7 @@ import link.signalapp.model.Signal;
 import link.signalapp.repository.FolderRepository;
 import link.signalapp.repository.SignalRepository;
 import link.signalapp.repository.UserTokenRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,7 +45,9 @@ public class SignalFolderService extends ServiceBase {
         Folder folder = folderRepository.findByIdAndUserId(folderId, userId)
                 .orElseThrow(SignalAppNotFoundException::new);
         signal.getFolders().add(folder);
-        signalRepository.save(signal);
+        try {
+            signalRepository.save(signal);
+        } catch (DataIntegrityViolationException ignore) {}
     }
 
     public void deleteFolder(String token, int id, int folderId)
