@@ -19,7 +19,7 @@ create table public.signal_in_folder
         constraint signal_in_folder_folder_id_fk
             references "folder"
             on update cascade on delete cascade,
-    signal_id        integer not null
+    signal_id integer not null
         constraint signal_in_folder_signal_id_fk
             references "signal"
             on update cascade on delete cascade
