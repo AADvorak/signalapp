@@ -143,7 +143,7 @@ export default {
       this.getSignalFromHistoryOrLoad()
     },
     signal() {
-      this.$refs.nameInput.focus()
+      this.signal.name && this.$refs.nameInput.focus()
     }
   },
   mounted() {
