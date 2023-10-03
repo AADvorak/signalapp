@@ -3,7 +3,7 @@ package link.signalapp.dto.request;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 @Getter
 @Setter

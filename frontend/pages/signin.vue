@@ -81,7 +81,7 @@ export default {
       this.clearValidation()
       await this.loadWithFlag(async () => {
         const token = await this.recaptcha()
-        const response = await ApiProvider.postJson('/api/sessions/', {...this.formValues, token})
+        const response = await ApiProvider.postJson('/api/sessions', {...this.formValues, token})
         if (response.ok) {
           this.signInRequestSuccess = true
           dataStore().setUserInfo(response.data)

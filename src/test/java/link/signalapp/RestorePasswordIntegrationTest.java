@@ -39,7 +39,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 restorePasswordDtoRequest(), String.class);
         CapturedEmailArguments arguments = captureEmailArguments();
         User user = userRepository.findByEmail(email1);
-        assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
+        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
                 () -> assertTrue(passwordEncoder.matches(arguments.getBody(), user.getPassword())));
     }
 
@@ -50,7 +50,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest(), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("email", error.getField()),
                 () -> assertEquals("WRONG_EMAIL", error.getCode()));
     }
@@ -61,7 +61,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setEmail("notexisting@email"), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("email", error.getField()),
                 () -> assertEquals("WRONG_EMAIL", error.getCode()));
     }
@@ -72,7 +72,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setEmail("notvalid"), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("email", error.getField()),
                 () -> assertEquals("Email", error.getCode()));
     }
@@ -83,7 +83,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setEmail(""), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("email", error.getField()),
                 () -> assertEquals("NotEmpty", error.getCode()));
     }
@@ -94,7 +94,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setEmail(null), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("email", error.getField()),
                 () -> assertEquals("NotEmpty", error.getCode()));
     }
@@ -105,7 +105,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setLocaleTitle(""), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("localeTitle", error.getField()),
                 () -> assertEquals("NotEmpty", error.getCode()));
     }
@@ -116,7 +116,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setLocaleMsg(""), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("localeMsg", error.getField()),
                 () -> assertEquals("NotEmpty", error.getCode()));
     }
@@ -131,7 +131,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                         restorePasswordDtoRequest(), String.class));
         ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
         String afterRequestPassword = userRepository.findByEmail(email1).getPassword();
-        assertAll(() -> assertEquals(500, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(500, exc.getStatusCode().value()),
                 () -> assertEquals("INTERNAL_SERVER_ERROR", error.getCode()),
                 () -> assertEquals(beforeRequestPassword, afterRequestPassword));
     }

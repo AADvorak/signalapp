@@ -6,8 +6,8 @@ import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.model.User;
 import link.signalapp.repository.UserConfirmRepository;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -48,10 +48,10 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
                 HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest(), headers), String.class);
         CapturedEmailArguments arguments = captureEmailArguments();
         assertAll(() -> assertEquals(email1, arguments.getEmail()),
-                () -> assertEquals(200, response1.getStatusCodeValue()));
+                () -> assertEquals(200, response1.getStatusCode().value()));
         ResponseEntity<String> response2 = restTemplateNoRedirect().getForEntity(arguments.getBody(), String.class);
         User user = userRepository.findByEmail(email1);
-        assertAll(() -> assertEquals(302, response2.getStatusCodeValue()),
+        assertAll(() -> assertEquals(302, response2.getStatusCode().value()),
                 () -> assertEquals(origin() + "/user-settings",
                         Objects.requireNonNull(response2.getHeaders().get("Location")).get(0)),
                 () -> assertTrue(user.isEmailConfirmed()));
@@ -65,7 +65,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest(), headers), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("EMAIL_ALREADY_CONFIRMED", error.getCode()));
     }
 
@@ -74,7 +74,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest()), String.class));
-        assertEquals(401, exc.getRawStatusCode());
+        assertEquals(401, exc.getStatusCode().value());
     }
 
     @Test
@@ -85,11 +85,11 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
                 HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest(), headers), String.class);
         CapturedEmailArguments arguments = captureEmailArguments();
         assertAll(() -> assertEquals(email1, arguments.getEmail()),
-                () -> assertEquals(200, response1.getStatusCodeValue()));
+                () -> assertEquals(200, response1.getStatusCode().value()));
         String url = arguments.getBody().substring(0, arguments.getBody().length() - 2);
         ResponseEntity<String> response2 = restTemplateNoRedirect().getForEntity(url, String.class);
         User user = userRepository.findByEmail(email1);
-        assertAll(() -> assertEquals(302, response2.getStatusCodeValue()),
+        assertAll(() -> assertEquals(302, response2.getStatusCode().value()),
                 () -> assertEquals(origin() + "/email-confirm-error",
                         Objects.requireNonNull(response2.getHeaders().get("Location")).get(0)),
                 () -> assertFalse(user.isEmailConfirmed()));
@@ -101,7 +101,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest().setOrigin("")), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("origin", error.getField()),
                 () -> assertEquals("NotEmpty", error.getCode()));
     }
@@ -112,7 +112,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest().setLocaleTitle("")), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("localeTitle", error.getField()),
                 () -> assertEquals("NotEmpty", error.getCode()));
     }
@@ -123,7 +123,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest().setLocaleMsg("")), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("localeMsg", error.getField()),
                 () -> assertEquals("NotEmpty", error.getCode()));
     }
@@ -140,7 +140,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
         // todo true while must be false
         boolean userConfirmExists = userConfirmRepository.findAll().stream()
                 .anyMatch(userConfirm -> email1.equals(userConfirm.getId().getUser().getEmail()));
-        assertAll(() -> assertEquals(500, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(500, exc.getStatusCode().value()),
                 () -> assertEquals("INTERNAL_SERVER_ERROR", error.getCode()),
                 () -> assertFalse(userConfirmExists));
     }
@@ -148,7 +148,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
     private RestTemplate restTemplateNoRedirect() {
         RestTemplate restTemplate = new RestTemplate();
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        CloseableHttpClient build = HttpClientBuilder.create().disableRedirectHandling().build();
+        HttpClient build = HttpClientBuilder.create().disableRedirectHandling().build();
         factory.setHttpClient(build);
         restTemplate.setRequestFactory(factory);
         return restTemplate;

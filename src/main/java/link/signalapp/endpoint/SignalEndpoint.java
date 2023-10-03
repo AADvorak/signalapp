@@ -20,7 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * @author anton

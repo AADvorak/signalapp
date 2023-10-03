@@ -46,10 +46,12 @@
 import {mdiDelete} from "@mdi/js";
 import PageBase from "../components/page-base";
 import formValidation from "../mixins/form-validation";
-import {dataStore} from "../stores/data-store";
+import {dataStore} from "~/stores/data-store";
 import TextInput from "../components/text-input";
 import formValues from "../mixins/form-values";
 import filterPatronymicField from "../mixins/filter-patronymic-field";
+
+const ME_URL = '/api/users/me'
 
 export default {
   name: "user-settings",
@@ -79,9 +81,11 @@ export default {
   methods: {
     async reloadUserInfo() {
       await this.loadWithOverlay(async () => {
-        const response = await this.getApiProvider().get('/api/users/me/')
+        const response = await this.getApiProvider().get(ME_URL)
         if (response.ok) {
           dataStore().setUserInfo(response.data)
+        } else {
+          this.showErrorsFromResponse(response)
         }
       })
     },
@@ -97,7 +101,7 @@ export default {
     async save() {
       this.clearValidation()
       await this.loadWithFlag(async () => {
-        const response = await this.getApiProvider().putJson('/api/users/me/', this.formValues)
+        const response = await this.getApiProvider().putJson(ME_URL, this.formValues)
         if (response.ok) {
           dataStore().setUserInfo(response.data)
           this.showMessage({
@@ -119,10 +123,10 @@ export default {
       })
     },
     async deleteAccount() {
-      const response = await this.getApiProvider().del('/api/users/me/')
+      const response = await this.getApiProvider().del(ME_URL)
       if (response.ok) {
         dataStore().clearUserInfo()
-        useRouter().push('/')
+        await useRouter().push('/')
       } else {
         this.showErrorsFromResponse(response, this._t('deleteError'))
       }

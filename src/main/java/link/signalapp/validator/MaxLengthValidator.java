@@ -3,8 +3,8 @@ package link.signalapp.validator;
 import link.signalapp.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 @RequiredArgsConstructor
 public class MaxLengthValidator implements ConstraintValidator<MaxLength, String> {

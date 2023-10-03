@@ -28,7 +28,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         userDtoRequest.setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH));
         ResponseEntity<UserDtoResponse> response = template.postForEntity(fullUrl(USERS_URL), userDtoRequest, UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
-        assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
+        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
                 () -> assertEquals(userDtoRequest.getEmail(), userDtoResponse.getEmail()),
                 () -> assertEquals(userDtoRequest.getFirstName(), userDtoResponse.getFirstName()),
                 () -> assertEquals(userDtoRequest.getLastName(), userDtoResponse.getLastName()),
@@ -42,7 +42,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         userDtoRequest.setFirstName(null);
         ResponseEntity<UserDtoResponse> response = template.postForEntity(fullUrl(USERS_URL), userDtoRequest, UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
-        assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
+        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
                 () -> assertEquals(userDtoRequest.getEmail(), userDtoResponse.getEmail()),
                 () -> assertEquals(userDtoRequest.getFirstName(), userDtoResponse.getFirstName()),
                 () -> assertEquals(userDtoRequest.getLastName(), userDtoResponse.getLastName()),
@@ -56,7 +56,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("NotEmpty", error.getCode()),
                 () -> assertEquals("email", error.getField()));
     }
@@ -67,7 +67,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("NotEmpty", error.getCode()),
                 () -> assertEquals("email", error.getField()));
     }
@@ -78,7 +78,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("Email", error.getCode()),
                 () -> assertEquals("email", error.getField()));
     }
@@ -89,7 +89,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("MinLength", error.getCode()),
                 () -> assertEquals("password", error.getField()));
     }
@@ -100,7 +100,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("MinLength", error.getCode()),
                 () -> assertEquals("password", error.getField()));
     }
@@ -111,7 +111,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("MinLength", error.getCode()),
                 () -> assertEquals("password", error.getField()));
     }
@@ -123,7 +123,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("Size", error.getCode()),
                 () -> assertEquals("password", error.getField()));
     }
@@ -135,7 +135,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("MaxLength", error.getCode()),
                 () -> assertEquals("firstName", error.getField()));
     }
@@ -147,7 +147,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("EMAIL_ALREADY_EXISTS", error.getCode()),
                 () -> assertEquals("Email already exists", error.getMessage()));
     }
@@ -161,7 +161,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
                 .setToken(PROPER_TOKEN);
         ResponseEntity<UserDtoResponse> response = template.postForEntity(fullUrl(USERS_URL), userDtoRequest, UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
-        assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
+        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
                 () -> assertEquals(userDtoRequest.getEmail(), userDtoResponse.getEmail()),
                 () -> assertEquals(userDtoRequest.getFirstName(), userDtoResponse.getFirstName()),
                 () -> assertEquals(userDtoRequest.getLastName(), userDtoResponse.getLastName()),
@@ -180,7 +180,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
                                 .setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH))
                                 .setToken(WRONG_TOKEN), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("RECAPTCHA_TOKEN_NOT_VERIFIED", error.getCode()),
                 () -> assertEquals("token", error.getField()));
         applicationProperties.setVerifyCaptcha(false);

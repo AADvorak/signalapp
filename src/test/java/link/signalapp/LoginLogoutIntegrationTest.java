@@ -37,7 +37,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
         ResponseEntity<String> response = template.postForEntity(fullUrl(SESSIONS_URL),
                 new LoginDtoRequest().setEmail(email1).setPassword(password), String.class);
         String tokenFromResponse = getTokenFromResponse(response), tokenFromRepository = getTokenFromRepository();
-        assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
+        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
                 () -> assertEquals(tokenFromResponse, tokenFromRepository));
     }
 
@@ -47,7 +47,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail("").setPassword(password), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("NotEmpty", error.getCode()),
                 () -> assertEquals("email", error.getField()));
     }
@@ -58,7 +58,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail(email1).setPassword(""), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("NotEmpty", error.getCode()),
                 () -> assertEquals("password", error.getField()));
     }
@@ -69,7 +69,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail("wrong").setPassword(password), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("WRONG_EMAIL_PASSWORD", error.getCode()));
     }
 
@@ -79,7 +79,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail(email1).setPassword("wrong"), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("WRONG_EMAIL_PASSWORD", error.getCode()));
     }
 
@@ -87,13 +87,13 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
     public void logoutOk() {
         HttpHeaders headers = login(email1);
         ResponseEntity<String> response = template.exchange(fullUrl(SESSIONS_URL), HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
-        assertEquals(response.getStatusCodeValue(), 200);
+        assertEquals(response.getStatusCode().value(), 200);
     }
 
     @Test
     public void logoutUnauthorized() {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, () -> template.delete(fullUrl(SESSIONS_URL)));
-        assertEquals(401, exc.getRawStatusCode());
+        assertEquals(401, exc.getStatusCode().value());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
                 new LoginDtoRequest().setEmail(email1).setPassword(password).setToken(PROPER_TOKEN), String.class);
         String tokenFromResponse = getTokenFromResponse(response);
         String tokenFromRepository = getTokenFromRepository();
-        assertAll(() -> assertEquals(200, response.getStatusCodeValue()),
+        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
                 () -> assertEquals(tokenFromResponse, tokenFromRepository));
         applicationProperties.setVerifyCaptcha(false);
     }
@@ -117,7 +117,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail(email1).setPassword(password).setToken(WRONG_TOKEN), String.class));
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getRawStatusCode()),
+        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
                 () -> assertEquals("RECAPTCHA_TOKEN_NOT_VERIFIED", error.getCode()),
                 () -> assertEquals("token", error.getField()));
         applicationProperties.setVerifyCaptcha(false);

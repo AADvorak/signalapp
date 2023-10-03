@@ -28,7 +28,6 @@ public class IntegrationTestBase {
     protected static final String BASE_URL = "http://localhost:";
     protected static final String SESSIONS_URL = "/api/sessions";
     protected static final String USERS_URL = "/api/users";
-    protected static final String MODULES_URL = "/api/modules";
 
     protected final String password = "password0000";
     protected final String email1 = "test1@test.com";

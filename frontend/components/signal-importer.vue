@@ -108,7 +108,7 @@ export default {
         return
       }
       SignalUtils.calculateMaxAbsY(signal)
-      const response = await this.getApiProvider().postJson('/api/signals/', signal)
+      const response = await this.getApiProvider().postJson('/api/signals', signal)
       if (response.ok) {
         useRouter().push('/signal-manager')
       } else if (response.status === 400) {

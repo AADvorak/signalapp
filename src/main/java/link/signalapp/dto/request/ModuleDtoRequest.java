@@ -6,7 +6,7 @@ import link.signalapp.validator.Module;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 @Getter
 @Setter

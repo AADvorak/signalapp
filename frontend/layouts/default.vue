@@ -191,7 +191,7 @@ export default {
   },
   methods: {
     async signOut() {
-      await ApiProvider.del('/api/sessions/')
+      await ApiProvider.del('/api/sessions')
       dataStore().clearPersonalData()
       this.toMainPage()
     },
@@ -199,14 +199,14 @@ export default {
       if (dataStore().userInfo !== undefined) {
         return
       }
-      const response = await ApiProvider.get('/api/users/me/', true)
+      const response = await ApiProvider.get('/api/users/me', true)
       dataStore().setUserInfo(response.ok ? response.data : null)
     },
     async loadSettings() {
       if (dataStore().settings !== undefined) {
         return
       }
-      const response = await ApiProvider.get('/api/settings/', true)
+      const response = await ApiProvider.get('/api/settings', true)
       dataStore().setSettings(response.ok ? response.data : null)
     },
     toMainPage() {

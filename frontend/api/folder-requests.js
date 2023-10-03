@@ -18,7 +18,7 @@ const FolderRequests = {
     }
   },
   async saveFolder(folder) {
-    return await this.apiProvider.postJson('/api/folders/', folder)
+    return await this.apiProvider.postJson('/api/folders', folder)
   },
   async updateFolder(folderId, folder) {
     return await this.apiProvider.putJson(`/api/folders/${folderId}`, folder)

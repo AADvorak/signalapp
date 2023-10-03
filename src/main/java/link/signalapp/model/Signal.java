@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  *
