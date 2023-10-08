@@ -22,36 +22,31 @@ public class FolderEndpoint extends EndpointBase {
     private final FolderService folderService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<FolderDtoResponse> get(
-            @CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId
-    ) throws SignalAppUnauthorizedException {
-        return folderService.get(sessionId);
+    public List<FolderDtoResponse> get() throws SignalAppUnauthorizedException {
+        return folderService.get();
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public FolderDtoResponse post(
-            @CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
             @RequestBody @Valid FolderDtoRequest request
     ) throws SignalAppConflictException, SignalAppUnauthorizedException, SignalAppDataException {
-        return folderService.add(sessionId, request);
+        return folderService.add(request);
     }
 
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void put(
-            @CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
             @RequestBody @Valid FolderDtoRequest request,
             @PathVariable int id
     ) throws SignalAppNotFoundException, SignalAppUnauthorizedException {
-        folderService.update(sessionId, request, id);
+        folderService.update(request, id);
     }
 
     @DeleteMapping("/{id}")
     void delete(
-            @CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
             @PathVariable int id,
             @RequestParam(required = false, defaultValue = "false") boolean deleteSignals
     ) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
-        folderService.delete(sessionId, id, deleteSignals);
+        folderService.delete(id, deleteSignals);
     }
 
 }

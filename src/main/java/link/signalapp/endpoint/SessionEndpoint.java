@@ -27,8 +27,8 @@ public class SessionEndpoint extends EndpointBase {
     }
 
     @DeleteMapping
-    public void delete(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId) throws SignalAppUnauthorizedException {
-        userService.logout(sessionId);
+    public void delete() throws SignalAppUnauthorizedException {
+        userService.logout();
     }
 
 }

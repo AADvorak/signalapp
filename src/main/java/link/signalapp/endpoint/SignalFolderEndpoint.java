@@ -17,28 +17,23 @@ public class SignalFolderEndpoint extends EndpointBase {
     private final SignalFolderService signalFolderService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Integer> get(
-            @CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-            @PathVariable int id
-    ) throws SignalAppNotFoundException, SignalAppUnauthorizedException {
-        return signalFolderService.getFolderIds(sessionId, id);
+    public List<Integer> get(@PathVariable int id) throws SignalAppNotFoundException, SignalAppUnauthorizedException {
+        return signalFolderService.getFolderIds(id);
     }
 
     @PostMapping("/{folderId}")
     public void post(
-            @CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
             @PathVariable int id,
             @PathVariable int folderId
     ) throws SignalAppNotFoundException, SignalAppUnauthorizedException {
-        signalFolderService.addFolder(sessionId, id, folderId);
+        signalFolderService.addFolder(id, folderId);
     }
 
     @DeleteMapping("/{folderId}")
     public void delete(
-            @CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
             @PathVariable int id,
             @PathVariable int folderId
     ) throws SignalAppNotFoundException, SignalAppUnauthorizedException {
-        signalFolderService.deleteFolder(sessionId, id, folderId);
+        signalFolderService.deleteFolder(id, folderId);
     }
 }

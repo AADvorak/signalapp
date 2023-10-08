@@ -1,11 +1,10 @@
 package link.signalapp.service;
 
-import link.signalapp.ApplicationProperties;
 import link.signalapp.audio.AudioBytesCoder;
 import link.signalapp.audio.AudioSampleReader;
+import link.signalapp.dto.request.SignalDtoRequest;
 import link.signalapp.dto.request.SignalFilterDto;
 import link.signalapp.dto.response.IdDtoResponse;
-import link.signalapp.dto.request.SignalDtoRequest;
 import link.signalapp.dto.response.ResponseWithTotalCounts;
 import link.signalapp.dto.response.SignalDtoResponse;
 import link.signalapp.dto.response.SignalWithDataDtoResponse;
@@ -15,7 +14,7 @@ import link.signalapp.mapper.SignalMapper;
 import link.signalapp.model.Signal;
 import link.signalapp.model.User;
 import link.signalapp.repository.SignalRepository;
-import link.signalapp.repository.UserTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SignalService extends ServiceBase {
 
     public static final int MAX_SIGNAL_LENGTH = 1024000;
@@ -42,16 +42,9 @@ public class SignalService extends ServiceBase {
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
 
-    public SignalService(UserTokenRepository userTokenRepository, ApplicationProperties applicationProperties,
-                         SignalRepository signalRepository, FileManager fileManager) {
-        super(userTokenRepository, applicationProperties);
-        this.signalRepository = signalRepository;
-        this.fileManager = fileManager;
-    }
-
-    public ResponseWithTotalCounts<SignalDtoResponse> filter(String token, SignalFilterDto filter)
+    public ResponseWithTotalCounts<SignalDtoResponse> filter(SignalFilterDto filter)
             throws SignalAppUnauthorizedException {
-        int userId = getUserByToken(token).getId();
+        int userId = getUserFromContext().getId();
         Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize() > MAX_USER_STORED_SIGNALS_NUMBER
                 || filter.getSize() <= 0
                 ? MAX_USER_STORED_SIGNALS_NUMBER
@@ -67,9 +60,9 @@ public class SignalService extends ServiceBase {
     }
 
     @Transactional(rollbackFor = IOException.class)
-    public IdDtoResponse add(String token, SignalDtoRequest request) throws SignalAppUnauthorizedException,
+    public IdDtoResponse add(SignalDtoRequest request) throws SignalAppUnauthorizedException,
             IOException, SignalAppConflictException {
-        int userId = getUserByToken(token).getId();
+        int userId = getUserFromContext().getId();
         checkStoredByUserSignalsNumber(userId);
         Signal signal = signalRepository.save(new Signal(request, userId));
         writeSignalDataToWavFile(signal, request.getData());
@@ -77,9 +70,9 @@ public class SignalService extends ServiceBase {
     }
 
     @Transactional(rollbackFor = IOException.class)
-    public void update(String token, SignalDtoRequest request, int id) throws SignalAppUnauthorizedException,
+    public void update(SignalDtoRequest request, int id) throws SignalAppUnauthorizedException,
             IOException, SignalAppNotFoundException {
-        Signal signal = getSignalByUserTokenAndId(token, id)
+        Signal signal = getSignalById(id)
                 .setName(request.getName())
                 .setDescription(request.getDescription())
                 .setMaxAbsY(request.getMaxAbsY())
@@ -90,8 +83,8 @@ public class SignalService extends ServiceBase {
     }
 
     @Transactional
-    public void delete(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
-        int userId = getUserByToken(token).getId();
+    public void delete(int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+        int userId = getUserFromContext().getId();
         if (signalRepository.deleteByIdAndUserId(id, userId) == 0) {
             throw new SignalAppNotFoundException();
         } else {
@@ -99,26 +92,26 @@ public class SignalService extends ServiceBase {
         }
     }
 
-    public SignalWithDataDtoResponse getSignalWithData(String token, int id) throws SignalAppNotFoundException,
+    public SignalWithDataDtoResponse getSignalWithData(int id) throws SignalAppNotFoundException,
             SignalAppUnauthorizedException, UnsupportedAudioFileException, IOException {
-        Signal signal = getSignalByUserTokenAndId(token, id);
+        Signal signal = getSignalById(id);
         SignalWithDataDtoResponse response = SignalMapper.INSTANCE.signalToDtoWithData(signal);
         response.setData(getDataForSignal(signal));
         return response;
     }
 
-    public List<BigDecimal> getData(String token, int id) throws SignalAppUnauthorizedException,
+    public List<BigDecimal> getData(int id) throws SignalAppUnauthorizedException,
             SignalAppNotFoundException, IOException, UnsupportedAudioFileException {
-        return getDataForSignal(getSignalByUserTokenAndId(token, id));
+        return getDataForSignal(getSignalById(id));
     }
 
-    public byte[] getWav(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
-        Signal signal = getSignalByUserTokenAndId(token, id);
+    public byte[] getWav(int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
+        Signal signal = getSignalById(id);
         return fileManager.readWavFromFile(signal.getUserId(), signal.getId());
     }
 
     @Transactional(rollbackFor = IOException.class)
-    public void importWav(String token, String fileName, byte[] data)
+    public void importWav(String fileName, byte[] data)
             throws SignalAppUnauthorizedException, UnsupportedAudioFileException, IOException, SignalAppException {
         AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(data));
         long sampleCount = asr.getSampleCount();
@@ -126,7 +119,7 @@ public class SignalService extends ServiceBase {
             throw new SignalAppException(SignalAppErrorCode.TOO_LONG_SIGNAL,
                     new MaxSizeExceptionParams(SignalService.MAX_SIGNAL_LENGTH));
         }
-        User user = getUserByToken(token);
+        User user = getUserFromContext();
         checkStoredByUserSignalsNumber(user.getId());
         if (asr.getFormat().getChannels() == 1) {
             double[] samples = new double[(int) sampleCount];
@@ -141,13 +134,13 @@ public class SignalService extends ServiceBase {
         }
     }
 
-    public List<BigDecimal> getSampleRates(String token) throws SignalAppUnauthorizedException {
-        return signalRepository.sampleRatesByUserId(getUserByToken(token).getId());
+    public List<BigDecimal> getSampleRates() throws SignalAppUnauthorizedException {
+        return signalRepository.sampleRatesByUserId(getUserFromContext().getId());
     }
 
-    private Signal getSignalByUserTokenAndId(String token, int id)
+    private Signal getSignalById(int id)
             throws SignalAppNotFoundException, SignalAppUnauthorizedException {
-        Signal signal = signalRepository.findByIdAndUserId(id, getUserByToken(token).getId());
+        Signal signal = signalRepository.findByIdAndUserId(id, getUserFromContext().getId());
         if (signal == null) {
             throw new SignalAppNotFoundException();
         }

@@ -1,16 +1,14 @@
 package link.signalapp.service;
 
-import link.signalapp.ApplicationProperties;
 import link.signalapp.dto.request.FolderDtoRequest;
 import link.signalapp.dto.response.FolderDtoResponse;
 import link.signalapp.error.*;
 import link.signalapp.file.FileManager;
 import link.signalapp.mapper.FolderMapper;
 import link.signalapp.model.Folder;
-import link.signalapp.model.Signal;
 import link.signalapp.repository.FolderRepository;
 import link.signalapp.repository.SignalRepository;
-import link.signalapp.repository.UserTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FolderService extends ServiceBase {
 
     public static final int MAX_USER_FOLDERS_NUMBER = 10;
@@ -26,23 +25,14 @@ public class FolderService extends ServiceBase {
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
 
-    public FolderService(UserTokenRepository userTokenRepository, ApplicationProperties applicationProperties,
-                         FolderRepository folderRepository, SignalRepository signalRepository,
-                         FileManager fileManager) {
-        super(userTokenRepository, applicationProperties);
-        this.folderRepository = folderRepository;
-        this.signalRepository = signalRepository;
-        this.fileManager = fileManager;
-    }
-
-    public List<FolderDtoResponse> get(String token) throws SignalAppUnauthorizedException {
-        return folderRepository.findByUserId(getUserByToken(token).getId())
+    public List<FolderDtoResponse> get() throws SignalAppUnauthorizedException {
+        return folderRepository.findByUserId(getUserFromContext().getId())
                 .stream().map(FolderMapper.INSTANCE::folderToDto).toList();
     }
 
-    public FolderDtoResponse add(String token, FolderDtoRequest request)
+    public FolderDtoResponse add(FolderDtoRequest request)
             throws SignalAppUnauthorizedException, SignalAppConflictException, SignalAppDataException {
-        int userId = getUserByToken(token).getId();
+        int userId = getUserFromContext().getId();
         if (folderRepository.countByUserId(userId) >= MAX_USER_FOLDERS_NUMBER) {
             throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_FOLDERS_CREATED,
                     new MaxNumberExceptionParams(MAX_USER_FOLDERS_NUMBER));
@@ -56,9 +46,9 @@ public class FolderService extends ServiceBase {
         }
     }
 
-    public FolderDtoResponse update(String token, FolderDtoRequest request, int id)
+    public FolderDtoResponse update(FolderDtoRequest request, int id)
             throws SignalAppUnauthorizedException, SignalAppNotFoundException {
-        Folder folder = folderRepository.findByIdAndUserId(id, getUserByToken(token).getId())
+        Folder folder = folderRepository.findByIdAndUserId(id, getUserFromContext().getId())
                 .orElseThrow(SignalAppNotFoundException::new)
                 .setName(request.getName())
                 .setDescription(request.getDescription());
@@ -66,9 +56,9 @@ public class FolderService extends ServiceBase {
     }
 
     @Transactional
-    public void delete(String token, int id, boolean deleteSignals)
+    public void delete(int id, boolean deleteSignals)
             throws SignalAppUnauthorizedException, SignalAppNotFoundException {
-        int userId = getUserByToken(token).getId();
+        int userId = getUserFromContext().getId();
         Folder folder = folderRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(SignalAppNotFoundException::new);
         folderRepository.delete(folder);

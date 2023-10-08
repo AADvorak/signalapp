@@ -28,54 +28,47 @@ public class ModuleEndpoint extends EndpointBase {
     private final ModuleService moduleService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ModuleDtoResponse> getAll(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId) {
-        return moduleService.getAll(sessionId);
+    public List<ModuleDtoResponse> getAll() {
+        return moduleService.getAll();
     }
     
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ModuleDtoResponse post(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                  @RequestBody @Valid ModuleDtoRequest module)
+    public ModuleDtoResponse post(@RequestBody @Valid ModuleDtoRequest module)
             throws SignalAppDataException, SignalAppUnauthorizedException {
-        return moduleService.add(sessionId, module);
+        return moduleService.add(module);
     }
     
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ModuleDtoResponse put(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                 @RequestBody @Valid EditModuleDtoRequest module, @PathVariable Integer id)
+    public ModuleDtoResponse put(@RequestBody @Valid EditModuleDtoRequest module, @PathVariable Integer id)
             throws SignalAppNotFoundException, SignalAppUnauthorizedException {
-        return moduleService.update(sessionId, module, id);
+        return moduleService.update(module, id);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                       @PathVariable Integer id) throws SignalAppNotFoundException, SignalAppUnauthorizedException {
-        moduleService.delete(sessionId, id);
+    public void delete(@PathVariable Integer id) throws SignalAppNotFoundException, SignalAppUnauthorizedException {
+        moduleService.delete(id);
     }
 
     @GetMapping(path = "/{id}/html", produces = MediaType.TEXT_HTML_VALUE)
-    public String getHtml(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                          @PathVariable Integer id) throws SignalAppNotFoundException {
-        return moduleService.getFile(sessionId, id, "html");
+    public String getHtml(@PathVariable Integer id) throws SignalAppNotFoundException {
+        return moduleService.getFile(id, "html");
     }
 
     @GetMapping(path = "/{id}/js", produces = "application/javascript")
-    public String getJs(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                        @PathVariable Integer id) throws SignalAppNotFoundException {
-        return moduleService.getFile(sessionId, id, "js");
+    public String getJs(@PathVariable Integer id) throws SignalAppNotFoundException {
+        return moduleService.getFile(id, "js");
     }
 
     @PutMapping(path = "/{id}/html", consumes = MediaType.TEXT_HTML_VALUE)
-    public void putHtml(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                        @PathVariable Integer id, @RequestBody String data)
+    public void putHtml(@PathVariable Integer id, @RequestBody String data)
             throws SignalAppNotFoundException, IOException, SignalAppUnauthorizedException {
-        moduleService.writeFile(sessionId, id, "html", data);
+        moduleService.writeFile(id, "html", data);
     }
 
     @PutMapping(path = "/{id}/js", consumes = MediaType.TEXT_PLAIN_VALUE)
-    public void putJs(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                      @PathVariable Integer id, @RequestBody String data)
+    public void putJs(@PathVariable Integer id, @RequestBody String data)
             throws SignalAppNotFoundException, IOException, SignalAppUnauthorizedException {
-        moduleService.writeFile(sessionId, id, "js", data);
+        moduleService.writeFile(id, "js", data);
     }
 
 }

@@ -1,33 +1,28 @@
 package link.signalapp.service;
 
-import link.signalapp.ApplicationProperties;
 import link.signalapp.error.SignalAppUnauthorizedException;
 import link.signalapp.model.User;
-import link.signalapp.model.UserToken;
-import link.signalapp.repository.UserTokenRepository;
-import lombok.RequiredArgsConstructor;
+import link.signalapp.security.SignalAppUserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
-@RequiredArgsConstructor
 public class ServiceBase {
 
-    protected final UserTokenRepository userTokenRepository;
+    protected User getUserFromContext() throws SignalAppUnauthorizedException {
+        return getUserDetailsFromContext().getUser();
+    }
 
-    protected final ApplicationProperties applicationProperties;
+    protected String getTokenFromContext() throws SignalAppUnauthorizedException {
+        return getUserDetailsFromContext().getToken();
+    }
 
-    protected User getUserByToken(String token) throws SignalAppUnauthorizedException {
-        UserToken userToken = userTokenRepository.findActiveToken(token, LocalDateTime.now(),
-                applicationProperties.getUserIdleTimeout());
-        if (userToken == null) {
+    protected SignalAppUserDetails getUserDetailsFromContext() throws SignalAppUnauthorizedException {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof SignalAppUserDetails)) {
             throw new SignalAppUnauthorizedException();
-        } else {
-            userToken.setLastActionTime(LocalDateTime.now());
-            userTokenRepository.save(userToken);
         }
-        return userToken.getId().getUser();
+        return (SignalAppUserDetails) principal;
     }
 
 }

@@ -1,6 +1,5 @@
 package link.signalapp.service;
 
-import link.signalapp.ApplicationProperties;
 import link.signalapp.dto.request.EditModuleDtoRequest;
 import link.signalapp.dto.request.ModuleDtoRequest;
 import link.signalapp.dto.response.ModuleDtoResponse;
@@ -13,7 +12,7 @@ import link.signalapp.mapper.ModuleMapper;
 import link.signalapp.model.Module;
 import link.signalapp.model.User;
 import link.signalapp.repository.ModuleRepository;
-import link.signalapp.repository.UserTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,23 +22,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ModuleService extends ServiceBase {
 
     private final ModuleRepository moduleRepository;
-
     private final FileManager fileManager;
 
-    public ModuleService(UserTokenRepository userTokenRepository, ApplicationProperties applicationProperties,
-                         ModuleRepository moduleRepository, FileManager fileManager) {
-        super(userTokenRepository, applicationProperties);
-        this.moduleRepository = moduleRepository;
-        this.fileManager = fileManager;
-    }
-
-    public List<ModuleDtoResponse> getAll(String token) {
+    public List<ModuleDtoResponse> getAll() {
         User user = null;
         try {
-            user = getUserByToken(token);
+            user = getUserFromContext();
         } catch (SignalAppUnauthorizedException ignored) {}
         List<Module> modules = user != null
                 ? moduleRepository.findByUserIdIsNullOrUserIdEquals(user.getId())
@@ -47,8 +39,8 @@ public class ModuleService extends ServiceBase {
         return modules.stream().map(ModuleMapper.INSTANCE::moduleToDto).collect(Collectors.toList());
     }
 
-    public ModuleDtoResponse add(String token, ModuleDtoRequest moduleDtoRequest) throws SignalAppDataException, SignalAppUnauthorizedException {
-        User user = getUserByToken(token);
+    public ModuleDtoResponse add(ModuleDtoRequest moduleDtoRequest) throws SignalAppDataException, SignalAppUnauthorizedException {
+        User user = getUserFromContext();
         Module module = ModuleMapper.INSTANCE.dtoToModule(moduleDtoRequest);
         module.setUser(user);
         try {
@@ -58,9 +50,9 @@ public class ModuleService extends ServiceBase {
         }
     }
 
-    public ModuleDtoResponse update(String token, EditModuleDtoRequest moduleDtoRequest, int id)
+    public ModuleDtoResponse update(EditModuleDtoRequest moduleDtoRequest, int id)
             throws SignalAppNotFoundException, SignalAppUnauthorizedException {
-        Module module = moduleRepository.findByIdAndUserId(id, getUserByToken(token).getId())
+        Module module = moduleRepository.findByIdAndUserId(id, getUserFromContext().getId())
                 .orElseThrow(SignalAppNotFoundException::new)
                 .setName(moduleDtoRequest.getName())
                 .setContainer(moduleDtoRequest.getContainer())
@@ -70,17 +62,17 @@ public class ModuleService extends ServiceBase {
     }
 
     @Transactional
-    public void delete(String token, int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
-        if (moduleRepository.deleteByIdAndUserId(id, getUserByToken(token).getId()) == 0) {
+    public void delete(int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+        if (moduleRepository.deleteByIdAndUserId(id, getUserFromContext().getId()) == 0) {
             throw new SignalAppNotFoundException();
         }
         // todo delete files
     }
 
-    public String getFile(String token, int id, String extension) throws SignalAppNotFoundException {
+    public String getFile(int id, String extension) throws SignalAppNotFoundException {
         User user = null;
         try {
-            user = getUserByToken(token);
+            user = getUserFromContext();
         } catch (SignalAppUnauthorizedException ignored) {}
         Module module = moduleRepository.findById(id).orElseThrow(SignalAppNotFoundException::new);
         if (user == null && module.getUser() != null || user != null && module.getUser() != null
@@ -94,9 +86,9 @@ public class ModuleService extends ServiceBase {
         }
     }
 
-    public void writeFile(String token, int id, String extension, String data) throws SignalAppNotFoundException,
+    public void writeFile(int id, String extension, String data) throws SignalAppNotFoundException,
             IOException, SignalAppUnauthorizedException {
-        Module module = moduleRepository.findByIdAndUserId(id, getUserByToken(token).getId())
+        Module module = moduleRepository.findByIdAndUserId(id, getUserFromContext().getId())
                 .orElseThrow(SignalAppNotFoundException::new);
         fileManager.writeModuleToFile(module.getModule(), extension, data);
     }

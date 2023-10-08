@@ -29,38 +29,40 @@ public class UserEndpoint extends EndpointBase {
     }
 
     @DeleteMapping("/me")
-    public void deleteCurrentUser(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId) throws SignalAppUnauthorizedException {
-        userService.deleteCurrentUser(sessionId);
+    public void deleteCurrentUser() throws SignalAppUnauthorizedException {
+        userService.deleteCurrentUser();
     }
 
     @GetMapping(path = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserDtoResponse getCurrentUserInfo(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId) throws SignalAppUnauthorizedException {
-        return userService.getCurrentUserInfo(sessionId);
+    public UserDtoResponse getCurrentUserInfo() throws SignalAppUnauthorizedException {
+        return userService.getCurrentUserInfo();
     }
 
     @PutMapping(path = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserDtoResponse editCurrentUser(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                           @Valid @RequestBody EditUserDtoRequest request) throws SignalAppUnauthorizedException, SignalAppDataException {
-        return userService.editCurrentUser(sessionId, request);
+    public UserDtoResponse editCurrentUser(
+            @Valid @RequestBody EditUserDtoRequest request
+    ) throws SignalAppUnauthorizedException, SignalAppDataException {
+        return userService.editCurrentUser(request);
     }
 
     @PutMapping(path = "/me/password", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void editCurrentUserPassword(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                        @Valid @RequestBody ChangePasswordDtoRequest request)
-            throws SignalAppUnauthorizedException, SignalAppDataException {
-        userService.changePasswordCurrentUser(sessionId, request);
+    public void editCurrentUserPassword(
+            @Valid @RequestBody ChangePasswordDtoRequest request
+    ) throws SignalAppUnauthorizedException, SignalAppDataException {
+        userService.changePasswordCurrentUser(request);
     }
 
     @PostMapping("/confirm")
-    public void postMailConfirm(@CookieValue(name = JAVASESSIONID, defaultValue = "") String sessionId,
-                                @Valid @RequestBody EmailConfirmDtoRequest request)
-            throws SignalAppUnauthorizedException, MessagingException, SignalAppDataException {
-        userService.makeUserEmailConfirmation(sessionId, request);
+    public void postMailConfirm(
+            @Valid @RequestBody EmailConfirmDtoRequest request
+    ) throws SignalAppUnauthorizedException, MessagingException, SignalAppDataException {
+        userService.makeUserEmailConfirmation(request);
     }
 
     @PostMapping(path = "/restore")
-    public void restorePassword(@Valid @RequestBody RestorePasswordDtoRequest request)
-            throws MessagingException, SignalAppDataException {
+    public void restorePassword(
+            @Valid @RequestBody RestorePasswordDtoRequest request
+    ) throws MessagingException, SignalAppDataException {
         userService.restorePassword(request);
     }
 

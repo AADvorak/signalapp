@@ -16,8 +16,11 @@ import link.signalapp.repository.UserConfirmRepository;
 import link.signalapp.repository.UserRepository;
 import link.signalapp.repository.UserTokenRepository;
 import link.signalapp.security.PasswordEncoder;
+import link.signalapp.security.SignalAppUserDetails;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,7 @@ import java.util.Objects;
 import static java.util.UUID.randomUUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserService extends ServiceBase {
 
     public static final int MAX_PASSWORD_LENGTH = 72;
@@ -36,29 +40,13 @@ public class UserService extends ServiceBase {
     public static final String EMAIL_CONFIRM_ERROR = "email-confirm-error";
 
     private final UserRepository userRepository;
-
     private final UserConfirmRepository userConfirmRepository;
-
     private final MailTransport mailTransport;
-
     private final FileManager fileManager;
-
     private final RecaptchaVerifier recaptchaVerifier;
-
     private final PasswordEncoder passwordEncoder;
-
-    public UserService(UserTokenRepository userTokenRepository, ApplicationProperties applicationProperties,
-                       UserRepository userRepository, UserConfirmRepository userConfirmRepository,
-                       MailTransport mailTransport, FileManager fileManager, RecaptchaVerifier recaptchaVerifier,
-                       PasswordEncoder passwordEncoder) {
-        super(userTokenRepository, applicationProperties);
-        this.userRepository = userRepository;
-        this.userConfirmRepository = userConfirmRepository;
-        this.mailTransport = mailTransport;
-        this.fileManager = fileManager;
-        this.recaptchaVerifier = recaptchaVerifier;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final ApplicationProperties applicationProperties;
+    private final UserTokenRepository userTokenRepository;
 
     public ResponseWithToken<UserDtoResponse> register(UserDtoRequest request) throws Exception {
         if (applicationProperties.isVerifyCaptcha()) {
@@ -93,25 +81,26 @@ public class UserService extends ServiceBase {
     }
 
     @Transactional
-    public void logout(String token) throws SignalAppUnauthorizedException {
-        if (userTokenRepository.deleteByToken(token) == 0) {
+    public void logout() throws SignalAppUnauthorizedException {
+        if (userTokenRepository.deleteByToken(getTokenFromContext()) == 0) {
             throw new SignalAppUnauthorizedException();
         }
+        SecurityContextHolder.clearContext();
     }
 
     @Transactional
-    public void deleteCurrentUser(String token) throws SignalAppUnauthorizedException {
-        int userId = getUserByToken(token).getId();
-        if (userRepository.deleteByToken(token) == 0) {
+    public void deleteCurrentUser() throws SignalAppUnauthorizedException {
+        SignalAppUserDetails userDetails = getUserDetailsFromContext();
+        if (userRepository.deleteByToken(userDetails.getToken()) == 0) {
             throw new SignalAppUnauthorizedException();
         } else {
-            fileManager.deleteAllUserData(userId);
+            fileManager.deleteAllUserData(userDetails.getUser().getId());
         }
     }
 
-    public UserDtoResponse editCurrentUser(String token, EditUserDtoRequest request) throws SignalAppUnauthorizedException,
+    public UserDtoResponse editCurrentUser(EditUserDtoRequest request) throws SignalAppUnauthorizedException,
             SignalAppDataException {
-        User user = getUserByToken(token);
+        User user = getUserFromContext();
         if (!Objects.equals(user.getEmail(), request.getEmail())) {
             user.setEmailConfirmed(false);
         }
@@ -127,9 +116,9 @@ public class UserService extends ServiceBase {
         return UserMapper.INSTANCE.userToDto(user);
     }
 
-    public void changePasswordCurrentUser(String token, ChangePasswordDtoRequest request)
+    public void changePasswordCurrentUser(ChangePasswordDtoRequest request)
             throws SignalAppUnauthorizedException, SignalAppDataException {
-        User user = getUserByToken(token);
+        User user = getUserFromContext();
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_OLD_PASSWORD);
         }
@@ -137,14 +126,14 @@ public class UserService extends ServiceBase {
         userRepository.save(user);
     }
 
-    public UserDtoResponse getCurrentUserInfo(String token) throws SignalAppUnauthorizedException {
-        return UserMapper.INSTANCE.userToDto(getUserByToken(token));
+    public UserDtoResponse getCurrentUserInfo() throws SignalAppUnauthorizedException {
+        return UserMapper.INSTANCE.userToDto(getUserFromContext());
     }
 
     @Transactional(rollbackFor = MessagingException.class)
-    public void makeUserEmailConfirmation(String token, EmailConfirmDtoRequest request) throws SignalAppUnauthorizedException,
+    public void makeUserEmailConfirmation(EmailConfirmDtoRequest request) throws SignalAppUnauthorizedException,
             MessagingException, SignalAppDataException {
-        User user = getUserByToken(token);
+        User user = getUserFromContext();
         if (user.isEmailConfirmed()) {
             throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_CONFIRMED);
         }
