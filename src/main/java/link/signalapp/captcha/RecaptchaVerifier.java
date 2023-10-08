@@ -23,7 +23,7 @@ public class RecaptchaVerifier {
         ResponseEntity<Response> responseEntity = new RestTemplate().postForEntity(
                 String.format("%s?secret=%s&response=%s", params.getUrl(), params.getSecret(), token),
                 null, Response.class);
-        if (responseEntity.getStatusCodeValue() != 200) {
+        if (responseEntity.getStatusCode().value() != 200) {
             throw new Exception("Recaptcha server response error");
         }
         if (!responseEntity.hasBody() || responseEntity.getBody() == null) {

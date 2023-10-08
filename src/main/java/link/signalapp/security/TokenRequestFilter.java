@@ -1,7 +1,6 @@
 package link.signalapp.security;
 
 import jakarta.servlet.http.Cookie;
-import link.signalapp.error.SignalAppUnauthorizedException;
 import link.signalapp.model.User;
 import link.signalapp.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
@@ -29,29 +28,39 @@ public class TokenRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         try {
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                final String requestToken = Arrays.stream(request.getCookies())
-                        .filter(cookie -> "JAVASESSIONID".equals(cookie.getName())).findAny()
-                        .orElseThrow().getValue();
-                User user = userTokenService.getUserByToken(requestToken);
-                if (null != user && null == SecurityContextHolder.getContext().getAuthentication()) {
-                    UserDetails userDetails = new SignalAppUserDetails(user).setToken(requestToken);
-                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
-                    usernamePasswordAuthenticationToken
-                            .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext()
-                            .setAuthentication(usernamePasswordAuthenticationToken);
-                }
-            }
-        } catch (SignalAppUnauthorizedException e) {
-            logger.error("Unauthorized");
+            tryToAuthorizeUser(request);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
         chain.doFilter(request, response);
+    }
+
+    private void tryToAuthorizeUser(HttpServletRequest request) {
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            return;
+        }
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return;
+        }
+        final String requestToken = Arrays.stream(cookies)
+                .filter(cookie -> "JAVASESSIONID".equals(cookie.getName())).findAny()
+                .map(Cookie::getValue).orElse(null);
+        if (requestToken == null) {
+            return;
+        }
+        User user = userTokenService.getUserByToken(requestToken);
+        if (user == null) {
+            return;
+        }
+        UserDetails userDetails = new SignalAppUserDetails(user).setToken(requestToken);
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+        usernamePasswordAuthenticationToken
+                .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext()
+                .setAuthentication(usernamePasswordAuthenticationToken);
     }
 
 }
