@@ -43,7 +43,7 @@ public class TokenRequestFilter extends OncePerRequestFilter {
         if (cookies == null) {
             return;
         }
-        final String requestToken = Arrays.stream(cookies)
+        String requestToken = Arrays.stream(cookies)
                 .filter(cookie -> "JAVASESSIONID".equals(cookie.getName())).findAny()
                 .map(Cookie::getValue).orElse(null);
         if (requestToken == null) {
