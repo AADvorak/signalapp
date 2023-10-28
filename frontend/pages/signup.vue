@@ -69,7 +69,7 @@ export default {
       }
       await this.loadWithFlag(async () => {
         const token = await this.recaptcha()
-        let response = await ApiProvider.postJson('/api/users/', {...this.formValues, token})
+        const response = await ApiProvider.postJson('/api/users', {...this.formValues, token})
         if (response.ok) {
           dataStore().setUserInfo(response.data)
           let waitingForAuthorization = dataStore().getWaitingForAuthorization

@@ -163,7 +163,7 @@ export default {
       const route = useRoute()
       this.signalId = route.params.id
       this.historyKey = route.query.history
-      let signal = dataStore().getSignalFromHistory(this.signalId, this.historyKey)
+      const signal = dataStore().getSignalFromHistory(this.signalId, this.historyKey)
       if (signal) {
         this.signal = signal
       } else if (!isNaN(this.signalId) && this.signalId !== '0' && (!this.historyKey || this.historyKey === '0')) {
@@ -175,15 +175,15 @@ export default {
       }
     },
     async loadSignal() {
-      let response = await this.getApiProvider().get('/api/signals/' + this.signalId)
+      const response = await this.getApiProvider().get(`/api/signals/${this.signalId}`)
       if (response.ok) {
-        let signal = response.data
+        const signal = response.data
         SignalUtils.calculateSignalParams(signal)
         const historyKey = dataStore().addSignalToHistory(signal)
         if (this.historyKey === '0') {
           this.signal = signal
         } else {
-          useRouter().push(`/signal/${this.signalId}?history=${historyKey}`)
+          await useRouter().push(`/signal/${this.signalId}?history=${historyKey}`)
         }
       } else if (response.status === 404) {
         this.signalNotFound()
@@ -196,14 +196,12 @@ export default {
     async saveSignal() {
       this.clearValidation()
       await this.loadWithOverlay(async () => {
-        let response
-        if (this.signalIsSaved) {
-          response = await this.getApiProvider().putJson('/api/signals/' + this.signal.id, this.signal)
-        } else {
-          response = await this.getApiProvider().postJson('/api/signals/', this.signal)
-        }
+        const response = this.signalIsSaved
+            ? await this.getApiProvider().putJson(`/api/signals/${this.signalId}`, this.signal)
+            : await this.getApiProvider().postJson('/api/signals', this.signal)
         if (response.ok) {
-          useRouter().push('/signal-manager')
+          // todo remove signal from history
+          await useRouter().push('/signal-manager')
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
           for (let error of response.errors) {
