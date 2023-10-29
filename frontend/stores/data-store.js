@@ -135,6 +135,13 @@ export const dataStore = defineStore('dataStore', {
       this.signalHistory[signalId][historyKey] = JSON.stringify(signal)
       return historyKey
     },
+    updateSignalInHistory(signal, historyKey) {
+      if (!historyKey) {
+        return
+      }
+      const signalId = String(signal.id || 0)
+      this.signalHistory[signalId][historyKey] = JSON.stringify(signal)
+    },
     getSignalFromHistory(signalId, historyKey) {
       const value = this.signalHistory[signalId]?.[parseInt(historyKey)]
       if (value) {

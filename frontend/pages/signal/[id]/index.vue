@@ -200,7 +200,7 @@ export default {
             ? await this.getApiProvider().putJson(`/api/signals/${this.signalId}`, this.signal)
             : await this.getApiProvider().postJson('/api/signals', this.signal)
         if (response.ok) {
-          // todo remove signal from history
+          dataStore().updateSignalInHistory(this.signal, this.historyKey)
           await useRouter().push('/signal-manager')
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
