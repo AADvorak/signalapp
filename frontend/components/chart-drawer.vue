@@ -24,7 +24,7 @@ export default {
     }
   },
   data: () => ({
-    darkMode: dataStore().getDarkMode,
+    darkMode: dataStore().darkMode,
     chartOptions: {
       chart: {
         zoomType: 'xy',

@@ -103,7 +103,7 @@ export default {
   }),
   computed: {
     recordedAudio() {
-      return dataStore().getRecordedAudio
+      return dataStore().recordedAudio
     },
     recordedInfo() {
       if (!this.recordedAudio) {

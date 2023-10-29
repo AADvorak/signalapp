@@ -54,7 +54,7 @@
 import {mdiFilterOff} from "@mdi/js";
 import ComponentBase from "./component-base";
 import formValuesSaving from "../mixins/form-values-saving";
-import {dataStore} from "~/stores/data-store";
+import {moduleStore} from "~/stores/module-store";
 import BtnWithTooltip from "~/components/btn-with-tooltip.vue";
 
 const TRANSFORMER_TYPES = ['amplifier', 'modulator', 'filter', 'oscillator', 'math']
@@ -82,7 +82,7 @@ export default {
   }),
   computed: {
     transformers() {
-      return this.double ? dataStore().getDoubleTransformers : dataStore().getTransformers
+      return this.double ? moduleStore().doubleTransformers : moduleStore().transformers
     },
     filteredTransformers() {
       return this.transformers.filter(transformer => {

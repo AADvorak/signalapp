@@ -57,7 +57,7 @@ export default {
   }),
   computed: {
     waitingForAuthorization() {
-      return dataStore().getWaitingForAuthorization
+      return dataStore().waitingForAuthorization
     },
     userInfo() {
       return dataStore().userInfo

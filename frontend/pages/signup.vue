@@ -72,7 +72,7 @@ export default {
         const response = await ApiProvider.postJson('/api/users', {...this.formValues, token})
         if (response.ok) {
           dataStore().setUserInfo(response.data)
-          let waitingForAuthorization = dataStore().getWaitingForAuthorization
+          const waitingForAuthorization = dataStore().waitingForAuthorization
           await useRouter().push(waitingForAuthorization ? waitingForAuthorization : '/')
           waitingForAuthorization && dataStore().clearWaitingForAuthorization()
         } else if (response.status === 400) {

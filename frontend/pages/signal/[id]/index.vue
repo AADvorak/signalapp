@@ -220,7 +220,7 @@ export default {
       this.showMessage({
         text: this._t('signalNotFound'),
         onHide: () => {
-          useRouter().push(dataStore().getUserInfo ? '/signal-manager' : '/signal-generator')
+          useRouter().push(dataStore().isSignedIn ? '/signal-manager' : '/signal-generator')
         }
       })
     },

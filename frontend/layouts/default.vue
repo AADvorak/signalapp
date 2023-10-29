@@ -97,6 +97,7 @@
 <script>
 
 import {dataStore} from "~/stores/data-store";
+import {moduleStore} from "~/stores/module-store";
 import ApiProvider from "../api/api-provider";
 import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
@@ -117,12 +118,12 @@ export default {
         sineWave: mdiSineWave,
         server: mdiServer
       },
-      darkMode: dataStore().getDarkMode,
+      darkMode: dataStore().darkMode,
       header: '',
       showMainMenu: false,
       isMobile: DeviceUtils.isMobile(),
       locales: {en, ru, pl},
-      numberInputType: dataStore().getNumberInputType
+      numberInputType: dataStore().numberInputType
     }
   },
   computed: {
@@ -139,7 +140,7 @@ export default {
       return dataStore().isSignedIn
     },
     modulesForMenu() {
-      return dataStore().getModulesForMenu
+      return moduleStore().modulesForMenu
     },
     mainMenuCols() {
       return this.isMobile ? 12 : 3
@@ -221,7 +222,7 @@ export default {
         this.header = this._t('startPage')
         return
       }
-      for (let module of dataStore().getAllModules) {
+      for (let module of moduleStore().modules) {
         if (routeName.startsWith(module.code.toLowerCase())) {
           this.header = this.$t(`${module.code}.name`)
           break
