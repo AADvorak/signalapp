@@ -2,9 +2,7 @@ package link.signalapp.service;
 
 import link.signalapp.ApplicationProperties;
 import link.signalapp.captcha.RecaptchaVerifier;
-import link.signalapp.dto.request.EditUserDtoRequest;
-import link.signalapp.dto.request.LoginDtoRequest;
-import link.signalapp.dto.request.UserDtoRequest;
+import link.signalapp.dto.request.*;
 import link.signalapp.dto.response.ResponseWithToken;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.error.SignalAppDataErrorCode;
@@ -13,6 +11,7 @@ import link.signalapp.error.SignalAppUnauthorizedException;
 import link.signalapp.file.FileManager;
 import link.signalapp.mail.MailTransport;
 import link.signalapp.model.User;
+import link.signalapp.model.UserConfirm;
 import link.signalapp.model.UserToken;
 import link.signalapp.repository.UserConfirmRepository;
 import link.signalapp.repository.UserRepository;
@@ -28,8 +27,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.mail.MessagingException;
+
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -66,9 +68,17 @@ public class UserServiceTest {
     @Captor
     private ArgumentCaptor<UserToken> userTokenCaptor;
     @Captor
+    private ArgumentCaptor<UserConfirm> userConfirmCaptor;
+    @Captor
     private ArgumentCaptor<String> rawPasswordCaptor;
     @Captor
     private ArgumentCaptor<Integer> idCaptor;
+    @Captor
+    private ArgumentCaptor<String> emailCaptor;
+    @Captor
+    private ArgumentCaptor<String> subjectCaptor;
+    @Captor
+    private ArgumentCaptor<String> bodyCaptor;
 
     @Test
     public void registerOk() throws Exception {
@@ -273,6 +283,90 @@ public class UserServiceTest {
         assertEquals(SignalAppDataErrorCode.EMAIL_ALREADY_EXISTS, exc.getErrorCode());
     }
 
+    @Test
+    public void changePasswordCurrentUserOk() {
+        User user = data.userWithConfirmedEmail();
+        String token = createToken();
+        fillSecurityContextHolder(user, token);
+        ChangePasswordDtoRequest request = data.changePasswordDtoRequest();
+        assertDoesNotThrow(() -> userService.changePasswordCurrentUser(request));
+        verify(userRepository).save(userCaptor.capture());
+        User capturedUser = userCaptor.getValue();
+        assertAll(
+                () -> assertTrue(passwordEncoder.matches(request.getPassword(), capturedUser.getPassword())),
+                () -> assertEquals(user.getId(), capturedUser.getId()),
+                () -> assertEquals(user.getEmail(), capturedUser.getEmail()),
+                () -> assertEquals(user.getFirstName(), capturedUser.getFirstName()),
+                () -> assertEquals(user.getLastName(), capturedUser.getLastName()),
+                () -> assertEquals(user.getPatronymic(), capturedUser.getPatronymic())
+        );
+    }
+
+    @Test
+    public void changePasswordCurrentUserWrongOldPasswordException() {
+        User user = data.userWithConfirmedEmail();
+        String token = createToken();
+        fillSecurityContextHolder(user, token);
+        ChangePasswordDtoRequest request = data.changePasswordDtoRequest()
+                .setOldPassword(user.getPassword() + "_");
+        SignalAppDataException exc = assertThrows(SignalAppDataException.class,
+                () -> userService.changePasswordCurrentUser(request));
+        assertEquals(SignalAppDataErrorCode.WRONG_OLD_PASSWORD, exc.getErrorCode());
+    }
+
+    @Test
+    public void changePasswordCurrentUserUnauthorizedException() {
+        ChangePasswordDtoRequest request = data.changePasswordDtoRequest();
+        fillSecurityContextHolder();
+        assertThrows(SignalAppUnauthorizedException.class,
+                () -> userService.changePasswordCurrentUser(request));
+    }
+
+    @Test
+    public void getCurrentUserInfoOk() throws SignalAppUnauthorizedException {
+        User user = data.userWithConfirmedEmail();
+        String token = createToken();
+        fillSecurityContextHolder(user, token);
+        UserDtoResponse response = userService.getCurrentUserInfo();
+        assertAll(
+                () -> assertEquals(user.getId(), response.getId()),
+                () -> assertEquals(user.getEmail(), response.getEmail()),
+                () -> assertEquals(user.getFirstName(), response.getFirstName()),
+                () -> assertEquals(user.getLastName(), response.getLastName()),
+                () -> assertEquals(user.getPatronymic(), response.getPatronymic()),
+                () -> assertEquals(user.isEmailConfirmed(), response.isEmailConfirmed())
+        );
+    }
+
+    @Test
+    public void getCurrentUserInfoUnauthorizedException() {
+        fillSecurityContextHolder();
+        assertThrows(SignalAppUnauthorizedException.class,
+                () -> userService.getCurrentUserInfo());
+    }
+
+    @Test
+    public void makeUserEmailConfirmationOk() throws MessagingException {
+        User user = data.userWithUnconfirmedEmail();
+        String token = createToken();
+        fillSecurityContextHolder(user, token);
+        EmailConfirmDtoRequest request = data.emailConfirmDtoRequest();
+        assertDoesNotThrow(() -> userService.makeUserEmailConfirmation(request));
+        verify(userConfirmRepository).save(userConfirmCaptor.capture());
+        verify(mailTransport).send(emailCaptor.capture(), subjectCaptor.capture(), bodyCaptor.capture());
+        UserConfirm capturedUserConfirm = userConfirmCaptor.getValue();
+        String capturedEmail = emailCaptor.getValue();
+        String capturedSubject = subjectCaptor.getValue();
+        String capturedBody = bodyCaptor.getValue();
+        assertAll(
+                () -> assertEquals(user.getId(), capturedUserConfirm.getId().getUser().getId()),
+                () -> assertEquals(user.getEmail(), capturedEmail),
+                () -> assertEquals(request.getLocaleTitle(), capturedSubject),
+                () -> assertTrue(capturedBody.contains(capturedUserConfirm.getCode()))
+        );
+        // todo more assertions
+    }
+
     private void prepareThrowRecaptchaTokenNotVerifiedException() throws Exception {
         doThrow(new SignalAppDataException(SignalAppDataErrorCode.RECAPTCHA_TOKEN_NOT_VERIFIED))
                 .when(recaptchaVerifier).verify(any(String.class));
@@ -332,6 +426,19 @@ public class UserServiceTest {
                     .setFirstName(user.getFirstName() + modifier)
                     .setLastName(user.getLastName() + modifier)
                     .setPatronymic(user.getPatronymic() + modifier);
+        }
+
+        private ChangePasswordDtoRequest changePasswordDtoRequest() {
+            return new ChangePasswordDtoRequest()
+                    .setPassword(PASSWORD + "1")
+                    .setOldPassword(PASSWORD);
+        }
+
+        private EmailConfirmDtoRequest emailConfirmDtoRequest() {
+            return new EmailConfirmDtoRequest()
+                    .setOrigin("origin")
+                    .setLocaleTitle("SignalApp - confirm email")
+                    .setLocaleMsg("To confirm you email use the link $origin$/api/users/confirm/$code$");
         }
 
         private User user() {
