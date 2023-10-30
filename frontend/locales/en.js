@@ -46,7 +46,8 @@ const en = {
       error: 'Error',
       wrongSignalSamplesNumber: 'Number of imported signal samples must be not greater than {maxSamplesNumber}. In selected file it is {samplesNumber}',
       noFolders: 'You have no folders',
-      noData: 'No data'
+      noData: 'No data',
+      alreadySignedIn: 'Already signed in'
     },
     fields: {
       name: 'Name',
@@ -195,7 +196,6 @@ const en = {
     signInToContinue: 'Please sign in to continue',
     forgotPassword: 'Forgot password',
     signInError: 'Error while sign in',
-    alreadySignedIn: 'Already signed in'
   },
   'signup': {
     name: 'Sign up',

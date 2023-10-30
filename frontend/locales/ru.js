@@ -46,7 +46,8 @@ const ru = {
       error: 'Ошибка',
       wrongSignalSamplesNumber: 'Количество отсчетов импортируемого сигнала должно быть не более {maxSamplesNumber}. В выбранном файле оно равно {samplesNumber}',
       noFolders: 'У вас нет папок',
-      noData: 'Нет данных'
+      noData: 'Нет данных',
+      alreadySignedIn: 'Вход уже выполнен'
     },
     fields: {
       name: 'Имя',
@@ -195,7 +196,6 @@ const ru = {
     signInToContinue: 'Пожалуйста, войдите для продолжения',
     forgotPassword: 'Не помню пароль',
     signInError: 'Ошибка при входе',
-    alreadySignedIn: 'Вход уже выполнен'
   },
   'signup': {
     name: 'Регистрация',

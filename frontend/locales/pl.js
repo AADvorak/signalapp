@@ -46,7 +46,8 @@ const pl = {
       error: 'Błąd',
       wrongSignalSamplesNumber: 'Liczba próbek importowanego sygnału nie może być większa niż {maxSamplesNumber}. W wybranym pliku wynosi {samplesNumber}',
       noFolders: 'Nie masz folderów',
-      noData: 'Nie ma danych'
+      noData: 'Nie ma danych',
+      alreadySignedIn: 'Już jesteś zalogowany(a)'
     },
     fields: {
       name: 'Nazwa',
@@ -195,7 +196,6 @@ const pl = {
     signInToContinue: 'Aby kontynuować, zaloguj się',
     forgotPassword: 'Zapomniałeś hasła',
     signInError: 'Błąd podczas logowania',
-    alreadySignedIn: 'Już jesteś zalogowany(a)'
   },
   'signup': {
     name: 'Rejestracja',

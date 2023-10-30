@@ -37,7 +37,7 @@ export const dataStore = defineStore('dataStore', {
       }
       return userInfo.email
     },
-    isSignedIn: state => state.userInfo?.id,
+    isSignedIn: state => !!state.userInfo?.id,
   },
   actions: {
     setUserInfo(userInfo) {
