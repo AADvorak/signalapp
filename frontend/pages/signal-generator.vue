@@ -1,48 +1,42 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%" min-width="400" max-width="800">
-        <v-card-title>
-          {{ _t('generate') }}
-        </v-card-title>
-        <v-card-text>
-          <v-form @submit.prevent>
-            <number-input
-                v-for="numberInput in numberInputs"
-                ref="inputRefs"
-                :field="numberInput"
-                :parent-name="$options.name"
-                :field-obj="form[numberInput]"
-                @update="v => form[numberInput].value = v"/>
-            <v-select
-                v-model="form.form.value"
-                item-title="name"
-                item-value="code"
-                :items="signalForms"
-                :label="_t('form')"/>
-            <div class="d-flex">
-              <v-btn type="submit" color="primary" :disabled="!signal" @click="generateAndOpenSignal">
-                {{ _t('generate') }}
-              </v-btn>
-              <v-btn
-                  color="secondary"
-                  @click="preview = !preview"
-              >
-                {{ _t('preview') }}
-                <v-icon>
-                  {{ preview ? mdiEye : mdiEyeOff }}
-                </v-icon>
-              </v-btn>
-            </div>
-          </v-form>
-          <chart-drawer class="mt-4" v-if="preview && signal" :signals="signal ? [signal] : []" :minimal="true"/>
-        </v-card-text>
-        <signal-importer @signal="s => saveSignalToHistoryAndOpen(s)"/>
-      </v-card>
-    </div>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
-    <loading-overlay :show="loadingOverlay"/>
-  </NuxtLayout>
+  <card-with-layout :message="message" :loading-overlay="loadingOverlay">
+    <v-card-title>
+      {{ _t('generate') }}
+    </v-card-title>
+    <v-card-text>
+      <v-form @submit.prevent>
+        <number-input
+            v-for="numberInput in numberInputs"
+            ref="inputRefs"
+            :field="numberInput"
+            :parent-name="$options.name"
+            :field-obj="form[numberInput]"
+            @update="v => form[numberInput].value = v"/>
+        <v-select
+            v-model="form.form.value"
+            item-title="name"
+            item-value="code"
+            :items="signalForms"
+            :label="_t('form')"/>
+        <div class="d-flex">
+          <v-btn type="submit" color="primary" :disabled="!signal" @click="generateAndOpenSignal">
+            {{ _t('generate') }}
+          </v-btn>
+          <v-btn
+              color="secondary"
+              @click="preview = !preview"
+          >
+            {{ _t('preview') }}
+            <v-icon>
+              {{ preview ? mdiEye : mdiEyeOff }}
+            </v-icon>
+          </v-btn>
+        </div>
+      </v-form>
+      <chart-drawer class="mt-4" v-if="preview && signal" :signals="signal ? [signal] : []" minimal/>
+    </v-card-text>
+    <signal-importer @signal="s => saveSignalToHistoryAndOpen(s)"/>
+  </card-with-layout>
 </template>
 
 <script>
@@ -51,11 +45,8 @@ import formValuesSaving from "../mixins/form-values-saving";
 import formNumberValues from "../mixins/form-number-values";
 import PageBase from "../components/page-base";
 import SignalUtils from "../utils/signal-utils";
-import ChartDrawer from "../components/chart-drawer";
 import {mdiEye, mdiEyeOff} from "@mdi/js";
-import NumberInput from "../components/number-input";
 import actionWithTimeout from "../mixins/action-with-timeout";
-import SignalImporter from "../components/signal-importer";
 import SignalActions from "../mixins/signal-actions";
 
 const PREVIEW_KEY = 'SignalGeneratorPreview'
@@ -98,7 +89,6 @@ const VALIDATION_FUNCTIONS = {
 
 export default {
   name: "signal-generator",
-  components: {SignalImporter, NumberInput, ChartDrawer},
   extends: PageBase,
   mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout, SignalActions],
   data: () => ({

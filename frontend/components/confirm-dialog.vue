@@ -30,11 +30,17 @@ export default {
   name: "confirm-dialog",
   extends: ComponentBase,
   props: {
-    opened: Boolean,
-    text: String,
+    opened: {
+      type: Boolean,
+      default: false
+    },
+    text: {
+      type: String,
+      default: ''
+    },
     okColor: {
       type: String,
-      default: 'success'
+      default: 'error'
     }
   },
   emits: ['ok', 'cancel'],

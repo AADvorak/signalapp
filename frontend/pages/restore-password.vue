@@ -1,39 +1,31 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%" min-width="400" max-width="800">
-        <v-card-text>
-          <v-form @submit.prevent>
-            <text-input
-                v-for="field in formFields"
-                :field="field"
-                :field-obj="form[field]"
-                @update="v => form[field].value = v"/>
-            <div class="d-flex">
-              <v-btn type="submit" color="primary" :loading="restorePasswordRequestSent" @click="restorePasswordRequest">
-                {{ _t('name') }}
-              </v-btn>
-            </div>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </div>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
-  </NuxtLayout>
+  <card-with-layout :message="message">
+    <v-card-text>
+      <v-form @submit.prevent>
+        <text-input
+            v-for="field in formFields"
+            :field="field"
+            :field-obj="form[field]"
+            @update="v => form[field].value = v"/>
+        <div class="d-flex">
+          <v-btn type="submit" color="primary" :loading="restorePasswordRequestSent" @click="restorePasswordRequest">
+            {{ _t('name') }}
+          </v-btn>
+        </div>
+      </v-form>
+    </v-card-text>
+  </card-with-layout>
 </template>
 
 <script>
-
 import formValidation from "../mixins/form-validation";
-import {dataStore} from "../stores/data-store";
+import {dataStore} from "~/stores/data-store";
 import ApiProvider from "../api/api-provider";
 import PageBase from "../components/page-base";
 import formValues from "../mixins/form-values";
-import TextInput from "../components/text-input";
 
 export default {
   name: "restore-password",
-  components: {TextInput},
   extends: PageBase,
   mixins: [formValidation, formValues],
   data: () => ({

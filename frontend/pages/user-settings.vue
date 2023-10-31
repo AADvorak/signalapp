@@ -1,45 +1,37 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%" min-width="400" max-width="800">
-        <v-card-text>
-          <div v-if="!emailConfirmed && !confirmEmailSent" class="mb-5">
-            <p style="color: #CF6679">{{ _t('emailNotConfirmed') }}</p>
-            <v-btn color="primary" :loading="confirmEmailRequestSent" @click="sendConfirmEmailRequest">
-              {{ _t('confirm') }}
-            </v-btn>
-          </div>
-          <div v-if="emailConfirmed" class="mb-5">
-            <p style="color: #4CAF50">{{ _t('emailConfirmed') }}</p>
-          </div>
-          <v-form @submit.prevent>
-            <text-input
-                v-for="field in filteredFormFields"
-                ref="inputRefs"
-                :field="field"
-                :field-obj="form[field]"
-                @update="v => form[field].value = v"/>
-            <div class="d-flex flex-wrap">
-              <v-btn type="submit" color="success" :loading="saveRequestSent" @click="save">
-                {{ _tc('buttons.save') }}
-              </v-btn>
-              <v-btn color="secondary" to="/change-password">
-                {{ _tc('buttons.changePassword') }}
-              </v-btn>
-              <v-btn color="error" @click="askConfirmDeleteAccount">
-                {{ _t('deleteAccount') }}
-                <v-icon>{{ mdiDelete }}</v-icon>
-              </v-btn>
-            </div>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </div>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
-    <confirm-dialog :opened="confirm.opened" :text="confirm.text" ok-color="error"
-                    @ok="confirm.ok" @cancel="confirm.cancel"/>
-    <loading-overlay :show="loadingOverlay"/>
-  </NuxtLayout>
+  <card-with-layout :message="message" :confirm="confirm" :loading-overlay="loadingOverlay">
+    <v-card-text>
+      <div v-if="!emailConfirmed && !confirmEmailSent" class="mb-5">
+        <p style="color: #CF6679">{{ _t('emailNotConfirmed') }}</p>
+        <v-btn color="primary" :loading="confirmEmailRequestSent" @click="sendConfirmEmailRequest">
+          {{ _t('confirm') }}
+        </v-btn>
+      </div>
+      <div v-if="emailConfirmed" class="mb-5">
+        <p style="color: #4CAF50">{{ _t('emailConfirmed') }}</p>
+      </div>
+      <v-form @submit.prevent>
+        <text-input
+            v-for="field in filteredFormFields"
+            ref="inputRefs"
+            :field="field"
+            :field-obj="form[field]"
+            @update="v => form[field].value = v"/>
+        <div class="d-flex flex-wrap">
+          <v-btn type="submit" color="success" :loading="saveRequestSent" @click="save">
+            {{ _tc('buttons.save') }}
+          </v-btn>
+          <v-btn color="secondary" to="/change-password">
+            {{ _tc('buttons.changePassword') }}
+          </v-btn>
+          <v-btn color="error" @click="askConfirmDeleteAccount">
+            {{ _t('deleteAccount') }}
+            <v-icon>{{ mdiDelete }}</v-icon>
+          </v-btn>
+        </div>
+      </v-form>
+    </v-card-text>
+  </card-with-layout>
 </template>
 
 <script>
@@ -47,7 +39,6 @@ import {mdiDelete} from "@mdi/js";
 import PageBase from "../components/page-base";
 import formValidation from "../mixins/form-validation";
 import {dataStore} from "~/stores/data-store";
-import TextInput from "../components/text-input";
 import formValues from "../mixins/form-values";
 import filterPatronymicField from "../mixins/filter-patronymic-field";
 
@@ -55,7 +46,6 @@ const ME_URL = '/api/users/me'
 
 export default {
   name: "user-settings",
-  components: {TextInput},
   extends: PageBase,
   mixins: [formValidation, formValues, filterPatronymicField],
   data: () => ({

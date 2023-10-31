@@ -1,39 +1,33 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%" min-width="400" max-width="800">
-        <v-card-text>
-          <p v-if="$options.name === 'signin' && waitingForAuthorization" class="mb-5">{{ _t('signInToContinue') }}</p>
-          <v-form @submit.prevent>
-            <text-input
-                v-for="field in formFields"
-                ref="inputRefs"
-                :field="field"
-                :field-obj="form[field]"
-                :show-password="showPassword"
-                @update="v => form[field].value = v"
-                @show="switchShowPassword"/>
-            <div class="d-flex flex-wrap">
-              <v-btn
-                  v-for="buttonConfig in buttonsConfig"
-                  :type="buttonConfig.isSubmit ? 'submit' : ''"
-                  :color="buttonConfig.color"
-                  :loading="buttonConfig.isSubmit && requestSent"
-                  @click="onClick(buttonConfig.key)"
-              >
-                {{ getButtonText(buttonConfig.text) }}
-              </v-btn>
-            </div>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </div>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
-  </NuxtLayout>
+  <card-with-layout :message="message">
+    <v-card-text>
+      <p v-if="$options.name === 'signin' && waitingForAuthorization" class="mb-5">{{ _t('signInToContinue') }}</p>
+      <v-form @submit.prevent>
+        <text-input
+            v-for="field in formFields"
+            ref="inputRefs"
+            :field="field"
+            :field-obj="form[field]"
+            :show-password="showPassword"
+            @update="v => form[field].value = v"
+            @show="switchShowPassword"/>
+        <div class="d-flex flex-wrap">
+          <v-btn
+              v-for="buttonConfig in buttonsConfig"
+              :type="buttonConfig.isSubmit ? 'submit' : ''"
+              :color="buttonConfig.color"
+              :loading="buttonConfig.isSubmit && requestSent"
+              @click="onClick(buttonConfig.key)"
+          >
+            {{ getButtonText(buttonConfig.text) }}
+          </v-btn>
+        </div>
+      </v-form>
+    </v-card-text>
+  </card-with-layout>
 </template>
 
 <script>
-import TextInput from "~/components/text-input.vue";
 import PageBase from "~/components/page-base.vue";
 import formValidation from "~/mixins/form-validation";
 import formValues from "~/mixins/form-values";
@@ -44,7 +38,6 @@ import ApiProvider from "~/api/api-provider";
 
 export default {
   name: 'sign-page-base',
-  components: {TextInput},
   extends: PageBase,
   mixins: [formValidation, formValues, showPassword, recaptcha],
   data: () => ({

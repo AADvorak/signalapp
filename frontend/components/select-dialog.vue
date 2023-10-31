@@ -30,8 +30,14 @@ export default {
   name: "select-dialog",
   extends: ComponentBase,
   props: {
-    opened: Boolean,
-    text: String,
+    opened: {
+      type: Boolean,
+      default: false
+    },
+    text: {
+      type: String,
+      default: ''
+    },
     items: {
       type: Array,
       required: true

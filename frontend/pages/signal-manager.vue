@@ -1,194 +1,183 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%">
-        <v-card-text>
-          <fixed-width-wrapper>
-            <p>
-              {{ _t('total', {pages, elements}) }}
+  <card-with-layout full-width :confirm="confirm" :loading-overlay="loadingOverlay">
+    <template #default>
+      <v-card-text>
+        <fixed-width-wrapper>
+          <p>
+            {{ _t('total', {pages, elements}) }}
+          </p>
+          <v-expansion-panels v-model="uiParams.openedPanels">
+            <v-expansion-panel value="loadParams">
+              <v-expansion-panel-title>
+                {{ _t('loadParams') }}
+                <btn-with-tooltip
+                    :disabled="filterIsEmpty"
+                    tooltip="clear"
+                    @click="clearFilter"
+                >
+                  <v-icon>
+                    {{ mdi.mdiFilterOff }}
+                  </v-icon>
+                </btn-with-tooltip>
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <v-form class="mt-5">
+                  <div class="d-flex justify-center flex-wrap">
+                    <number-input
+                        class="param-input"
+                        field="pageSize"
+                        :label="_t('pageSize')"
+                        :field-obj="form.pageSize"
+                        @update="v => form.pageSize.value = v"/>
+                    <text-input
+                        class="param-input"
+                        field="search"
+                        :field-obj="form.search"
+                        @update="v => form.search.value = v"/>
+                    <v-select
+                        class="param-input"
+                        v-model="form.sampleRates.value"
+                        item-title="reduced"
+                        item-value="value"
+                        :items="sampleRates"
+                        :label="_t('sampleRates')"
+                        multiple
+                    >
+                      <template v-slot:no-data>
+                        {{ _tc('messages.noData') }}
+                      </template>
+                    </v-select>
+                    <v-select
+                        class="param-input"
+                        v-model="form.folderIds.value"
+                        item-title="name"
+                        item-value="id"
+                        :items="folders"
+                        :label="_t('folders')"
+                        multiple
+                    >
+                      <template v-slot:append-inner>
+                        <btn-with-tooltip
+                            :tooltip="folders.length ? 'edit' : 'create'"
+                            :small="false"
+                            @click="openFolderManager"
+                        >
+                          <v-icon style="width: 22px; height: 22px;">
+                            {{ folders.length ? mdi.mdiFolderEdit : mdi.mdiFolderPlus }}
+                          </v-icon>
+                        </btn-with-tooltip>
+                      </template>
+                      <template v-slot:no-data>
+                        {{ _tc('messages.noFolders') }}
+                      </template>
+                    </v-select>
+                  </div>
+                </v-form>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </fixed-width-wrapper>
+        <fixed-width-wrapper v-if="signalsEmpty && !loadingOverlay">
+          <h3 v-if="filterIsEmpty" style="text-align: center;">{{ _t('youHaveNoStoredSignals') }}.
+            <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
+            <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
+          <h3 v-else style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
+        </fixed-width-wrapper>
+        <div v-else>
+          <table-or-list
+              data-name="signals"
+              caption="name"
+              :select="true"
+              :items="signals"
+              :columns="tableOrListConfig.columns"
+              :buttons="tableOrListConfig.buttons"
+              :sort-cols="['name', 'description', 'sampleRate']"
+              :sort-prop="{by: this.sortBy, dir: this.sortDir}"
+              @click="onTableButtonClick"
+              @change="onTableChange"
+              @select="onTableSelect"
+              @sort="onTableSort"/>
+        </div>
+        <fixed-width-wrapper>
+          <v-pagination
+              v-model="page"
+              :length="pages"/>
+          <div class="d-flex justify-center flex-wrap">
+            <p class="mt-5">
+              {{ _t('actionsWithSelectedSignals') }}
             </p>
-            <v-expansion-panels v-model="uiParams.openedPanels">
-              <v-expansion-panel value="loadParams">
-                <v-expansion-panel-title>
-                  {{ _t('loadParams') }}
-                  <btn-with-tooltip
-                      :disabled="filterIsEmpty"
-                      tooltip="clear"
-                      @click="clearFilter"
-                  >
-                    <v-icon>
-                      {{ mdi.mdiFilterOff }}
-                    </v-icon>
-                  </btn-with-tooltip>
-                </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                  <v-form class="mt-5">
-                    <div class="d-flex justify-center flex-wrap">
-                      <number-input
-                          class="param-input"
-                          field="pageSize"
-                          :label="_t('pageSize')"
-                          :field-obj="form.pageSize"
-                          @update="v => form.pageSize.value = v"/>
-                      <text-input
-                          class="param-input"
-                          field="search"
-                          :field-obj="form.search"
-                          @update="v => form.search.value = v"/>
-                      <v-select
-                          class="param-input"
-                          v-model="form.sampleRates.value"
-                          item-title="reduced"
-                          item-value="value"
-                          :items="sampleRates"
-                          :label="_t('sampleRates')"
-                          multiple
-                      >
-                        <template v-slot:no-data>
-                          {{ _tc('messages.noData') }}
-                        </template>
-                      </v-select>
-                      <v-select
-                          class="param-input"
-                          v-model="form.folderIds.value"
-                          item-title="name"
-                          item-value="id"
-                          :items="folders"
-                          :label="_t('folders')"
-                          multiple
-                      >
-                        <template v-slot:append-inner>
-                          <btn-with-tooltip
-                              :tooltip="folders.length ? 'edit' : 'create'"
-                              :small="false"
-                              @click="openFolderManager"
-                          >
-                            <v-icon style="width: 22px; height: 22px;">
-                              {{ folders.length ? mdi.mdiFolderEdit : mdi.mdiFolderPlus }}
-                            </v-icon>
-                          </btn-with-tooltip>
-                        </template>
-                        <template v-slot:no-data>
-                          {{ _tc('messages.noFolders') }}
-                        </template>
-                      </v-select>
-                    </div>
-                  </v-form>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </fixed-width-wrapper>
-          <fixed-width-wrapper v-if="signalsEmpty && !loadingOverlay">
-            <h3 v-if="filterIsEmpty" style="text-align: center;">{{ _t('youHaveNoStoredSignals') }}.
-              <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
-              <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
-            <h3 v-else style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
-          </fixed-width-wrapper>
-          <div v-else>
-            <table-or-list
-                data-name="signals"
-                caption="name"
-                :select="true"
-                :items="signals"
-                :columns="tableOrListConfig.columns"
-                :buttons="tableOrListConfig.buttons"
-                :sort-cols="['name', 'description', 'sampleRate']"
-                :sort-prop="{by: this.sortBy, dir: this.sortDir}"
-                @click="onTableButtonClick"
-                @change="onTableChange"
-                @select="onTableSelect"
-                @sort="onTableSort"/>
           </div>
-          <fixed-width-wrapper>
-            <v-pagination
-                v-model="page"
-                :length="pages"/>
-            <div class="d-flex justify-center flex-wrap">
-              <p class="mt-5">
-                {{ _t('actionsWithSelectedSignals') }}
-              </p>
-            </div>
-            <div class="d-flex justify-center flex-wrap">
-              <v-dialog
-                  v-model="transformDialog"
-                  max-width="800px"
-                  max-height="500px"
-              >
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                      :disabled="!transformSignalsAvailable"
-                      color="primary"
-                      v-bind="props"
-                      @click="loadSelectedSignalsData"
-                  >
-                    {{ _tc('buttons.transform') }}
-                  </v-btn>
-                </template>
-                <select-transformer :bus="bus" :double="selectedSignals.length === 2" @close="transformDialog = false"/>
-              </v-dialog>
-              <v-dialog
-                  v-model="viewDialog"
-                  max-height="800px"
-              >
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                      :disabled="!viewSignalsAvailable"
-                      color="secondary"
-                      v-bind="props"
-                      @click="loadSelectedSignalsData"
-                  >
-                    {{ _t('view') }}
-                  </v-btn>
-                </template>
-                <v-card width="100%">
-                  <toolbar-with-close-btn :title="_t('viewSignals')" @close="viewDialog = false"/>
-                  <v-card-text>
-                    <chart-drawer :signals="viewDialog && selectedSignalsDataLoaded ? selectedSignals : []"/>
-                  </v-card-text>
-                </v-card>
-              </v-dialog>
-              <v-btn :disabled="!selectedSignals.length" color="error" @click="askConfirmDeleteSelectedSignals">
-                {{ _tc('buttons.delete') }}
-                <v-icon>{{ mdi.mdiDelete }}</v-icon>
-              </v-btn>
-            </div>
-          </fixed-width-wrapper>
-        </v-card-text>
-      </v-card>
-    </div>
-    <transformer-double-dialog
-        v-if="selectedSignals.length === 2"
-        :bus="bus"
-        :signals="transformSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals : []"/>
-    <transformer-dialog
-        v-if="selectedSignals.length === 1"
-        :bus="bus"
-        :signal="transformSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals[0] : null"/>
-    <confirm-dialog :opened="confirm.opened" :text="confirm.text" ok-color="error"
-                    @ok="confirm.ok" @cancel="confirm.cancel"/>
-    <loading-overlay :show="loadingOverlay"/>
-  </NuxtLayout>
+          <div class="d-flex justify-center flex-wrap">
+            <v-dialog
+                v-model="transformDialog"
+                max-width="800px"
+                max-height="500px"
+            >
+              <template v-slot:activator="{ props }">
+                <v-btn
+                    :disabled="!transformSignalsAvailable"
+                    color="primary"
+                    v-bind="props"
+                    @click="loadSelectedSignalsData"
+                >
+                  {{ _tc('buttons.transform') }}
+                </v-btn>
+              </template>
+              <select-transformer :bus="bus" :double="selectedSignals.length === 2" @close="transformDialog = false"/>
+            </v-dialog>
+            <v-dialog
+                v-model="viewDialog"
+                max-height="800px"
+            >
+              <template v-slot:activator="{ props }">
+                <v-btn
+                    :disabled="!viewSignalsAvailable"
+                    color="secondary"
+                    v-bind="props"
+                    @click="loadSelectedSignalsData"
+                >
+                  {{ _t('view') }}
+                </v-btn>
+              </template>
+              <v-card width="100%">
+                <toolbar-with-close-btn :title="_t('viewSignals')" @close="viewDialog = false"/>
+                <v-card-text>
+                  <chart-drawer :signals="viewDialog && selectedSignalsDataLoaded ? selectedSignals : []"/>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
+            <v-btn :disabled="!selectedSignals.length" color="error" @click="askConfirmDeleteSelectedSignals">
+              {{ _tc('buttons.delete') }}
+              <v-icon>{{ mdi.mdiDelete }}</v-icon>
+            </v-btn>
+          </div>
+        </fixed-width-wrapper>
+      </v-card-text>
+    </template>
+    <template #dialogs>
+      <transformer-double-dialog
+          v-if="selectedSignals.length === 2"
+          :bus="bus"
+          :signals="transformSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals : []"/>
+      <transformer-dialog
+          v-if="selectedSignals.length === 1"
+          :bus="bus"
+          :signal="transformSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals[0] : null"/>
+    </template>
+  </card-with-layout>
 </template>
 
 <script>
 import {mdiDelete, mdiPlay, mdiStop, mdiFileEdit, mdiFolder, mdiFolderEdit, mdiFolderPlus, mdiFilterOff} from "@mdi/js";
 import SignalPlayer from "../audio/signal-player";
 import PageBase from "../components/page-base";
-import ChartDrawer from "../components/chart-drawer";
 import mitt from "mitt";
-import TransformerDoubleDialog from "../components/transformer-double-dialog";
 import SignalUtils from "../utils/signal-utils";
-import FixedWidthWrapper from "../components/fixed-width-wrapper";
-import TransformerDialog from "../components/transformer-dialog";
-import SelectTransformer from "../components/select-transformer";
-import NumberInput from "../components/number-input";
 import formNumberValues from "../mixins/form-number-values";
 import formValidation from "../mixins/form-validation";
 import actionWithTimeout from "../mixins/action-with-timeout";
 import formValuesSaving from "../mixins/form-values-saving";
-import TextInput from "../components/text-input";
 import DeviceUtils from "../utils/device-utils";
-import BtnWithTooltip from "../components/btn-with-tooltip";
 import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
 import NumberUtils from "~/utils/number-utils";
@@ -196,14 +185,6 @@ import uiParamsSaving from "~/mixins/ui-params-saving";
 
 export default {
   name: "signal-manager",
-  components: {
-    BtnWithTooltip,
-    TextInput,
-    NumberInput,
-    SelectTransformer, TransformerDialog,
-    ChartDrawer, TransformerDoubleDialog,
-    FixedWidthWrapper
-  },
   extends: PageBase,
   mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving],
   data: () => ({

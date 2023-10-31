@@ -1,58 +1,53 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%">
-        <v-card-text>
-          <fixed-width-wrapper v-if="!folders.length && !loadingOverlay">
-            <h3 style="text-align: center">{{ _tc('messages.noFolders') }}</h3>
-          </fixed-width-wrapper>
-          <div v-else>
-            <table-or-list
-                data-name="folders"
-                caption="name"
-                :items="folders"
-                :columns="tableOrListConfig.columns"
-                :buttons="tableOrListConfig.buttons"
-                @click="onTableButtonClick"/>
+  <card-with-layout full-width :message="message" :loading-overlay="loadingOverlay">
+    <template #default>
+      <v-card-text>
+        <fixed-width-wrapper v-if="!folders.length && !loadingOverlay">
+          <h3 style="text-align: center">{{ _tc('messages.noFolders') }}</h3>
+        </fixed-width-wrapper>
+        <div v-else>
+          <table-or-list
+              data-name="folders"
+              caption="name"
+              :items="folders"
+              :columns="tableOrListConfig.columns"
+              :buttons="tableOrListConfig.buttons"
+              @click="onTableButtonClick"/>
+        </div>
+        <fixed-width-wrapper>
+          <div class="mt-5 d-flex justify-center flex-wrap">
+            <v-btn @click="createFolder">
+              {{ _tc('buttons.create') }}
+            </v-btn>
           </div>
-          <fixed-width-wrapper>
-            <div class="mt-5 d-flex justify-center flex-wrap">
-              <v-btn @click="createFolder">
-                {{ _tc('buttons.create') }}
-              </v-btn>
-            </div>
-          </fixed-width-wrapper>
-        </v-card-text>
-      </v-card>
-    </div>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
-    <loading-overlay :show="loadingOverlay"/>
-    <select-dialog
-        :items="selectItems"
-        :opened="select.opened"
-        :text="select.text"
-        @select="select.select"
-        @cancel="select.cancel"/>
-    <folder-editor
-        :opened="folderEditorOpened"
-        :folder="selectedFolder"
-        @close="folderEditorOpened = false"
-        @response="onEditorResponse"/>
-  </NuxtLayout>
+        </fixed-width-wrapper>
+      </v-card-text>
+    </template>
+    <template #dialogs>
+      <select-dialog
+          :items="selectItems"
+          :opened="select.opened"
+          :text="select.text"
+          @select="select.select"
+          @cancel="select.cancel"/>
+      <folder-editor
+          :opened="folderEditorOpened"
+          :folder="selectedFolder"
+          @close="folderEditorOpened = false"
+          @response="onEditorResponse"/>
+    </template>
+  </card-with-layout>
 </template>
 
 <script>
 import {mdiDelete, mdiFileEdit} from "@mdi/js";
-import TableOrList from "~/components/table-or-list.vue";
 import PageBase from "~/components/page-base.vue";
 import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
-import FolderEditor from "~/components/folder-editor.vue";
 
 export default {
   name: "folder-manager",
   extends: PageBase,
-  components: {TableOrList, FolderEditor},
   data: () => ({
     tableOrListConfig: {
       columns: ['description'],

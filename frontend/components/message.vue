@@ -27,8 +27,14 @@ export default {
   name: "message",
   extends: ComponentBase,
   props: {
-    opened: Boolean,
-    text: String
+    opened: {
+      type: Boolean,
+      default: false
+    },
+    text: {
+      type: String,
+      default: ''
+    },
   },
   emits: ['hide'],
   methods: {

@@ -1,68 +1,62 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%" min-width="400" max-width="800">
-        <v-card-text>
-          <v-form>
-            <number-input
-                v-for="field in formFields"
-                :field="field"
-                :parent-name="$options.name"
-                :field-obj="form[field]"
-                @update="v => form[field].value = v"/>
-          </v-form>
-          <div>{{ info }}</div>
-          <div>{{ _t('recordStatuses.' + recordStatus) }}</div>
-          <div class="d-flex flex-wrap">
-            <v-btn color="error" :disabled="recordStatus !== RECORD_STATUSES.READY" @click="startRecord">
-              {{ _t('rec') }}
-            </v-btn>
-            <v-btn color="warning" :disabled="recordStatus === RECORD_STATUSES.READY" @click="pauseOrContinueRecord">
-              {{ _t('pause') }}
-            </v-btn>
-            <v-btn color="gray" :disabled="recordStatus === RECORD_STATUSES.READY" @click="stopRecord">
-              {{ _t('stop') }}
-            </v-btn>
-          </div>
-          <div>{{ recordedInfo }}</div>
-          <div class="d-flex flex-wrap">
-            <v-btn
-                color="primary"
-                :disabled="!recordedAudio"
-                @click="playOrStopSignal"
-            >
-              <v-icon>
-                {{ isSignalPlayed ? mdiStop : mdiPlay }}
-              </v-icon>
-            </v-btn>
-            <v-btn color="primary" :disabled="!recordedAudio" :loading="saveRequestSent" @click="openRecorded">
-              {{ _tc('buttons.open') }}
-            </v-btn>
-            <v-btn color="success" :disabled="!recordedAudio" :loading="saveRequestSent" @click="saveRecorded">
-              {{ _tc('buttons.save') }}
-            </v-btn>
-            <v-btn color="secondary" :disabled="!recordedAudio" @click="exportRecordedToWav">
-              {{ _tc('buttons.exportWav') }}
-            </v-btn>
-            <v-btn color="gray" :disabled="!recordedAudio" @click="clearRecorded">
-              {{ _t('clear') }}
-            </v-btn>
-          </div>
-        </v-card-text>
-      </v-card>
-    </div>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
-  </NuxtLayout>
+  <card-with-layout :message="message">
+    <v-card-text>
+      <v-form>
+        <number-input
+            v-for="field in formFields"
+            :field="field"
+            :parent-name="$options.name"
+            :field-obj="form[field]"
+            @update="v => form[field].value = v"/>
+      </v-form>
+      <div>{{ info }}</div>
+      <div>{{ _t('recordStatuses.' + recordStatus) }}</div>
+      <div class="d-flex flex-wrap">
+        <v-btn color="error" :disabled="recordStatus !== RECORD_STATUSES.READY" @click="startRecord">
+          {{ _t('rec') }}
+        </v-btn>
+        <v-btn color="warning" :disabled="recordStatus === RECORD_STATUSES.READY" @click="pauseOrContinueRecord">
+          {{ _t('pause') }}
+        </v-btn>
+        <v-btn color="gray" :disabled="recordStatus === RECORD_STATUSES.READY" @click="stopRecord">
+          {{ _t('stop') }}
+        </v-btn>
+      </div>
+      <div>{{ recordedInfo }}</div>
+      <div class="d-flex flex-wrap">
+        <v-btn
+            color="primary"
+            :disabled="!recordedAudio"
+            @click="playOrStopSignal"
+        >
+          <v-icon>
+            {{ isSignalPlayed ? mdiStop : mdiPlay }}
+          </v-icon>
+        </v-btn>
+        <v-btn color="primary" :disabled="!recordedAudio" :loading="saveRequestSent" @click="openRecorded">
+          {{ _tc('buttons.open') }}
+        </v-btn>
+        <v-btn color="success" :disabled="!recordedAudio" :loading="saveRequestSent" @click="saveRecorded">
+          {{ _tc('buttons.save') }}
+        </v-btn>
+        <v-btn color="secondary" :disabled="!recordedAudio" @click="exportRecordedToWav">
+          {{ _tc('buttons.exportWav') }}
+        </v-btn>
+        <v-btn color="gray" :disabled="!recordedAudio" @click="clearRecorded">
+          {{ _t('clear') }}
+        </v-btn>
+      </div>
+    </v-card-text>
+  </card-with-layout>
 </template>
 
 <script>
 import PageBase from "../components/page-base";
 import formValidation from "../mixins/form-validation";
 import formValuesSaving from "../mixins/form-values-saving";
-import {dataStore} from "../stores/data-store";
+import {dataStore} from "~/stores/data-store";
 import FileUtils from "../utils/file-utils";
 import Recorder from "../audio/recorder";
-import NumberInput from "../components/number-input";
 import formNumberValues from "../mixins/form-number-values";
 import {mdiPlay, mdiStop} from "@mdi/js";
 import SignalPlayer from "../audio/signal-player";
@@ -71,7 +65,6 @@ import SignalActions from "../mixins/signal-actions";
 
 export default {
   name: "signal-recorder",
-  components: {NumberInput},
   extends: PageBase,
   mixins: [formValidation, formValuesSaving, formNumberValues, SignalActions],
   data: () => ({

@@ -1,28 +1,23 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%" min-width="400" max-width="800">
-        <v-card-text>
-          <v-form @submit.prevent>
-            <text-input
-                v-for="field in formFields"
-                ref="inputRefs"
-                :field="field"
-                :field-obj="form[field]"
-                :show-password="showPassword"
-                @update="v => form[field].value = v"
-                @show="switchShowPassword"/>
-            <div class="d-flex">
-              <v-btn type="submit" color="success" :loading="changePasswordRequestSent" @click="changePasswordRequest">
-                {{ _tc('buttons.changePassword') }}
-              </v-btn>
-            </div>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </div>
-    <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
-  </NuxtLayout>
+  <card-with-layout :message="message">
+    <v-card-text>
+      <v-form @submit.prevent>
+        <text-input
+            v-for="field in formFields"
+            ref="inputRefs"
+            :field="field"
+            :field-obj="form[field]"
+            :show-password="showPassword"
+            @update="v => form[field].value = v"
+            @show="switchShowPassword"/>
+        <div class="d-flex">
+          <v-btn type="submit" color="success" :loading="changePasswordRequestSent" @click="changePasswordRequest">
+            {{ _tc('buttons.changePassword') }}
+          </v-btn>
+        </div>
+      </v-form>
+    </v-card-text>
+  </card-with-layout>
 </template>
 
 <script>
@@ -30,11 +25,9 @@ import formValidation from "../mixins/form-validation";
 import PageBase from "../components/page-base";
 import formValues from "../mixins/form-values";
 import showPassword from "../mixins/show-password";
-import TextInput from "../components/text-input";
 
 export default {
   name: "change-password",
-  components: {TextInput},
   extends: PageBase,
   mixins: [formValidation, formValues, showPassword],
   data: () => ({

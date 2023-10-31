@@ -1,13 +1,9 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="d-flex align-center flex-column">
-      <v-card width="100%" min-width="400" max-width="800">
-        <v-card-text>
-          <component v-bind:is="'description-' + $i18n.locale"/>
-        </v-card-text>
-      </v-card>
-    </div>
-  </NuxtLayout>
+  <card-with-layout>
+    <v-card-text>
+      <component :is="'description-' + $i18n.locale"/>
+    </v-card-text>
+  </card-with-layout>
 </template>
 
 <script>
