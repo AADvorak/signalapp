@@ -18,16 +18,16 @@ export default {
 }
 </script>
 <style scoped>
-/deep/ .desc-div {
+:deep(.desc-div) {
   margin-top: 5px;
 }
-/deep/ .desc-ul {
+:deep(.desc-ul) {
   margin-left: 20px;
 }
-/deep/ .desc-h2 {
+:deep(.desc-h2) {
   margin-top: 10px;
 }
-/deep/ .desc-h1 {
+:deep(.desc-h1) {
   margin-bottom: 10px;
 }
 </style>
