@@ -5,6 +5,7 @@ import link.signalapp.model.UserToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 
@@ -14,17 +15,25 @@ public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenP
             "from user_token " +
             "where token = :token and extract(epoch from (:currentTime - last_action_time)) < :userIdleTimeout",
             nativeQuery = true)
-    UserToken findActiveToken(String token, LocalDateTime currentTime, int userIdleTimeout);
+    UserToken findActiveToken(
+            @Param("token") String token,
+            @Param("currentTime") LocalDateTime currentTime,
+            @Param("userIdleTimeout") int userIdleTimeout
+    );
 
     @Modifying
     @Query(value = "delete from user_token where user_id = :userId " +
             "and extract(epoch from (:currentTime - last_action_time)) > :userIdleTimeout",
             nativeQuery = true)
-    int deleteOldTokens(int userId, LocalDateTime currentTime, int userIdleTimeout);
+    int deleteOldTokens(
+            @Param("userId") int userId,
+            @Param("currentTime") LocalDateTime currentTime,
+            @Param("userIdleTimeout") int userIdleTimeout
+    );
 
     @Modifying
     @Query(value = "delete from user_token where token = :token",
             nativeQuery = true)
-    int deleteByToken(String token);
+    int deleteByToken(@Param("token") String token);
 
 }

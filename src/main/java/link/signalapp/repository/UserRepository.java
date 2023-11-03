@@ -4,6 +4,7 @@ import link.signalapp.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
@@ -12,13 +13,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findByEmailAndEmailConfirmedTrue(String email);
 
     @Modifying
-    @Query(value = "delete from \"user\" where id = (select user_id from user_token where token = ?1)",
+    @Query(value = "delete from \"user\" where id = (select user_id from user_token where token = :token)",
             nativeQuery = true)
-    int deleteByToken(String token);
+    int deleteByToken(@Param("token") String token);
 
     @Modifying
-    @Query(value = "update \"user\" set email_confirmed = true where id = ?1",
+    @Query(value = "update \"user\" set email_confirmed = true where id = :userId",
             nativeQuery = true)
-    int updateSetEmailConfirmedTrue(int userId);
+    int updateSetEmailConfirmedTrue(@Param("userId") int userId);
 
 }

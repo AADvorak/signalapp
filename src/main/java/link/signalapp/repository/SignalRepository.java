@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,11 +24,11 @@ public interface SignalRepository extends PagingAndSortingRepository<Signal, Int
 
     @Query(value = "select count(1) from signal " +
             "where user_id = :userId", nativeQuery = true)
-    int countByUserId(int userId);
+    int countByUserId(@Param("userId") int userId);
 
     @Query(value = "select distinct sample_rate from signal " +
             "where user_id = :userId", nativeQuery = true)
-    List<BigDecimal> sampleRatesByUserId(int userId);
+    List<BigDecimal> sampleRatesByUserId(@Param("userId") int userId);
 
     @Query(value = "select s.* from signal s " +
             "where user_id = :userId " +
@@ -37,10 +38,10 @@ public interface SignalRepository extends PagingAndSortingRepository<Signal, Int
             "and (0 in :folderIds or exists(select 1 from signal_in_folder sif " +
             "where sif.signal_id = s.id and sif.folder_id in :folderIds))", nativeQuery = true)
     Page<Signal> findByUserIdAndFilter(
-            int userId,
-            String filter,
-            List<BigDecimal> sampleRates,
-            List<Integer> folderIds,
+            @Param("userId") int userId,
+            @Param("filter") String filter,
+            @Param("sampleRates") List<BigDecimal> sampleRates,
+            @Param("folderIds") List<Integer> folderIds,
             Pageable pageable
     );
 
