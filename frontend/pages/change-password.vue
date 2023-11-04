@@ -54,7 +54,8 @@ export default {
         const response = await this.getApiProvider().putJson('/api/users/me/password', this.formValues)
         if (response.ok) {
           this.showMessage({
-            text: this._t('passwordChangeSuccess')
+            text: this._t('passwordChangeSuccess'),
+            onHide: () => useRouter().push('/user-settings')
           })
           this.clearForm()
         } else if (response.status === 400) {

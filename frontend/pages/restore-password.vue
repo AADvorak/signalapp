@@ -47,6 +47,7 @@ export default {
           localeMsg: this._t('restorePasswordMailMsg'),
         })
         if (response.ok) {
+          dataStore().emailForPasswordRestore = this.formValues.email
           this.showMessage({
             text: this._t('newPasswordSentByEmail'),
             onHide: () => useRouter().push('/signin')
