@@ -74,7 +74,7 @@ export default {
       return this.$t(`operationNames.${key}`)
     },
     doTransform() {
-      this.worker = new Worker('/transformers.js')
+      this.worker = new Worker('/processors.js')
       this.worker.onmessage = msg => {
         if (msg.data.signal) {
           let signal = msg.data.signal
