@@ -1,9 +1,9 @@
 <script>
-import TransformerBase from "./transformer-base";
+import ProcessorBase from "./processor-base";
 
 export default {
-  name: "PiecewiseLinearAsymmetricSaturationAmp",
-  extends: TransformerBase,
+  name: "PiecewiseLinearSymmetricSaturationAmp",
+  extends: ProcessorBase,
   data: () => ({
     form: {
       coefficient: {
@@ -14,16 +14,8 @@ export default {
           step: 0.01
         }
       },
-      maxPositiveOutput: {
+      maxOutput: {
         value: 1,
-        params: {
-          min: 0,
-          max: 10,
-          step: 0.01
-        }
-      },
-      maxNegativeOutput: {
-        value: 0.5,
         params: {
           min: 0,
           max: 10,

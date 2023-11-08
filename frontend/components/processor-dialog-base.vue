@@ -3,14 +3,14 @@ import ComponentBase from "./component-base";
 import StringUtils from "../utils/string-utils";
 
 export default {
-  name: "transformer-dialog-base",
+  name: "processor-dialog-base",
   extends: ComponentBase,
   props: {
     bus: Object
   },
   data: () => ({
     dialog: false,
-    selectedTransformer: null,
+    selectedProcessor: null,
     processing: false,
     processingDisabled: false,
     progress: 0,
@@ -25,7 +25,7 @@ export default {
       return this._tc('buttons.' + (this.processing ? 'working' : 'ok'))
     },
     titleWithRestrictedLength() {
-      return StringUtils.restrictLength(this._tr(this.selectedTransformer.code), 40)
+      return StringUtils.restrictLength(this._tpn(this.selectedProcessor.code), 40)
     }
   },
   watch: {
@@ -50,8 +50,8 @@ export default {
       this.progress = obj.progress
       this.operation = obj.operation
     })
-    this.bus.on('transformerSelected', transformer => this.selectTransformer(transformer))
-    this.bus.on('transformed', () => {
+    this.bus.on('processorSelected', processor => this.selectProcessor(processor))
+    this.bus.on('processed', () => {
       this.dialog = false
     })
   },
@@ -59,25 +59,25 @@ export default {
     this.bus.off('validationFailed')
     this.bus.off('validationPassed')
     this.bus.off('progress')
-    this.bus.off('transformerSelected')
-    this.bus.off('transformed')
+    this.bus.off('processorSelected')
+    this.bus.off('processed')
   },
   methods: {
     ok() {
       this.processing = true
-      this.bus.emit('transform')
+      this.bus.emit('process')
     },
     cancel() {
       this.dialog = false
     },
-    selectTransformer(transformer) {
-      this.selectedTransformer = transformer
+    selectProcessor(processor) {
+      this.selectedProcessor = processor
       this.dialog = true
       this.processing = false
       this.progress = 0
     },
-    makeTransformWithQuestion(key) {
-      return this._tc('messages.' + key, {transformerName: this._tr('with' + this.selectedTransformer.code)})
+    makeProcessWithQuestion(key) {
+      return this._tc('messages.' + key, {processorName: this._tpn('with' + this.selectedProcessor.code)})
     }
   },
 }

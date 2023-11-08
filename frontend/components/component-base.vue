@@ -8,11 +8,11 @@ export default {
     _tc(key, params) {
       return this.$t(`common.${key}`, params)
     },
-    _tr(key) {
-      return this.$t('transformerNames.' + key)
+    _tpn(key) {
+      return this.$t('processorNames.' + key)
     },
-    _trt(key) {
-      return this.$t('transformerTypes.' + key)
+    _tpt(key) {
+      return this.$t('processorTypes.' + key)
     },
     _tsn(key) {
       return this.$t('signalNames.' + key)

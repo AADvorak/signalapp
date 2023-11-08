@@ -31,7 +31,7 @@
           </v-text-field>
         </div>
       </v-form>
-      <h3 style="height: 300px" v-if="!filteredTransformers.length">{{ _tc('messages.nothingIsFound') }}</h3>
+      <h3 style="height: 300px" v-if="!filteredProcessors.length">{{ _tc('messages.nothingIsFound') }}</h3>
       <v-table v-else fixed-header height="300px">
         <thead>
         <tr>
@@ -40,9 +40,9 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="transformer in filteredTransformers" @click="select(transformer)">
-          <td style="cursor: pointer;">{{ _tr(transformer.code) }}</td>
-          <td style="cursor: pointer;">{{ _trt(transformer.type) }}</td>
+        <tr v-for="processor in filteredProcessors" @click="select(processor)">
+          <td style="cursor: pointer;">{{ _tpn(processor.code) }}</td>
+          <td style="cursor: pointer;">{{ _tpt(processor.type) }}</td>
         </tr>
         </tbody>
       </v-table>
@@ -55,14 +55,12 @@ import {mdiFilterOff} from "@mdi/js";
 import ComponentBase from "./component-base";
 import formValuesSaving from "../mixins/form-values-saving";
 import {moduleStore} from "~/stores/module-store";
-import BtnWithTooltip from "~/components/btn-with-tooltip.vue";
 
-const TRANSFORMER_TYPES = ['amplifier', 'modulator', 'filter', 'oscillator', 'math']
+const PROCESSOR_TYPES = ['amplifier', 'modulator', 'filter', 'oscillator', 'math']
 
 export default {
-  name: "select-transformer",
+  name: "select-processor",
   extends: ComponentBase,
-  components: [BtnWithTooltip],
   mixins: [formValuesSaving],
   props: {
     bus: Object,
@@ -81,26 +79,26 @@ export default {
     mdiFilterOff
   }),
   computed: {
-    transformers() {
-      return this.double ? moduleStore().doubleTransformers : moduleStore().transformers
+    processors() {
+      return this.double ? moduleStore().doubleProcessors : moduleStore().processors
     },
-    filteredTransformers() {
-      return this.transformers.filter(transformer => {
+    filteredProcessors() {
+      return this.processors.filter(processor => {
         const {filter, types} = this.formValues
         let matchType = true, matchFilter = true
         if (filter.length) {
-          matchFilter = this._tr(transformer.code).toLowerCase().includes(filter.toLowerCase())
+          matchFilter = this._tpn(processor.code).toLowerCase().includes(filter.toLowerCase())
         }
         if (types.length) {
-          matchType = types.includes(transformer.type)
+          matchType = types.includes(processor.type)
         }
         return matchFilter && matchType
       })
     },
     types() {
-      return TRANSFORMER_TYPES
+      return PROCESSOR_TYPES
           .filter((value, index, self) => self.indexOf(value) === index)
-          .map(code => ({code, name: this._trt(code)}))
+          .map(code => ({code, name: this._tpt(code)}))
     },
     filterIsEmpty() {
       return !this.formValues.filter && !this.formValues.types.length
@@ -118,9 +116,9 @@ export default {
     this.restoreFormValues()
   },
   methods: {
-    select(transformer) {
+    select(processor) {
       this.close()
-      this.bus.emit('transformerSelected', transformer)
+      this.bus.emit('processorSelected', processor)
     },
     close() {
       this.$emit('close')

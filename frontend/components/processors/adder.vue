@@ -1,9 +1,9 @@
 <script>
-import TransformerDoubleBase from "./transformer-double-base";
+import DoubleProcessorBase from "./double-processor-base";
 
 export default {
   name: "Adder",
-  extends: TransformerDoubleBase,
+  extends: DoubleProcessorBase,
   data: () => ({
     form: {
       coefficient1: {

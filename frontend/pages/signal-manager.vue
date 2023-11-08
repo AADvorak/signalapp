@@ -109,21 +109,21 @@
           </div>
           <div class="d-flex justify-center flex-wrap">
             <v-dialog
-                v-model="transformDialog"
+                v-model="processDialog"
                 max-width="800px"
                 max-height="500px"
             >
               <template v-slot:activator="{ props }">
                 <v-btn
-                    :disabled="!transformSignalsAvailable"
+                    :disabled="!processSignalsAvailable"
                     color="primary"
                     v-bind="props"
                     @click="loadSelectedSignalsData"
                 >
-                  {{ _tc('buttons.transform') }}
+                  {{ _tc('buttons.process') }}
                 </v-btn>
               </template>
-              <select-transformer :bus="bus" :double="selectedSignals.length === 2" @close="transformDialog = false"/>
+              <select-processor :bus="bus" :double="selectedSignals.length === 2" @close="processDialog = false"/>
             </v-dialog>
             <v-dialog
                 v-model="viewDialog"
@@ -155,14 +155,14 @@
       </v-card-text>
     </template>
     <template #dialogs>
-      <transformer-double-dialog
+      <double-processor-dialog
           v-if="selectedSignals.length === 2"
           :bus="bus"
-          :signals="transformSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals : []"/>
-      <transformer-dialog
+          :signals="processSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals : []"/>
+      <single-processor-dialog
           v-if="selectedSignals.length === 1"
           :bus="bus"
-          :signal="transformSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals[0] : null"/>
+          :signal="processSignalsAvailable && selectedSignalsDataLoaded ? selectedSignals[0] : null"/>
     </template>
   </card-with-layout>
 </template>
@@ -190,7 +190,7 @@ export default {
   data: () => ({
     mounted: false,
     viewDialog: false,
-    transformDialog: false,
+    processDialog: false,
     sampleRates: [],
     signals: [],
     selectedIds: [],
@@ -273,7 +273,7 @@ export default {
       const selectedSignalsNumber = this.selectedSignals.length
       return selectedSignalsNumber > 0 && selectedSignalsNumber <= 5
     },
-    transformSignalsAvailable() {
+    processSignalsAvailable() {
       return this.selectedSignals.length === 1
           || this.selectedSignals.length === 2 && SignalUtils.checkSignalsHaveSameValueGrid(this.selectedSignals)
     },

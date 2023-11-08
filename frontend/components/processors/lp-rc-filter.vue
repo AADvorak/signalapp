@@ -1,9 +1,9 @@
 <script>
-import TransformerBase from "./transformer-base";
+import ProcessorBase from "./processor-base";
 
 export default {
-  name: "HpRcFilter",
-  extends: TransformerBase,
+  name: "LpRcFilter",
+  extends: ProcessorBase,
   data: () => ({
     form: {
       tau: {

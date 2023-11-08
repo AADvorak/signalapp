@@ -1,11 +1,11 @@
 <template>
   <div>
     <h1 class="desc-h1">App description</h1>
-    <div class="desc-div">This web app models signals and their transformations.</div>
+    <div class="desc-div">This web app models signals and their processing.</div>
     <div class="desc-div"><b>App abilities:</b></div>
     <ul class="desc-div desc-ul">
       <li>simple form signals generation,</li>
-      <li>signal transformation,</li>
+      <li>signal processing,</li>
       <li>signal storage on server,</li>
       <li>signal export to / import from txt and wav files,</li>
       <li>signal recording / playing.</li>
@@ -15,8 +15,8 @@
     <h2 class="desc-h2">Signal recording</h2>
     <div class="desc-div">Use <a href="/signal-recorder">signal recorder</a> to record signals from your audio input device.</div>
     <h2 class="desc-h2">Signal management</h2>
-    <div class="desc-div">Use <a href="/signal-manager">signal manager</a> to view, edit, delete, play, transform, export to txt and wav files your stored signals.</div>
-    <div class="desc-div">All generated and stored signals can be opened to edit and do transformation chains. Every time you have generated new signal, opened stored signal, or done some transformation, the result signal is opened with the special module, where you can preview it, edit name and description, save it, export data, or do further transformations.</div>
+    <div class="desc-div">Use <a href="/signal-manager">signal manager</a> to view, edit, delete, play, process, export to txt and wav files your stored signals.</div>
+    <div class="desc-div">All generated and stored signals can be opened to edit and do processing chains. Every time you have generated new signal, opened stored signal, or done some processing, the result signal is opened with the special module, where you can preview it, edit name and description, save it, export data, or do further processing.</div>
     <h2 class="desc-h2" style="color: brown">Warning</h2>
     <div class="desc-div">The app is for educational purposes only. Not for long audio files processing. Maximal length of</div>
     <ul class="desc-div desc-ul">

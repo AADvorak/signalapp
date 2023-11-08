@@ -38,7 +38,7 @@
                 :error="!!form.description.validation?.length"
                 :error-messages="form.description.validation"/>
             <div class="d-flex flex-wrap">
-              <select-transformer-dialog :bus="bus"/>
+              <select-processor-dialog :bus="bus"/>
               <v-btn color="success" @click="saveSignal">
                 {{ _tc('buttons.save') }}
               </v-btn>
@@ -80,7 +80,7 @@
       </v-card-text>
     </template>
     <template #dialogs>
-      <transformer-dialog :bus="bus" :signal="signal"/>
+      <single-processor-dialog :bus="bus" :signal="signal"/>
     </template>
   </card-with-layout>
 </template>
@@ -139,7 +139,7 @@ export default {
     this.getSignalFromHistoryOrLoad()
     this.bus.on('error', error => {
       this.showMessage({
-        text: `${this._t('transformSignalError')}: ${error.message}`
+        text: `${this._t('processSignalError')}: ${error.message}`
       })
     })
   },

@@ -11,20 +11,18 @@
           v-bind="props"
           :disabled="disabled"
       >
-        {{ _tc('buttons.transform') }}
+        {{ _tc('buttons.process') }}
       </v-btn>
     </template>
-    <select-transformer :bus="bus" :double="double" @close="dialog = false"/>
+    <select-processor :bus="bus" :double="double" @close="dialog = false"/>
   </v-dialog>
 </template>
 
 <script>
 import ComponentBase from "./component-base";
-import SelectTransformer from "./select-transformer";
 
 export default {
-  name: "select-transformer-dialog",
-  components: {SelectTransformer},
+  name: "select-processor-dialog",
   extends: ComponentBase,
   props: {
     bus: Object,

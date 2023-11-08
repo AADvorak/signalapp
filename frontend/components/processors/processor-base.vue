@@ -3,24 +3,22 @@
       v-for="field in formFields"
       ref="inputRefs"
       :field="field"
-      :label="_trp(field)"
+      :label="_tpp(field)"
       :field-obj="form[field]"
       @update="v => form[field].value = v"/>
 </template>
 
 <script>
 import formValidation from "../../mixins/form-validation";
-import {dataStore} from "../../stores/data-store";
+import {dataStore} from "~/stores/data-store";
 import formValuesSaving from "../../mixins/form-values-saving";
 import formNumberValues from "../../mixins/form-number-values";
 import ComponentBase from "../component-base";
 import actionWithTimeout from "../../mixins/action-with-timeout";
-import NumberInput from "../number-input";
 import {toRaw, isProxy} from "vue";
 
 export default {
-  name: "TransformerBase",
-  components: {NumberInput},
+  name: "processor-base",
   extends: ComponentBase,
   mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout],
   props: {
@@ -32,7 +30,7 @@ export default {
     form: {},
   }),
   computed: {
-    transformFunctionName() {
+    processorName() {
       const name = this.$options.name
       return name.charAt(0).toLowerCase() + name.slice(1)
     }
@@ -54,8 +52,8 @@ export default {
   },
   mounted() {
     this.form && this.restoreFormValues()
-    this.bus.on('transform', () => {
-      this.doTransform()
+    this.bus.on('process', () => {
+      this.doProcess()
     })
     this.bus.on('cancel', () => {
       this.worker && this.worker.terminate()
@@ -63,18 +61,18 @@ export default {
     setTimeout(() => this.focusFirstFormField())
   },
   beforeUnmount() {
-    this.bus.off('transform')
+    this.bus.off('process')
     this.bus.off('cancel')
   },
   methods: {
-    _trp(key, params) {
-      return this.$t(`transformerParams.${this.$options.name}.${key}`, params)
+    _tpp(key, params) {
+      return this.$t(`processorParams.${this.$options.name}.${key}`, params)
     },
     _ton(key) {
       return this.$t(`operationNames.${key}`)
     },
-    doTransform() {
-      this.worker = new Worker('/processors.js')
+    doProcess() {
+      this.worker = new Worker('/worker/processors.js')
       this.worker.onmessage = msg => {
         if (msg.data.signal) {
           let signal = msg.data.signal
@@ -89,13 +87,14 @@ export default {
         }
       }
       this.worker.onerror = e => {
-        this.bus.emit('error', e.message)
+        this.bus.emit('processed')
+        this.bus.emit('error', e)
       }
       this.worker.postMessage(this.makeWorkerMessage())
     },
     makeWorkerMessage() {
       return {
-        transformFunctionName: this.transformFunctionName,
+        processorName: this.processorName,
         signal: this.toRawDeep(this.signal),
         params: this.formValues
       }
@@ -116,15 +115,15 @@ export default {
       if (signal.description) {
         signal.description += '\n'
       }
-      signal.description += this.makeTransformedWithText() + ' ' + this.makeParamsText()
+      signal.description += this.makeProcessedWithText() + ' ' + this.makeParamsText()
     },
-    makeTransformedWithText() {
-      return this._tc('messages.transformed') + ' ' + this._tr('with' + this.$options.name)
+    makeProcessedWithText() {
+      return this._tc('messages.processed') + ' ' + this._tpn('with' + this.$options.name)
     },
     makeParamsText() {
       let paramsDescription = ''
       for (const field in this.formValues) {
-        paramsDescription += (paramsDescription && ', ') + `${this._trp(field).toLowerCase()} = ${this.formValues[field]}`
+        paramsDescription += (paramsDescription && ', ') + `${this._tpp(field).toLowerCase()} = ${this.formValues[field]}`
       }
       return paramsDescription && `(${paramsDescription})`
     },
@@ -133,7 +132,7 @@ export default {
       const signalId = route.params.id || signal.id || '0', currentHistoryKey = route.query.history || '0'
       const historyKey = dataStore().addSignalToHistory(signal, currentHistoryKey)
       useRouter().push(`/signal/${signalId}?history=${historyKey}`)
-      this.bus.emit('transformed')
+      this.bus.emit('processed')
     },
     validateForm() {
       let validated = true

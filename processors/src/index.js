@@ -76,9 +76,9 @@ const DoubleProcessors = {
 onmessage = msg => {
   let {signal, signal1, signal2, params} = msg.data
   if (signal) {
-    signal = SingleProcessors[msg.data.transformFunctionName].process(signal, params)
+    signal = SingleProcessors[msg.data.processorName].process(signal, params)
   } else if (signal1 && signal2) {
-    signal = DoubleProcessors[msg.data.transformFunctionName].process(signal1, signal2, params)
+    signal = DoubleProcessors[msg.data.processorName].process(signal1, signal2, params)
   }
   Common.calculateMaxAbsYAndParams(signal)
   postMessage({signal})

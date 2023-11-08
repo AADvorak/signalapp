@@ -1,9 +1,9 @@
 <script>
-import TransformerBase from "./transformer-base";
+import ProcessorBase from "./processor-base";
 
 export default {
   name: "LinearOscillator",
-  extends: TransformerBase,
+  extends: ProcessorBase,
   data: () => ({
     form: {
       frequency: {

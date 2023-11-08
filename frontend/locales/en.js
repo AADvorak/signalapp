@@ -11,7 +11,7 @@ const en = {
       deleteWithSignals: 'Delete with signals',
       ok: 'OK',
       cancel: 'Cancel',
-      transform: 'Transform',
+      process: 'Process',
       exportWav: 'Export wav',
       exportTxt: 'Export txt',
       exportSignal: 'Export signal',
@@ -39,9 +39,9 @@ const en = {
     },
     messages: {
       fileSaveError: 'Error while saving file',
-      transformSignalWith: 'Transform signal with {transformerName}',
-      transformSignalsWith: 'Transform signals with {transformerName}',
-      transformed: 'Transformed',
+      processSignalWith: 'Process signal with {processorName}',
+      processSignalsWith: 'Process signals with {processorName}',
+      processed: 'Processed',
       nothingIsFound: 'Nothing is found. Change search criteria.',
       error: 'Error',
       wrongSignalSamplesNumber: 'Number of imported signal samples must be not greater than {maxSamplesNumber}. In selected file it is {samplesNumber}',
@@ -76,8 +76,8 @@ const en = {
   'select-dialog': {
     title: 'Selection'
   },
-  'select-transformer': {
-    title: 'Select transformer',
+  'select-processor': {
+    title: 'Select processor',
     filterByTypes: 'Filter by types',
   },
   'default': {
@@ -120,7 +120,7 @@ const en = {
     name: 'Signal',
     saveAsNew: 'Save as new',
     sampleRate: 'Sample rate: {sampleRate} Hz',
-    transformSignalError: 'Error while transforming signal',
+    processSignalError: 'Error while processing signal',
     signalDataSaveError: 'Error while saving signal data',
     signalSaveError: 'Error while saving signal',
     signalNotFound: 'Signal is not found'
@@ -216,7 +216,7 @@ const en = {
     confirmEmailMailTitle: 'SignalApp - confirm email',
     confirmEmailMailMsg: 'To confirm you email use the link $origin$/api/users/confirm/$code$'
   },
-  transformerNames: {
+  processorNames: {
     LinearAmp: 'Linear amplifier',
     withLinearAmp: 'with linear amplifier',
     PiecewiseLinearSymmetricSaturationAmp: 'Piecewise linear symmetric amplifier with saturation',
@@ -250,14 +250,14 @@ const en = {
     TwoSignalAmplitudeModulator: 'Two signal amplitude modulator (carrier, modulating)',
     withTwoSignalAmplitudeModulator: 'with two signal amplitude modulator (carrier, modulating)'
   },
-  transformerTypes: {
+  processorTypes: {
     amplifier: 'Amplifier',
     modulator: 'Modulator',
     filter: 'Filter',
     oscillator: 'Oscillator',
     math: 'Math',
   },
-  transformerParams: {
+  processorParams: {
     Adder: {
       coefficient1: 'Signal 1 coefficient',
       coefficient2: 'Signal 2 coefficient',

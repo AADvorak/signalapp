@@ -1,9 +1,9 @@
 <script>
-import TransformerDoubleBase from "./transformer-double-base";
+import DoubleProcessorBase from "./double-processor-base";
 
 export default {
   name: "TwoSignalAmplitudeModulator",
-  extends: TransformerDoubleBase,
+  extends: DoubleProcessorBase,
   data: () => ({
     form: {
       depth: {

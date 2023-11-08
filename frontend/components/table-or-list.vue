@@ -95,7 +95,6 @@ import {mdiSortAscending, mdiSortDescending} from "@mdi/js";
 import DeviceUtils from "~/utils/device-utils";
 import StringUtils from "~/utils/string-utils";
 import ComponentBase from "~/components/component-base.vue";
-import BtnWithTooltip from "~/components/btn-with-tooltip.vue";
 
 const SORT_DIRS = {
   DESC: 'desc',
@@ -105,7 +104,6 @@ const SORT_DIRS = {
 export default {
   name: "table-or-list",
   extends: ComponentBase,
-  components: {BtnWithTooltip},
   props: {
     dataName: {
       type: String,

@@ -5,6 +5,6 @@ module.exports = {
   entry: './src/index.js',
   output: {
     filename: 'processors.js',
-    path: path.resolve(__dirname, '../frontend/public'),
+    path: path.resolve(__dirname, '../frontend/public/worker'),
   },
 };

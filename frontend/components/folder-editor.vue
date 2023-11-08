@@ -35,8 +35,7 @@
 </template>
 
 <script>
-import ToolbarWithCloseBtn from "~/components/toolbar-with-close-btn.vue";
-import PageBase from "~/components/page-base.vue";
+import PageBase from "~/components/page-base";
 import FolderRequests from "~/api/folder-requests";
 import formValues from "~/mixins/form-values";
 import formValidation from "~/mixins/form-validation";
@@ -44,7 +43,6 @@ import formValidation from "~/mixins/form-validation";
 export default {
   name: "folder-editor",
   extends: PageBase,
-  components: {ToolbarWithCloseBtn},
   mixins: [formValues, formValidation],
   props: {
     opened: Boolean,

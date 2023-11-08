@@ -11,7 +11,7 @@ const pl = {
       deleteWithSignals: 'Usuń razem z sygnałami',
       ok: 'OK',
       cancel: 'Anuluj',
-      transform: 'Przetwórz',
+      process: 'Przetwórz',
       exportWav: 'Eksportuj wav',
       exportTxt: 'Eksportuj txt',
       exportSignal: 'Eksportuj sygnał',
@@ -39,9 +39,9 @@ const pl = {
     },
     messages: {
       fileSaveError: 'Błąd podczas zapisywania pliku',
-      transformSignalWith: 'Przetwórz sygnał {transformerName}',
-      transformSignalsWith: 'Przetwórz sygnały {transformerName}',
-      transformed: 'Przetworzony',
+      processSignalWith: 'Przetwórz sygnał {processorName}',
+      processSignalsWith: 'Przetwórz sygnały {processorName}',
+      processed: 'Przetworzony',
       nothingIsFound: 'Nic nie znaleziono. Zmień kryteria wyszukiwania.',
       error: 'Błąd',
       wrongSignalSamplesNumber: 'Liczba próbek importowanego sygnału nie może być większa niż {maxSamplesNumber}. W wybranym pliku wynosi {samplesNumber}',
@@ -76,7 +76,7 @@ const pl = {
   'select-dialog': {
     title: 'Wybór'
   },
-  'select-transformer': {
+  'select-processor': {
     title: 'Wybór przetwarzacza',
     filterByTypes: 'Filtruj według typów',
   },
@@ -120,7 +120,7 @@ const pl = {
     name: 'Sygnał',
     saveAsNew: 'Zapisz jako nowy',
     sampleRate: 'Częstotliwość próbkowania: {sampleRate} Hz',
-    transformSignalError: 'Błąd podczas przetwarzania sygnału',
+    processSignalError: 'Błąd podczas przetwarzania sygnału',
     signalDataSaveError: 'Błąd podczas zapisywania danych sygnału',
     signalSaveError: 'Błąd podczas zapisywania sygnału',
     signalNotFound: 'Nie znaleziono sygnału'
@@ -216,7 +216,7 @@ const pl = {
     confirmEmailMailTitle: 'SignalApp - potwierdzenie e-maila',
     confirmEmailMailMsg: 'Aby potwierdzić e-mail, użyj linku $origin$/api/users/confirm/$code$'
   },
-  transformerNames: {
+  processorNames: {
     LinearAmp: 'Wzmacniacz liniowy',
     withLinearAmp: 'wzmacniaczem liniowym',
     PiecewiseLinearSymmetricSaturationAmp: 'Wzmacniacz symetryczny liniowy z nasyceniem',
@@ -250,14 +250,14 @@ const pl = {
     TwoSignalAmplitudeModulator: 'Modulator amplitudy nośnego sygnału modulującym',
     withTwoSignalAmplitudeModulator: 'modulatorem amplitudy nośnego sygnału modulującym'
   },
-  transformerTypes: {
+  processorTypes: {
     amplifier: 'Wzmacniacz',
     modulator: 'Modulator',
     filter: 'Filtr',
     oscillator: 'Oscylator',
     math: 'Matematyczne',
   },
-  transformerParams: {
+  processorParams: {
     Adder: {
       coefficient1: 'Współczynnik sygnału 1',
       coefficient2: 'Współczynnik sygnału 2',

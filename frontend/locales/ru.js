@@ -11,7 +11,7 @@ const ru = {
       deleteWithSignals: 'Удалить вместе с сигналами',
       ok: 'OK',
       cancel: 'Отмена',
-      transform: 'Преобразовать',
+      process: 'Преобразовать',
       exportWav: 'Экспортировать wav',
       exportTxt: 'Экспортировать txt',
       exportSignal: 'Экспортировать сигнал',
@@ -39,9 +39,9 @@ const ru = {
     },
     messages: {
       fileSaveError: 'Ошибка при сохранении файла',
-      transformSignalWith: 'Преобразовать сигнал {transformerName}',
-      transformSignalsWith: 'Преобразовать сигналы {transformerName}',
-      transformed: 'Преобразован',
+      processSignalWith: 'Преобразовать сигнал {processorName}',
+      processSignalsWith: 'Преобразовать сигналы {processorName}',
+      processed: 'Преобразован',
       nothingIsFound: 'Ничего не найдено. Измените критерии поиска.',
       error: 'Ошибка',
       wrongSignalSamplesNumber: 'Количество отсчетов импортируемого сигнала должно быть не более {maxSamplesNumber}. В выбранном файле оно равно {samplesNumber}',
@@ -76,7 +76,7 @@ const ru = {
   'select-dialog': {
     title: 'Выбор'
   },
-  'select-transformer': {
+  'select-processor': {
     title: 'Выбор преобразователя',
     filterByTypes: 'Фильтр по типу'
   },
@@ -120,7 +120,7 @@ const ru = {
     name: 'Сигнал',
     saveAsNew: 'Сохранить как новый',
     sampleRate: 'Частота дискретизации: {sampleRate} Гц',
-    transformSignalError: 'Ошибка при преобразовании сигнала',
+    processSignalError: 'Ошибка при преобразовании сигнала',
     signalDataSaveError: 'Ошибка при сохранении данных сигнала',
     signalSaveError: 'Ошибка при сохранении сигнала',
     signalNotFound: 'Сигнал не найден'
@@ -216,7 +216,7 @@ const ru = {
     confirmEmailMailTitle: 'SignalApp - подтверждение эл. почты',
     confirmEmailMailMsg: 'Чтобы подтвердить электронную почту перейдите по ссылке $origin$/api/users/confirm/$code$'
   },
-  transformerNames: {
+  processorNames: {
     LinearAmp: 'Линейный усилитель',
     withLinearAmp: 'линейным усилителем',
     PiecewiseLinearSymmetricSaturationAmp: 'Усилитель с насыщением с кусочно-линейной симметричной амплитудной характеристикой',
@@ -250,14 +250,14 @@ const ru = {
     TwoSignalAmplitudeModulator: 'Амплитудный модулятор с двумя входными сигналами (несущий, модулирующий)',
     withTwoSignalAmplitudeModulator: 'амплитудным модулятором с двумя входными сигналами (несущий, модулирующий)'
   },
-  transformerTypes: {
+  processorTypes: {
     amplifier: 'Усилитель',
     modulator: 'Модулятор',
     filter: 'Фильтр',
     oscillator: 'Осциллятор',
     math: 'Математический',
   },
-  transformerParams: {
+  processorParams: {
     Adder: {
       coefficient1: 'Коэффициент сигнала 1',
       coefficient2: 'Коэффициент сигнала 2',

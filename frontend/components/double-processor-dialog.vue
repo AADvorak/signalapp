@@ -10,12 +10,12 @@
       <v-card-text>
         <v-form @submit.prevent>
           <div :hidden="processing">
-            <div class="mb-5">{{ makeTransformWithQuestion('transformSignalsWith') }}?</div>
+            <div class="mb-5">{{ makeProcessWithQuestion('processSignalsWith') }}?</div>
             <div class="d-flex justify-center flex-wrap">
               <v-text-field
                   class="signal-name-input"
                   v-model="signal1.name"
-                  :label="_tsn(selectedTransformer.signal1 || 'signal1')"
+                  :label="_tsn(selectedProcessor.signal1 || 'signal1')"
                   readonly/>
               <btn-with-tooltip tooltip="change" :small="false" @click="changeSignals">
                 <v-icon>
@@ -25,10 +25,10 @@
               <v-text-field
                   class="signal-name-input"
                   v-model="signal2.name"
-                  :label="_tsn(selectedTransformer.signal2 || 'signal2')"
+                  :label="_tsn(selectedProcessor.signal2 || 'signal2')"
                   readonly/>
             </div>
-            <component v-bind:is="selectedTransformer.code" :signal1="signal1" :signal2="signal2" :bus="bus"/>
+            <component :is="selectedProcessor.code" :signal1="signal1" :signal2="signal2" :bus="bus"/>
           </div>
           <div class="d-flex">
             <v-btn type="submit" color="primary" class="mr-4"
@@ -50,16 +50,15 @@
 
 <script>
 import {mdiRotate360} from "@mdi/js";
-import TransformerDialogBase from "./transformer-dialog-base";
-import Adder from "./transformers/adder";
-import Correlator from "./transformers/correlator";
-import TwoSignalAmplitudeModulator from "./transformers/two-signal-amplitude-modulator";
-import BtnWithTooltip from "~/components/btn-with-tooltip.vue";
+import ProcessorDialogBase from "./processor-dialog-base";
+import Adder from "~/components/processors/adder";
+import Correlator from "~/components/processors/correlator";
+import TwoSignalAmplitudeModulator from "~/components/processors/two-signal-amplitude-modulator";
 
 export default {
-  name: "transformer-double-dialog",
-  components: {BtnWithTooltip, Adder, Correlator, TwoSignalAmplitudeModulator},
-  extends: TransformerDialogBase,
+  name: "double-processor-dialog",
+  components: {Adder, Correlator, TwoSignalAmplitudeModulator},
+  extends: ProcessorDialogBase,
   props: {
     signals: Array
   },
