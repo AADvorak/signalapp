@@ -13,13 +13,16 @@ export default {
     selectedProcessor: null,
     processing: false,
     processingDisabled: false,
-    progress: 0,
-    operation: '',
+    progress: {
+      value: 0,
+      operation: '',
+    }
   }),
   computed: {
     progressBarText() {
-      const progress = Math.ceil(this.progress) + '%'
-      return this.operation ? this.operation + ': ' + progress : progress
+      const {value, operation} = this.progress
+      const formattedValue = value ? Math.ceil(value) + '%' : ''
+      return operation ? this._ton(operation) + ': ' + formattedValue : formattedValue
     },
     okButtonText() {
       return this._tc('buttons.' + (this.processing ? 'working' : 'ok'))
@@ -31,8 +34,10 @@ export default {
   watch: {
     dialog(newValue) {
       if (newValue) {
-        this.progress = 0
-        this.operation = ''
+        this.progress = {
+          value: 0,
+          operation: '',
+        }
         this.processingDisabled = false
       } else {
         this.bus.emit('cancel')
@@ -46,9 +51,8 @@ export default {
     this.bus.on('validationPassed', () => {
       this.processingDisabled = false
     })
-    this.bus.on('progress', obj => {
-      this.progress = obj.progress
-      this.operation = obj.operation
+    this.bus.on('progress', progress => {
+      this.progress = progress
     })
     this.bus.on('processorSelected', processor => this.selectProcessor(processor))
     this.bus.on('processed', () => {
@@ -63,6 +67,9 @@ export default {
     this.bus.off('processed')
   },
   methods: {
+    _ton(key) {
+      return this.$t(`operationNames.${key}`)
+    },
     ok() {
       this.processing = true
       this.bus.emit('process')

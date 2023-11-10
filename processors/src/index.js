@@ -8,7 +8,8 @@ import {FrequencyModulator} from "./single/frequency-modulator";
 import {LpRcFilter} from "./single/lp-rc-filter";
 import {HpRcFilter} from "./single/hp-rc-filter";
 import {LinearOscillator} from "./single/linear-oscillator";
-import {SpectrumAnalyser} from "./single/spectrum-analyser";
+import {SpectrumAnalyserDct} from "./single/spectrum-analyser-dct";
+import {SpectrumAnalyserFft} from "./single/spectrum-analyser-fft";
 import {Adder} from "./double/adder";
 import {TwoSignalAmplitudeModulator} from "./double/two-signal-amplitude-modulator";
 
@@ -49,7 +50,8 @@ const SingleProcessors = {
       return signal
     }
   },
-  spectrumAnalyser: SpectrumAnalyser,
+  spectrumAnalyserDct: SpectrumAnalyserDct,
+  spectrumAnalyserFft: SpectrumAnalyserFft,
   selfCorrelator: {
     process(signal) {
       const {data, xMin} = Common.calculateCorrelationFunction(signal, signal)
@@ -74,11 +76,11 @@ const DoubleProcessors = {
 }
 
 onmessage = msg => {
-  let {signal, signal1, signal2, params} = msg.data
+  let {signal, signal1, signal2, params, processorName} = msg.data
   if (signal) {
-    signal = SingleProcessors[msg.data.processorName].process(signal, params)
+    signal = SingleProcessors[processorName].process(signal, params)
   } else if (signal1 && signal2) {
-    signal = DoubleProcessors[msg.data.processorName].process(signal1, signal2, params)
+    signal = DoubleProcessors[processorName].process(signal1, signal2, params)
   }
   Common.calculateMaxAbsYAndParams(signal)
   postMessage({signal})

@@ -31,7 +31,8 @@ export const moduleStore = defineStore('moduleStore', {
       // math
       {code: 'Integrator', forMenu: false, processor: true, type: 'math'},
       {code: 'Differentiator', forMenu: false, processor: true, type: 'math'},
-      {code: 'SpectrumAnalyser', forMenu: false, processor: true, type: 'math'},
+      {code: 'SpectrumAnalyserDct', forMenu: false, processor: true, type: 'math'},
+      {code: 'SpectrumAnalyserFft', forMenu: false, processor: true, type: 'math'},
       {code: 'SelfCorrelator', forMenu: false, processor: true, type: 'math'},
       // double processors
       {code: 'Adder', forMenu: false, doubleProcessor: true, type: 'amplifier'},

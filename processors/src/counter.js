@@ -1,28 +1,27 @@
 export const Counter = {
 
-  pointsNumber: 0,
-
-  currentPoint: 0,
-
-  progress: 0,
-
+  stepsNumber: 0,
+  currentStep: 0,
+  value: 0,
   operation: undefined,
 
-  init(pointsNumber, operation) {
-    this.pointsNumber = pointsNumber
+  init(stepsNumber, operation) {
+    this.stepsNumber = stepsNumber
     this.operation = operation
-    this.progress = 0
-    this.currentPoint = 0
+    this.value = 0
+    this.currentStep = 0
   },
 
   increase() {
-    this.currentPoint++
-    const percent = 100 * this.currentPoint / this.pointsNumber
-    if (percent > this.progress) {
-      this.progress = Math.floor(percent)
+    this.currentStep++
+    const value = Math.floor(100 * this.currentStep / this.stepsNumber)
+    if (value > this.value) {
+      this.value = value
       postMessage({
-        progress: this.progress,
-        operation: this.operation
+        progress: {
+          value: this.value,
+          operation: this.operation
+        }
       })
     }
   }

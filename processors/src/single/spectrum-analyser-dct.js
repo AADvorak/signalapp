@@ -1,6 +1,6 @@
 import {Counter} from "../counter";
 
-export const SpectrumAnalyser = {
+export const SpectrumAnalyserDct = {
   process(signal) {
     const kernel = (n, k, N) => {
       return Math.cos(Math.PI * k * (n + 0.5) / N)

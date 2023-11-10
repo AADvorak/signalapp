@@ -4,7 +4,8 @@
   "description": "Processors logic for SignalApp to start in separate Worker",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npx webpack --watch",
+    "build": "npx webpack"
   },
   "author": "",
   "license": "ISC",

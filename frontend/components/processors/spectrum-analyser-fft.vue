@@ -2,7 +2,7 @@
 import ProcessorBase from "./processor-base";
 
 export default {
-  name: "SpectrumAnalyser",
+  name: "SpectrumAnalyserFft",
   extends: ProcessorBase,
 }
 </script>

@@ -23,7 +23,11 @@
           </v-btn>
           </div>
         </v-form>
-        <v-progress-linear v-if="processing" v-model="progress" color="blue" height="25" class="mt-5">
+        <v-progress-linear
+            v-if="processing"
+            v-model="progress.value"
+            :indeterminate="!progress.value"
+            color="blue" height="25" class="mt-5">
           <strong>{{ progressBarText }}</strong>
         </v-progress-linear>
       </v-card-text>
@@ -44,7 +48,8 @@ import LinearOscillator from "~/components/processors/linear-oscillator";
 import Integrator from "~/components/processors/integrator";
 import Differentiator from "~/components/processors/differentiator";
 import SelfCorrelator from "~/components/processors/self-correlator";
-import SpectrumAnalyser from "~/components/processors/spectrum-analyser";
+import SpectrumAnalyserDct from "~/components/processors/spectrum-analyser-dct";
+import SpectrumAnalyserFft from "~/components/processors/spectrum-analyser-fft";
 import ProcessorDialogBase from "./processor-dialog-base";
 
 export default {
@@ -62,7 +67,8 @@ export default {
     Integrator,
     Differentiator,
     SelfCorrelator,
-    SpectrumAnalyser
+    SpectrumAnalyserDct,
+    SpectrumAnalyserFft
   },
   extends: ProcessorDialogBase,
   props: {

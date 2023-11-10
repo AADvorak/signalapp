@@ -21,7 +21,6 @@ export const Common = {
     let equationsNumber = equations.length
     let currentValues = initial
     outData.push(currentValues[outNumber])
-    Counter.init(inData.length)
     for (let i = 1; i < inData.length; i++) {
       let nextValues = []
       for (let n = 0; n < equationsNumber; n++) {
@@ -29,7 +28,6 @@ export const Common = {
       }
       currentValues = nextValues
       outData.push(currentValues[outNumber])
-      Counter.increase()
     }
     return outData
   },
@@ -37,10 +35,9 @@ export const Common = {
   /**
    * @param {number[]} data
    * @param {number} step
-   * @param {String} [operation]
    */
-  integrate(data, step, operation) {
-    return this.transformWithFunction(data, this.integrateStep, step, operation)
+  integrate(data, step) {
+    return this.transformWithFunction(data, this.integrateStep, step)
   },
 
   /**
@@ -56,10 +53,9 @@ export const Common = {
   /**
    * @param {number[]} data
    * @param {number} step
-   * @param {String} [operation]
    */
-  differentiate(data, step, operation) {
-    return this.transformWithFunction(data, this.differentiateStep, step, operation)
+  differentiate(data, step) {
+    return this.transformWithFunction(data, this.differentiateStep, step)
   },
 
   /**
@@ -76,16 +72,13 @@ export const Common = {
    * @param {number[]} data
    * @param {Function} func
    * @param {number} step
-   * @param {String} [operation]
    */
-  transformWithFunction(data, func, step, operation) {
+  transformWithFunction(data, func, step) {
     let output = [0]
     let currY = 0
-    Counter.init(data.length, operation)
     for (let i = 1; i < data.length; i++) {
       currY = func(currY, data[i-1], data[i], step)
       output.push(currY)
-      Counter.increase()
     }
     return output
   },
@@ -156,11 +149,9 @@ export const Common = {
     }
     let grid = []
     let x = xMin
-    Counter.init(Math.floor((xMax - xMin) / step), 'preparingSignals')
     while (x <= xMax) {
       grid.push(x)
       x += step
-      Counter.increase()
     }
     return grid
   },
@@ -170,13 +161,11 @@ export const Common = {
    */
   calculateMaxAbsYAndParams(signal) {
     let maxAbsY = 0
-    Counter.init(signal.data.length, 'calculatingMaxAbsValue')
     for (let point of signal.data) {
       const absY = Math.abs(point)
       if (maxAbsY < absY) {
         maxAbsY = absY
       }
-      Counter.increase()
     }
     signal.maxAbsY = maxAbsY
     const xMin = signal.xMin

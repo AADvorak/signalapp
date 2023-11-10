@@ -68,22 +68,16 @@ export default {
     _tpp(key, params) {
       return this.$t(`processorParams.${this.$options.name}.${key}`, params)
     },
-    _ton(key) {
-      return this.$t(`operationNames.${key}`)
-    },
     doProcess() {
       this.worker = new Worker('/worker/processors.js')
       this.worker.onmessage = msg => {
         if (msg.data.signal) {
-          let signal = msg.data.signal
+          const signal = msg.data.signal
           this.changeSignalNameAndDescription(signal)
           this.addSignalToHistoryAndOpen(signal)
         }
         if (msg.data.progress) {
-          this.bus.emit('progress', {
-            progress: msg.data.progress,
-            operation: msg.data.operation ? this._ton(msg.data.operation) : '',
-          })
+          this.bus.emit('progress', msg.data.progress)
         }
       }
       this.worker.onerror = e => {

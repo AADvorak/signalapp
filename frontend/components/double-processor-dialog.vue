@@ -40,7 +40,11 @@
             </v-btn>
           </div>
         </v-form>
-        <v-progress-linear v-if="processing" v-model="progress" color="blue" height="25" class="mt-5">
+        <v-progress-linear
+            v-if="processing"
+            v-model="progress.value"
+            :indeterminate="!progress.value"
+            color="blue" height="25" class="mt-5">
           <strong>{{ progressBarText }}</strong>
         </v-progress-linear>
       </v-card-text>

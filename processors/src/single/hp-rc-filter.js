@@ -5,7 +5,7 @@ export const HpRcFilter = {
     const equations = [
       (input, variables, params) => input - variables[0] / params.tau
     ]
-    const inData = Common.differentiate(signal.data, signal.params.step, 'preparingSignal')
+    const inData = Common.differentiate(signal.data, signal.params.step)
     signal.data = Common.solveDifEq({
       inData,
       step: signal.params.step,

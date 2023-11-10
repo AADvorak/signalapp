@@ -119,11 +119,16 @@ export default {
       return !!this.signal.id
     },
     signalParamsText() {
-      if (!this.signal.sampleRate) {
-        return ''
+      let text = ''
+      if (this.signal.sampleRate) {
+        text += this._t('sampleRate',
+            {sampleRate: NumberUtils.reduceFractionDigitsByValue(this.signal.sampleRate)})
       }
-      return this._t('sampleRate',
-         {sampleRate: NumberUtils.reduceFractionDigitsByValue(this.signal.sampleRate)})
+      const samplesNumber = this.signal.data?.length
+      if (samplesNumber) {
+        text += ', ' + this._t('samplesNumber', {samplesNumber})
+      }
+      return text
     }
   },
   watch: {
