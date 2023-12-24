@@ -18,6 +18,7 @@ import FileUtils from "../utils/file-utils";
 import WavCoder from "../audio/wav-coder";
 import SignalUtils from "../utils/signal-utils";
 import SignalActions from "../mixins/signal-actions";
+import {SignalRequests} from "~/api/signal-requests";
 
 const ACTION_SELECT_ITEMS = [
   {name: 'open', color: 'primary'},
@@ -90,13 +91,35 @@ export default {
     },
     async saveWav(file) {
       const arrayBuffer = await FileUtils.readArrayBufferFromWavFile(file)
-      const response = await this.getApiProvider().post('/api/signals/wav/' + file.name,
-          arrayBuffer, 'audio/wave')
-      if (response.ok) {
-        useRouter().push('/signal-manager')
-      } else {
-        this.showErrorsFromResponse(response, this._tc('messages.fileSaveError'))
+      const audioData = await WavCoder.decodeWAV(arrayBuffer)
+      if (!this.validateAudioDataLength(audioData)) {
+        return
       }
+      const blobs = WavCoder.splitChannels(audioData)
+      const responses = []
+      const promises = blobs.map((blob, i) => (async () => {
+        const signalDto = {
+          maxAbsY: 1,
+          xMin: 0,
+          sampleRate: audioData.sampleRate
+        }
+        this.makeSignalNameAndDescriptionFromFile(signalDto, file)
+        if (blobs.length > 1) {
+          signalDto.name += ' (' + i + ')'
+        }
+        const response = await SignalRequests.saveNewSignalDtoWithData(signalDto, blob)
+        responses.push(response)
+      })())
+      await Promise.all(promises)
+      let noErrors = true, errorResponse = null
+      responses.forEach(response => {
+        if (!response.ok) {
+          noErrors = false
+          errorResponse = response
+        }
+      })
+      noErrors && await useRouter().push('/signal-manager')
+      errorResponse && this.showErrorsFromResponse(errorResponse, this._tc('messages.fileSaveError'))
     },
     async openText(file) {
       const signal = await this.tryReadSignalFromTextFile(file)
@@ -108,9 +131,9 @@ export default {
         return
       }
       SignalUtils.calculateMaxAbsY(signal)
-      const response = await this.getApiProvider().postJson('/api/signals', signal)
+      const response = await SignalRequests.saveNewSignal(signal)
       if (response.ok) {
-        useRouter().push('/signal-manager')
+        await useRouter().push('/signal-manager')
       } else if (response.status === 400) {
         for (let error of response.errors) {
           if (error.field === 'data') {

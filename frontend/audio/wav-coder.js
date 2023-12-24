@@ -9,12 +9,22 @@ const WavCoder = {
   },
 
   async wavToSignals(arrayBuffer) {
-    const audioData = await WavDecoder.decode(arrayBuffer)
+    const audioData = await this.decodeWAV(arrayBuffer)
     return audioData.channelData.map(channelDataItem => ({
       xMin: 0,
       sampleRate: audioData.sampleRate,
       data: Array.prototype.slice.call(channelDataItem)
     }))
+  },
+
+  splitChannels(audioData) {
+    return audioData.channelData
+        .map(channelDataItem => this.encodeWAV(channelDataItem, 1, audioData.sampleRate))
+        .map(dataView => new Blob([dataView], {type: 'audio/wav'}))
+  },
+
+  async decodeWAV(arrayBuffer) {
+    return await WavDecoder.decode(arrayBuffer)
   },
 
   encodeWAV(samples, numChannels, sampleRate) {

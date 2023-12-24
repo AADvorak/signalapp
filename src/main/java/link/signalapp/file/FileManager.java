@@ -52,6 +52,12 @@ public class FileManager {
         AudioSystem.write(ais, AudioFileFormat.Type.WAVE, new File(wavDir + "/" + signalId + ".wav"));
     }
 
+    public void writeWavToFile(int userId, int signalId, byte[] bytes) throws IOException {
+        String wavDir = getWavDir(userId, signalId);
+        createDirIfNotExists(wavDir);
+        writeBytesToFile(bytes, wavDir + "/" + signalId + ".wav");
+    }
+
     public void deleteSignalData(int userId, int signalId) {
         deleteDirRecursively(new File(getWavDir(userId, signalId)));
     }
@@ -68,6 +74,10 @@ public class FileManager {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write(string);
         }
+    }
+
+    private void writeBytesToFile(byte[] bytes, String fileName) throws IOException {
+        Files.write(Paths.get(fileName), bytes);
     }
 
     private String readStringFromFile(String fileName) throws IOException {

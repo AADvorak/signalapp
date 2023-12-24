@@ -4,7 +4,13 @@ import {dataStore} from "~/stores/data-store";
 export default {
   methods: {
     validateSignalLength(signal) {
-      const maxSamplesNumber = 1024000, samplesNumber = signal.data.length
+      return this.validateSamplesNumber(signal.data.length)
+    },
+    validateAudioDataLength(audioData) {
+      return this.validateSamplesNumber(audioData.channelData[0].length)
+    },
+    validateSamplesNumber(samplesNumber) {
+      const maxSamplesNumber = 1024000
       if (samplesNumber > maxSamplesNumber) {
         this.showMessage({
           text: this._tc('messages.wrongSignalSamplesNumber', {samplesNumber, maxSamplesNumber})

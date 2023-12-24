@@ -2,8 +2,6 @@ import {dataStore} from "~/stores/data-store";
 
 const ApiProvider = {
 
-  BASE_URL: window.location.port === '3000' ? 'http://localhost:8080' : '',
-
   router: null,
   route: null,
 
@@ -18,7 +16,7 @@ const ApiProvider = {
   },
 
   get(url, noHandleUnauthorized) {
-    return fetch(this.BASE_URL + url, {
+    return fetch(url, {
       credentials: 'include'
     })
         .then(response => this.parseResponse(response, noHandleUnauthorized))
@@ -29,47 +27,40 @@ const ApiProvider = {
     return this.post(url, JSON.stringify(data), 'application/json', noHandleUnauthorized)
   },
 
+  postMultipart(url, object, data, noHandleUnauthorized) {
+    return this.post(url, this.createFormData(object, data), '', noHandleUnauthorized)
+  },
+
   post(url, body, contentType, noHandleUnauthorized) {
-    return fetch(this.BASE_URL + url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': contentType || 'text/plain'
-      },
+    return this.request(url, 'POST', body, contentType, noHandleUnauthorized)
+  },
+
+  putJson(url, data, noHandleUnauthorized) {
+    return this.request(url, 'PUT', data, 'application/json', noHandleUnauthorized)
+  },
+
+  putMultipart(url, object, data, noHandleUnauthorized) {
+    return this.request(url, 'PUT', this.createFormData(object, data), '', noHandleUnauthorized)
+  },
+
+  request(url, method, body, contentType, noHandleUnauthorized) {
+    const init = {
+      method,
       body,
       credentials: 'include'
-    })
+    }
+    if (contentType) {
+      init.headers = {
+        'Content-Type': contentType
+      }
+    }
+    return fetch(url, init)
         .then(response => this.parseResponse(response, noHandleUnauthorized))
         .catch(error => error)
   },
 
-  putJson(url, data) {
-    return fetch(this.BASE_URL + url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data),
-      credentials: 'include'
-    })
-        .then(response => this.parseResponse(response))
-        .catch(error => error)
-  },
-
-  putText(url, data, extension) {
-    return fetch(this.BASE_URL + url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'text/' + (extension === 'html' ? extension : 'plain')
-      },
-      body: data,
-      credentials: 'include'
-    })
-        .then(response => this.parseResponse(response))
-        .catch(error => error)
-  },
-
   del(url) {
-    return fetch(this.BASE_URL + url, {
+    return fetch(url, {
       method: 'DELETE',
       credentials: 'include'
     })
@@ -98,6 +89,13 @@ const ApiProvider = {
       this.router && this.router.push('/signin')
     }
     return {...result, errors: data}
+  },
+
+  createFormData(object, data) {
+    const formData = new FormData()
+    formData.append('json', new Blob([JSON.stringify(object)],  {type: 'application/json'}) )
+    formData.append('data', data)
+    return formData
   }
 
 }

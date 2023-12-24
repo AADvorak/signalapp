@@ -62,6 +62,7 @@ import {mdiPlay, mdiStop} from "@mdi/js";
 import SignalPlayer from "../audio/signal-player";
 import WavCoder from "../audio/wav-coder";
 import SignalActions from "../mixins/signal-actions";
+import {SignalRequests} from "~/api/signal-requests";
 
 export default {
   name: "signal-recorder",
@@ -176,8 +177,12 @@ export default {
     },
     async saveRecorded() {
       await this.loadWithFlag(async () => {
-        const response = await this.getApiProvider().post('/api/signals/wav/' + this.recordedAudio.fileName,
-            await this.recordedAudio.blob.arrayBuffer(), 'audio/wave')
+        const response = await SignalRequests.saveNewSignalDtoWithData({
+          name: this.recordedAudio.fileName,
+          maxAbsY: 1,
+          xMin: 0,
+          sampleRate: this.formValues.sampleRate
+        }, this.recordedAudio.blob)
         if (response.ok) {
           useRouter().push('/signal-manager')
         } else {

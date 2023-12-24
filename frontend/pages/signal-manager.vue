@@ -182,6 +182,7 @@ import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
 import NumberUtils from "~/utils/number-utils";
 import uiParamsSaving from "~/mixins/ui-params-saving";
+import {SignalRequests} from "~/api/signal-requests";
 
 export default {
   name: "signal-manager",
@@ -306,6 +307,7 @@ export default {
   },
   mounted() {
     this.mounted = true
+    SignalRequests.setApiProvider(this.getApiProvider())
     this.restoreFormValues()
     this.restoreUiParams()
     this.readUrlParams()
@@ -351,10 +353,11 @@ export default {
       if (signal.data) {
         return
       }
-      let response = await this.getApiProvider().get(`/api/signals/${signal.id}/data`)
-      if (response.ok) {
-        signal.data = response.data
+      try {
+        signal.data = await SignalRequests.loadData(signal.id)
         SignalUtils.calculateSignalParams(signal)
+      } catch (e) {
+        console.log(e)
       }
     },
     async loadSampleRates() {

@@ -96,6 +96,7 @@ import WavCoder from "../../../audio/wav-coder";
 import SignalPlayer from "../../../audio/signal-player";
 import {mdiPlay, mdiStop} from "@mdi/js";
 import NumberUtils from "~/utils/number-utils";
+import {SignalRequests} from "~/api/signal-requests";
 
 export default {
   name: "signal",
@@ -141,6 +142,7 @@ export default {
     }
   },
   mounted() {
+    SignalRequests.setApiProvider(this.getApiProvider())
     this.getSignalFromHistoryOrLoad()
     this.bus.on('error', error => {
       this.showMessage({
@@ -169,9 +171,8 @@ export default {
       }
     },
     async loadSignal() {
-      const response = await this.getApiProvider().get(`/api/signals/${this.signalId}`)
-      if (response.ok) {
-        const signal = response.data
+      try {
+        const signal = await SignalRequests.loadSignalWithData(this.signalId)
         SignalUtils.calculateSignalParams(signal)
         const historyKey = dataStore().addSignalToHistory(signal)
         if (this.historyKey === '0') {
@@ -179,8 +180,10 @@ export default {
         } else {
           await useRouter().push(`/signal/${this.signalId}?history=${historyKey}`)
         }
-      } else if (response.status === 404) {
-        this.signalNotFound()
+      } catch (e) {
+        if (e.status === 404) {
+          this.signalNotFound()
+        }
       }
     },
     async saveSignalAsNew() {
@@ -191,8 +194,8 @@ export default {
       this.clearValidation()
       await this.loadWithOverlay(async () => {
         const response = this.signalIsSaved
-            ? await this.getApiProvider().putJson(`/api/signals/${this.signalId}`, this.signal)
-            : await this.getApiProvider().postJson('/api/signals', this.signal)
+            ? await SignalRequests.saveExistingSignal(this.signal)
+            : await SignalRequests.saveNewSignal(this.signal)
         if (response.ok) {
           this.signalIsSaved && dataStore().updateSignalInHistory(this.signal, this.historyKey)
           await useRouter().push('/signal-manager')

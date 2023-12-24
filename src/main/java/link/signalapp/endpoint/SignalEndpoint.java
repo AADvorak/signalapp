@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import link.signalapp.dto.request.SignalDtoRequest;
 import link.signalapp.dto.request.SignalFilterDto;
 import link.signalapp.dto.response.IdDtoResponse;
-import link.signalapp.dto.request.SignalDtoRequest;
 import link.signalapp.dto.response.ResponseWithTotalCounts;
 import link.signalapp.dto.response.SignalDtoResponse;
-import link.signalapp.dto.response.SignalWithDataDtoResponse;
-import link.signalapp.error.SignalAppConflictException;
 import link.signalapp.error.SignalAppException;
 import link.signalapp.error.SignalAppNotFoundException;
 import link.signalapp.error.SignalAppUnauthorizedException;
@@ -55,19 +53,22 @@ public class SignalEndpoint extends EndpointBase {
         return signalService.filter(filter);
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     IdDtoResponse post(
-            @RequestBody @Valid SignalDtoRequest signalDtoRequest
-    ) throws SignalAppUnauthorizedException, IOException, SignalAppConflictException {
-        return signalService.add(signalDtoRequest);
+            @RequestPart @Valid SignalDtoRequest json,
+            @RequestPart byte[] data
+    ) throws SignalAppUnauthorizedException, IOException, SignalAppException, UnsupportedAudioFileException {
+        return signalService.add(json, data);
     }
 
-    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     void put(
-            @RequestBody @Valid SignalDtoRequest signalDtoRequest,
+            @RequestBody @Valid SignalDtoRequest json,
+            @RequestPart byte[] data,
             @PathVariable int id
-    ) throws SignalAppUnauthorizedException, IOException, SignalAppNotFoundException {
-        signalService.update(signalDtoRequest, id);
+    ) throws SignalAppUnauthorizedException, IOException, SignalAppNotFoundException,
+            UnsupportedAudioFileException, SignalAppException {
+        signalService.update(json, data, id);
     }
 
     @DeleteMapping("/{id}")
@@ -76,17 +77,10 @@ public class SignalEndpoint extends EndpointBase {
     }
 
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    SignalWithDataDtoResponse getSignalWithData(
+    SignalDtoResponse getSignal(
             @PathVariable int id
-    ) throws SignalAppUnauthorizedException, SignalAppNotFoundException, UnsupportedAudioFileException, IOException {
-        return signalService.getSignalWithData(id);
-    }
-
-    @GetMapping(path = "/{id}/data", produces = MediaType.APPLICATION_JSON_VALUE)
-    List<BigDecimal> getData(
-            @PathVariable int id
-    ) throws SignalAppUnauthorizedException, SignalAppNotFoundException, UnsupportedAudioFileException, IOException {
-        return signalService.getData(id);
+    ) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+        return signalService.getSignal(id);
     }
 
     @GetMapping(path = "/{id}/wav", produces = "audio/wave")
@@ -94,14 +88,6 @@ public class SignalEndpoint extends EndpointBase {
             @PathVariable int id
     ) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
         return signalService.getWav(id);
-    }
-
-    @PostMapping(path = "/wav/{fileName}", consumes = "audio/wave")
-    void postWav(
-            @PathVariable String fileName,
-            @RequestBody byte[] data
-    ) throws UnsupportedAudioFileException, SignalAppUnauthorizedException, IOException, SignalAppException {
-        signalService.importWav(fileName, data);
     }
 
     @GetMapping(path = "/sample-rates", produces = MediaType.APPLICATION_JSON_VALUE)
