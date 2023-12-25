@@ -63,7 +63,7 @@ public class SignalEndpoint extends EndpointBase {
 
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     void put(
-            @RequestBody @Valid SignalDtoRequest json,
+            @RequestPart @Valid SignalDtoRequest json,
             @RequestPart byte[] data,
             @PathVariable int id
     ) throws SignalAppUnauthorizedException, IOException, SignalAppNotFoundException,
