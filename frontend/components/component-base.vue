@@ -16,9 +16,6 @@ export default {
     },
     _tsn(key) {
       return this.$t('signalNames.' + key)
-    },
-    _tsm(key, params) {
-      return this.$t('serverMessages.' + key, params)
     }
   }
 }

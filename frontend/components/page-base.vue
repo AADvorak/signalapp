@@ -103,15 +103,21 @@ export default {
       let errorMsg = ''
       if (Array.isArray(response.errors)) {
         for (let error of response.errors) {
-          error.code && (errorMsg += (errorMsg && ', ') + this.getLocalizedErrorMessage(error))
+          error.code && !error.field && (errorMsg += (errorMsg && ', ') + this.getLocalizedErrorMessage(error))
         }
       }
-      this.showMessage({
-        text: (text || this._tc('messages.error')) + (errorMsg ? ': ' + errorMsg : '')
+      errorMsg && this.showMessage({
+        text: (text || this._tc('messages.error')) + ': ' + errorMsg
       })
     },
     getLocalizedErrorMessage(error) {
-      return this._tsm(error.code, error.params)
+      const keyRoot = 'serverMessages.'
+      const key = keyRoot + error.code
+      let msg = this.$t(key, error.params)
+      if (msg === key) {
+        msg = this.$t(keyRoot + 'UNKNOWN_ERROR')
+      }
+      return msg
     },
   },
 }

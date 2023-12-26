@@ -72,10 +72,9 @@ export default {
           this.requestSuccess = true
           dataStore().setUserInfo(response.data)
           await useRouter().push(this.waitingForAuthorization ? this.waitingForAuthorization : '/')
-        } else if (response.status === 400) {
+        } else {
           this.parseValidation(response.errors)
           this.showRecaptchaValidationError(response.errors)
-        } else {
           this.showErrorsFromResponse(response, this._t(errorKey))
         }
       }, 'requestSent').then()

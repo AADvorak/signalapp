@@ -199,17 +199,8 @@ export default {
         if (response.ok) {
           this.signalIsSaved && dataStore().updateSignalInHistory(this.signal, this.historyKey)
           await useRouter().push('/signal-manager')
-        } else if (response.status === 400) {
-          this.parseValidation(response.errors)
-          // todo fix this
-          for (let error of response.errors) {
-            if (error.field === 'data') {
-              this.showMessage({
-                text: `${this._t('signalDataSaveError')}: ${this.getLocalizedErrorMessage(error)}`
-              })
-            }
-          }
         } else {
+          this.parseValidation(response.errors)
           this.showErrorsFromResponse(response, this._t('signalSaveError'))
         }
       })

@@ -22,7 +22,7 @@ export default {
     },
     parseValidation(errors) {
       for (let error of errors) {
-        this.pushValidationMsg(error.field, this.getLocalizedErrorMessage(error))
+        error.field && this.pushValidationMsg(error.field, this.getLocalizedErrorMessage(error))
       }
     },
     clearValidation() {

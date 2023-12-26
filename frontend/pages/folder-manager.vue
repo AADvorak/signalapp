@@ -96,7 +96,7 @@ export default {
     onEditorResponse(response) {
       if (response.ok) {
         this.loadFolders(true)
-      } else if (response.status !== 400) {
+      } else {
         this.showErrorsFromResponse(response)
       }
     },

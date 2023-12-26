@@ -82,10 +82,10 @@ export default {
         } else {
           response = await FolderRequests.saveFolder(this.formValues)
         }
-        if (response.status === 400) {
-          this.parseValidation(response.errors)
-        } else {
+        if (response.ok) {
           this.close()
+        } else {
+          this.parseValidation(response.errors)
         }
         this.$emit('response', response)
       }, 'saveFolderRequestSent')

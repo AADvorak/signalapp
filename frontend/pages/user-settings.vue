@@ -97,9 +97,8 @@ export default {
           this.showMessage({
             text: this._t('saveSuccess')
           })
-        } else if (response.status === 400) {
-          this.parseValidation(response.errors)
         } else {
+          this.parseValidation(response.errors)
           this.showErrorsFromResponse(response, this._t('saveError'))
         }
       }, 'saveRequestSent')

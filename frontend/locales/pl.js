@@ -336,7 +336,8 @@ const pl = {
     MaxLength: 'Naruszenie maksymalnej długości',
     Email: 'Musi być w formacie adresu e-mail',
     RECAPTCHA_TOKEN_NOT_VERIFIED: 'Weryfikacja recaptcha nie udała się',
-    INTERNAL_SERVER_ERROR: 'Wewnętrzny błąd serwera'
+    INTERNAL_SERVER_ERROR: 'Wewnętrzny błąd serwera',
+    UNKNOWN_ERROR: 'Niewiadomy błąd'
   },
   chart: {
     resetZoom: 'Zresetuj zoom'

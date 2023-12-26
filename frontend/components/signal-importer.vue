@@ -134,14 +134,6 @@ export default {
       const response = await SignalRequests.saveNewSignal(signal)
       if (response.ok) {
         await useRouter().push('/signal-manager')
-      } else if (response.status === 400) {
-        for (let error of response.errors) {
-          if (error.field === 'data') {
-            this.showMessage({
-              text: this.getLocalizedErrorMessage(error)
-            })
-          }
-        }
       } else {
         this.showErrorsFromResponse(response)
       }

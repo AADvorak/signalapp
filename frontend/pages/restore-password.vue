@@ -52,9 +52,8 @@ export default {
             text: this._t('newPasswordSentByEmail'),
             onHide: () => useRouter().push('/signin')
           })
-        } else if (response.status === 400) {
-          this.parseValidation(response.errors)
         } else {
+          this.parseValidation(response.errors)
           this.showErrorsFromResponse(response, this._t('passwordSendError'))
         }
       }, 'restorePasswordRequestSent')

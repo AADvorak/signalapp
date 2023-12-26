@@ -336,7 +336,8 @@ const ru = {
     MaxLength: 'Нарушение требования максимальной длины',
     Email: 'Должно быть в формате email',
     RECAPTCHA_TOKEN_NOT_VERIFIED: 'Проверка Recaptcha не удалась',
-    INTERNAL_SERVER_ERROR: 'Внутренняя ошибка сервера'
+    INTERNAL_SERVER_ERROR: 'Внутренняя ошибка сервера',
+    UNKNOWN_ERROR: 'Неизвестная ошибка'
   },
   chart: {
     resetZoom: 'Сбросить увеличение'

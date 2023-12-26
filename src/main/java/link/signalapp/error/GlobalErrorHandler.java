@@ -21,24 +21,24 @@ public class GlobalErrorHandler {
 
     @ExceptionHandler(SignalAppNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public void handleSignalAppNotFoundException(SignalAppNotFoundException exc) {
+    public void handleSignalAppNotFoundException() {
     }
 
     @ExceptionHandler(SignalAppUnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public void handleSignalAppUnauthorizedException(SignalAppUnauthorizedException exc) {
+    public void handleSignalAppUnauthorizedException() {
     }
 
     @ExceptionHandler(SignalAppAccessException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public void handleSignalAppAccessException(SignalAppAccessException exc) {
+    public void handleSignalAppAccessException() {
     }
 
     @ExceptionHandler(SignalAppDataException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public List<FieldErrorDtoResponse> handleSignalAppDataException(SignalAppDataException exc) {
         List<FieldErrorDtoResponse> errors = new ArrayList<>();
-        if (exc.getErrorCode().getFields().size() == 0) {
+        if (exc.getErrorCode().getFields().isEmpty()) {
             errors.add(new FieldErrorDtoResponse()
                     .setCode(exc.getErrorCode().toString())
                     .setMessage(exc.getErrorCode().getDescription()));
@@ -54,35 +54,13 @@ public class GlobalErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BindException.class)
     public List<FieldErrorDtoResponse> handleBindException(BindException exc) {
-        List<FieldErrorDtoResponse> errors = new ArrayList<>();
-        exc.getBindingResult().getFieldErrors().forEach(fieldError ->
-                errors.add(new FieldErrorDtoResponse()
-                        .setCode(fieldError.getCode())
-                        .setField(fieldError.getField())
-                        .setMessage(fieldError.getDefaultMessage())));
-        exc.getBindingResult().getGlobalErrors().forEach(err ->
-                errors.add(new FieldErrorDtoResponse()
-                        .setCode(err.getCode())
-                        .setField(err.getObjectName())
-                        .setMessage(err.getDefaultMessage())));
-        return errors;
+        return makeFieldErrors(exc);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public List<FieldErrorDtoResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exc) {
-        List<FieldErrorDtoResponse> errors = new ArrayList<>();
-        exc.getBindingResult().getFieldErrors().forEach(fieldError ->
-                errors.add(new FieldErrorDtoResponse()
-                        .setCode(fieldError.getCode())
-                        .setField(fieldError.getField())
-                        .setMessage(fieldError.getDefaultMessage())));
-        exc.getBindingResult().getGlobalErrors().forEach(err ->
-                errors.add(new FieldErrorDtoResponse()
-                        .setCode(err.getCode())
-                        .setField(err.getObjectName())
-                        .setMessage(err.getDefaultMessage())));
-        return errors;
+        return makeFieldErrors(exc);
     }
 
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
@@ -160,5 +138,19 @@ public class GlobalErrorHandler {
         return errors;
     }
 
-}
+    private List<FieldErrorDtoResponse> makeFieldErrors(BindException exc) {
+        List<FieldErrorDtoResponse> errors = new ArrayList<>();
+        exc.getBindingResult().getFieldErrors().forEach(fieldError ->
+                errors.add(new FieldErrorDtoResponse()
+                        .setCode(fieldError.getCode())
+                        .setField(fieldError.getField())
+                        .setMessage(fieldError.getDefaultMessage())));
+        exc.getBindingResult().getGlobalErrors().forEach(err ->
+                errors.add(new FieldErrorDtoResponse()
+                        .setCode(err.getCode())
+                        .setField(err.getObjectName())
+                        .setMessage(err.getDefaultMessage())));
+        return errors;
+    }
 
+}
