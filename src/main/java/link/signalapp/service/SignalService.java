@@ -56,7 +56,7 @@ public class SignalService extends ServiceBase {
     @Transactional(rollbackFor = IOException.class)
     public IdDtoResponse add(SignalDtoRequest request, byte[] data) throws SignalAppUnauthorizedException,
             IOException, SignalAppException, UnsupportedAudioFileException {
-        checkAudioData(request, data);
+        checkAudioData(data);
         int userId = getUserFromContext().getId();
         checkStoredByUserSignalsNumber(userId);
         Signal signal = signalRepository.save(new Signal(request, userId));
@@ -67,7 +67,7 @@ public class SignalService extends ServiceBase {
     @Transactional(rollbackFor = IOException.class)
     public void update(SignalDtoRequest request, byte[] data, int id) throws SignalAppUnauthorizedException,
             IOException, SignalAppNotFoundException, UnsupportedAudioFileException, SignalAppException {
-        checkAudioData(request, data);
+        checkAudioData(data);
         int userId = getUserFromContext().getId();
         Signal signal = getSignalById(id)
                 .setName(request.getName())
@@ -125,7 +125,7 @@ public class SignalService extends ServiceBase {
         }
     }
 
-    private void checkAudioData(SignalDtoRequest request, byte[] data) throws UnsupportedAudioFileException,
+    private void checkAudioData(byte[] data) throws UnsupportedAudioFileException,
             IOException, SignalAppException {
         AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(data));
         long sampleCount = asr.getSampleCount();
@@ -136,10 +136,6 @@ public class SignalService extends ServiceBase {
         AudioFormat format = asr.getFormat();
         if (format.getChannels() > 1) {
             throw new SignalAppException(SignalAppErrorCode.WRONG_VAW_FORMAT, null);
-        }
-        BigDecimal wavSampleRate = BigDecimal.valueOf(format.getSampleRate());
-        if (wavSampleRate.compareTo(request.getSampleRate()) != 0) {
-            request.setSampleRate(wavSampleRate);
         }
     }
 
