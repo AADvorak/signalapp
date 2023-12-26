@@ -201,6 +201,7 @@ export default {
           await useRouter().push('/signal-manager')
         } else if (response.status === 400) {
           this.parseValidation(response.errors)
+          // todo fix this
           for (let error of response.errors) {
             if (error.field === 'data') {
               this.showMessage({
