@@ -74,7 +74,6 @@ export default {
           await useRouter().push(this.waitingForAuthorization ? this.waitingForAuthorization : '/')
         } else {
           this.parseValidation(response.errors)
-          this.showRecaptchaValidationError(response.errors)
           this.showErrorsFromResponse(response, this._t(errorKey))
         }
       }, 'requestSent').then()

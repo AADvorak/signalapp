@@ -1,6 +1,7 @@
 package link.signalapp;
 
 import link.signalapp.dto.request.LoginDtoRequest;
+import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.dto.response.FieldErrorDtoResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.model.UserToken;
@@ -116,10 +117,9 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail(email1).setPassword(password).setToken(WRONG_TOKEN), String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("RECAPTCHA_TOKEN_NOT_VERIFIED", error.getCode()),
-                () -> assertEquals("token", error.getField()));
+                () -> assertEquals("RECAPTCHA_TOKEN_NOT_VERIFIED", error.getCode()));
         applicationProperties.setVerifyCaptcha(false);
     }
 

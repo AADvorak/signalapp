@@ -1,6 +1,7 @@
 package link.signalapp;
 
 import link.signalapp.dto.request.UserDtoRequest;
+import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.service.UserService;
@@ -179,10 +180,9 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
                         createUser(email1)
                                 .setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH))
                                 .setToken(WRONG_TOKEN), String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
         assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("RECAPTCHA_TOKEN_NOT_VERIFIED", error.getCode()),
-                () -> assertEquals("token", error.getField()));
+                () -> assertEquals("RECAPTCHA_TOKEN_NOT_VERIFIED", error.getCode()));
         applicationProperties.setVerifyCaptcha(false);
     }
 

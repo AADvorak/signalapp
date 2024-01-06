@@ -1,7 +1,7 @@
 package link.signalapp.captcha;
 
-import link.signalapp.error.SignalAppDataErrorCode;
-import link.signalapp.error.SignalAppDataException;
+import link.signalapp.error.SignalAppErrorCode;
+import link.signalapp.error.SignalAppException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class RecaptchaVerifier {
             throw new Exception("Recaptcha server empty response");
         }
         if (!responseEntity.getBody().isSuccess()) {
-            throw new SignalAppDataException(SignalAppDataErrorCode.RECAPTCHA_TOKEN_NOT_VERIFIED);
+            throw new SignalAppException(SignalAppErrorCode.RECAPTCHA_TOKEN_NOT_VERIFIED, null);
         }
     }
 
