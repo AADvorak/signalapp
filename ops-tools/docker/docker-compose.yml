@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
 
@@ -10,8 +10,17 @@ services:
       - '8080:8080'
     depends_on:
       - signalapp-postgres
+    environment:
+      DB_URL: jdbc:postgresql://signalapp-postgres:5432/postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      RECAPTCHA_SECRET: ${RECAPTCHA_SECRET}
+      MAILING_SMTP_HOST: smtp.mail.ru
+      MAILING_SMTP_PORT: 587
+      MAILING_USERNAME: ${MAILING_USERNAME}
+      MAILING_PASSWORD: ${MAILING_PASSWORD}
     volumes:
-      - ../../:/signalapp
+      - ../../target/signalapp-1.3.0.jar:/signalapp/signalapp.jar
       - ../../../signalappdata/:/signalapp/signalappdata
     stdin_open: true
     tty: true

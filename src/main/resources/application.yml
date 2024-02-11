@@ -1,0 +1,31 @@
+application:
+    data_path: signalappdata/
+    debug: false
+    max_name_length: 100
+    min_password_length: 5
+    user_idle_timeout: 3600
+    verify_captcha: true
+mailing:
+    password: ${MAILING_PASSWORD}
+    smtp_port: ${MAILING_SMTP_PORT}
+    smtp_host: ${MAILING_SMTP_HOST}
+    username: ${MAILING_USERNAME}
+recaptcha:
+    secret: ${RECAPTCHA_SECRET}
+    url: https://www.google.com/recaptcha/api/siteverify
+spring:
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        password: ${DB_PASSWORD}
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+    flyway:
+        locations: classpath:db/migration
+    jpa:
+        database: postgresql
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+        show-sql: false
+    servlet:
+        multipart:
+            max-file-size: 20MB
+            max-request-size: 20MB
