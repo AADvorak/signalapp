@@ -1,5 +1,6 @@
 package link.signalapp.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @Accessors(chain = true)
+@EqualsAndHashCode
 @Embeddable
 public class UserConfirmPK implements Serializable {
 

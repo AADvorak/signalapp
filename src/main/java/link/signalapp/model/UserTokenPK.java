@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @Accessors(chain = true)
+@EqualsAndHashCode
 @Embeddable
 public class UserTokenPK implements Serializable {
 
