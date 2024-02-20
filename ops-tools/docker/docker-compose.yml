@@ -17,6 +17,7 @@ services:
       MAILING_SMTP_HOST: smtp.mail.ru
       MAILING_SMTP_PORT: 587
       SECURITY_USER_PASSWORD: password
+      SECURE_RANDOM_SEED: seed
     env_file: ./secrets/secrets.env
     volumes:
       - ../../target/signalapp-1.3.0.jar:/signalapp/signalapp.jar

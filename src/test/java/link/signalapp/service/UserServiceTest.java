@@ -37,6 +37,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
+    private static final PasswordEncoder PASSWORD_ENCODER = new PasswordEncoder(
+            new ApplicationProperties().setSecureRandomSeed("seed")
+    );
+
     private final Data data = new Data();
 
     @InjectMocks
@@ -57,7 +61,7 @@ public class UserServiceTest {
     @Mock
     private ApplicationProperties applicationProperties;
     @Spy
-    private final PasswordEncoder passwordEncoder = new PasswordEncoder();
+    private final PasswordEncoder passwordEncoder = PASSWORD_ENCODER;
 
     @Captor
     private ArgumentCaptor<User> userCaptor;
@@ -398,7 +402,7 @@ public class UserServiceTest {
         private static final String LAST_NAME = "Last";
         private static final String PATRONYMIC = "Patronymic";
 
-        private final PasswordEncoder passwordEncoder = new PasswordEncoder();
+        private final PasswordEncoder passwordEncoder = UserServiceTest.PASSWORD_ENCODER;
 
         private LoginDtoRequest loginDtoRequest() {
             return new LoginDtoRequest()

@@ -5,6 +5,7 @@ application:
     min_password_length: 5
     user_idle_timeout: 3600
     verify_captcha: true
+    secure_random_seed: ${SECURE_RANDOM_SEED}
 mailing:
     password: ${MAILING_PASSWORD}
     smtp_port: ${MAILING_SMTP_PORT}
