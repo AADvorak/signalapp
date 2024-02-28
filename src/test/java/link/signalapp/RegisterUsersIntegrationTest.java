@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -29,12 +30,14 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         userDtoRequest.setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH));
         ResponseEntity<UserDtoResponse> response = template.postForEntity(fullUrl(USERS_URL), userDtoRequest, UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
-        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertEquals(userDtoRequest.getEmail(), userDtoResponse.getEmail()),
                 () -> assertEquals(userDtoRequest.getFirstName(), userDtoResponse.getFirstName()),
                 () -> assertEquals(userDtoRequest.getLastName(), userDtoResponse.getLastName()),
                 () -> assertEquals(userDtoRequest.getPatronymic(), userDtoResponse.getPatronymic()),
-                () -> assertFalse(userDtoResponse.isEmailConfirmed()));
+                () -> assertFalse(userDtoResponse.isEmailConfirmed())
+        );
     }
 
     @Test
@@ -43,147 +46,128 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
         userDtoRequest.setFirstName(null);
         ResponseEntity<UserDtoResponse> response = template.postForEntity(fullUrl(USERS_URL), userDtoRequest, UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
-        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertEquals(userDtoRequest.getEmail(), userDtoResponse.getEmail()),
                 () -> assertEquals(userDtoRequest.getFirstName(), userDtoResponse.getFirstName()),
                 () -> assertEquals(userDtoRequest.getLastName(), userDtoResponse.getLastName()),
                 () -> assertEquals(userDtoRequest.getPatronymic(), userDtoResponse.getPatronymic()),
-                () -> assertFalse(Objects.requireNonNull(response.getBody()).isEmailConfirmed()));
+                () -> assertFalse(Objects.requireNonNull(response.getBody()).isEmailConfirmed())
+        );
     }
 
     @Test
     public void registerNullEmail() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser(null);
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("NotEmpty", error.getCode()),
-                () -> assertEquals("email", error.getField()));
+        checkBadRequestFieldError(
+                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                "NotEmpty", "email");
     }
 
     @Test
     public void registerEmptyEmail() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser("");
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("NotEmpty", error.getCode()),
-                () -> assertEquals("email", error.getField()));
+        checkBadRequestFieldError(
+                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                "NotEmpty", "email");
     }
 
     @Test
     public void registerInvalidEmail() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser("aaa");
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("Email", error.getCode()),
-                () -> assertEquals("email", error.getField()));
+        checkBadRequestFieldError(
+                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                "Email", "email");
     }
 
     @Test
     public void registerNullPassword() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser(email1).setPassword(null);
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("MinLength", error.getCode()),
-                () -> assertEquals("password", error.getField()));
+        checkBadRequestFieldError(
+                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                "MinLength", "password");
     }
 
     @Test
     public void registerEmptyPassword() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser(email1).setPassword("");
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("MinLength", error.getCode()),
-                () -> assertEquals("password", error.getField()));
+        checkBadRequestFieldError(
+                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                "MinLength", "password");
     }
 
     @Test
     public void registerShortPassword() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser(email1).setPassword("0000");
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("MinLength", error.getCode()),
-                () -> assertEquals("password", error.getField()));
+        checkBadRequestFieldError(
+                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                "MinLength", "password");
     }
 
     @Test
     public void registerLongPassword() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser(email1)
                 .setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH + 1));
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("Size", error.getCode()),
-                () -> assertEquals("password", error.getField()));
+        checkBadRequestFieldError(
+                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                "Size", "password");
     }
 
     @Test
     public void registerLongName() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser(email1)
                 .setFirstName(RandomStringUtils.randomAlphanumeric(applicationProperties.getMaxNameLength() + 1));
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("MaxLength", error.getCode()),
-                () -> assertEquals("firstName", error.getField()));
+        checkBadRequestFieldError(
+                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                "MaxLength", "firstName");
     }
 
     @Test
     public void registerEmailAlreadyExists() throws JsonProcessingException {
         UserDtoRequest userDtoRequest = createUser(email1);
         template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class);
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("EMAIL_ALREADY_EXISTS", error.getCode()),
-                () -> assertEquals("Email already exists", error.getMessage()));
+        checkBadRequestFieldError(
+                () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                "EMAIL_ALREADY_EXISTS");
     }
 
     @Test
     public void registerWithProperRecaptchaToken() throws Exception {
         prepareRecaptchaVerifier();
         applicationProperties.setVerifyCaptcha(true);
-        UserDtoRequest userDtoRequest = createUser(email1)
-                .setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH))
-                .setToken(PROPER_TOKEN);
-        ResponseEntity<UserDtoResponse> response = template.postForEntity(fullUrl(USERS_URL), userDtoRequest, UserDtoResponse.class);
-        UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
-        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
-                () -> assertEquals(userDtoRequest.getEmail(), userDtoResponse.getEmail()),
-                () -> assertEquals(userDtoRequest.getFirstName(), userDtoResponse.getFirstName()),
-                () -> assertEquals(userDtoRequest.getLastName(), userDtoResponse.getLastName()),
-                () -> assertEquals(userDtoRequest.getPatronymic(), userDtoResponse.getPatronymic()),
-                () -> assertFalse(userDtoResponse.isEmailConfirmed()));
-        applicationProperties.setVerifyCaptcha(false);
+        try {
+            UserDtoRequest userDtoRequest = createUser(email1)
+                    .setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH))
+                    .setToken(PROPER_TOKEN);
+            ResponseEntity<UserDtoResponse> response = template.postForEntity(fullUrl(USERS_URL), userDtoRequest, UserDtoResponse.class);
+            UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
+            assertAll(
+                    () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                    () -> assertEquals(userDtoRequest.getEmail(), userDtoResponse.getEmail()),
+                    () -> assertEquals(userDtoRequest.getFirstName(), userDtoResponse.getFirstName()),
+                    () -> assertEquals(userDtoRequest.getLastName(), userDtoResponse.getLastName()),
+                    () -> assertEquals(userDtoRequest.getPatronymic(), userDtoResponse.getPatronymic()),
+                    () -> assertFalse(userDtoResponse.isEmailConfirmed())
+            );
+        } finally {
+            applicationProperties.setVerifyCaptcha(false);
+        }
     }
 
     @Test
     public void registerWithWrongRecaptchaToken() throws Exception {
         prepareRecaptchaVerifier();
         applicationProperties.setVerifyCaptcha(true);
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.postForEntity(fullUrl(USERS_URL),
-                        createUser(email1)
-                                .setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH))
-                                .setToken(WRONG_TOKEN), String.class));
-        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("RECAPTCHA_TOKEN_NOT_VERIFIED", error.getCode()));
-        applicationProperties.setVerifyCaptcha(false);
+        try {
+            UserDtoRequest userDtoRequest = createUser(email1)
+                    .setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH))
+                    .setToken(WRONG_TOKEN);
+            checkBadRequestError(
+                    () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
+                    "RECAPTCHA_TOKEN_NOT_VERIFIED");
+        } finally {
+            applicationProperties.setVerifyCaptcha(false);
+        }
     }
 
 }

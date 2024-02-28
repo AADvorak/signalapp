@@ -7,10 +7,7 @@ import link.signalapp.dto.response.UserDtoResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Objects;
@@ -32,73 +29,70 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
     public void testGetUserInfoOk() {
         ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.GET,
                 new HttpEntity<>(login(email1)), UserDtoResponse.class);
-        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
-                () -> assertEquals(Objects.requireNonNull(response.getBody()).getEmail(), email1));
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertEquals(Objects.requireNonNull(response.getBody()).getEmail(), email1)
+        );
     }
 
     @Test
     public void testGetUserInfoUnauthorized() {
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.getForEntity(fullUrl(USERS_URL + ME_URL), String.class));
-        assertEquals(401, exc.getStatusCode().value());
+        checkUnauthorizedError(() -> template.getForEntity(fullUrl(USERS_URL + ME_URL), String.class));
     }
 
     @Test
     public void testEditUserInfoOk() {
         HttpHeaders headers = login(email1);
-        ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.GET,
-                new HttpEntity<>(headers), UserDtoResponse.class);
+        ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL),
+                HttpMethod.GET, new HttpEntity<>(headers), UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
         EditUserDtoRequest editUserDtoRequest = new EditUserDtoRequest()
                 .setEmail("1" + userDtoResponse.getEmail())
                 .setFirstName(userDtoResponse.getFirstName() + "1")
                 .setLastName(userDtoResponse.getLastName() + "1")
                 .setPatronymic(userDtoResponse.getPatronymic() + "1");
-        ResponseEntity<UserDtoResponse> response1 = template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.PUT,
-                new HttpEntity<>(editUserDtoRequest, headers), UserDtoResponse.class);
+        ResponseEntity<UserDtoResponse> response1 = template.exchange(fullUrl(USERS_URL + ME_URL),
+                HttpMethod.PUT, new HttpEntity<>(editUserDtoRequest, headers), UserDtoResponse.class);
         UserDtoResponse userDtoResponse1 = Objects.requireNonNull(response1.getBody());
-        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertEquals(userDtoResponse1.getEmail(), editUserDtoRequest.getEmail()),
                 () -> assertEquals(userDtoResponse1.getFirstName(), editUserDtoRequest.getFirstName()),
                 () -> assertEquals(userDtoResponse1.getLastName(), editUserDtoRequest.getLastName()),
-                () -> assertEquals(userDtoResponse1.getPatronymic(), editUserDtoRequest.getPatronymic()));
+                () -> assertEquals(userDtoResponse1.getPatronymic(), editUserDtoRequest.getPatronymic())
+        );
     }
 
     @Test
     public void testEditUserInfoExistingEmail() throws JsonProcessingException {
         HttpHeaders headers = login(email1);
-        ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.GET,
-                new HttpEntity<>(headers), UserDtoResponse.class);
+        ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL),
+                HttpMethod.GET, new HttpEntity<>(headers), UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
         EditUserDtoRequest editUserDtoRequest = new EditUserDtoRequest()
                 .setEmail(email2)
                 .setFirstName(userDtoResponse.getFirstName() + "1")
                 .setLastName(userDtoResponse.getLastName() + "1")
                 .setPatronymic(userDtoResponse.getPatronymic() + "1");
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.PUT,
-                new HttpEntity<>(editUserDtoRequest, headers), UserDtoResponse.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("email", error.getField()),
-                () -> assertEquals("EMAIL_ALREADY_EXISTS", error.getCode()));
+                        new HttpEntity<>(editUserDtoRequest, headers), UserDtoResponse.class),
+                "EMAIL_ALREADY_EXISTS", "email");
     }
 
     @Test
     public void testEditUserInfoUnauthorized() {
         HttpHeaders headers = login(email1);
-        ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.GET,
-                new HttpEntity<>(headers), UserDtoResponse.class);
+        ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL),
+                HttpMethod.GET, new HttpEntity<>(headers), UserDtoResponse.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody());
         EditUserDtoRequest editUserDtoRequest = new EditUserDtoRequest()
                 .setEmail(email2)
                 .setFirstName(userDtoResponse.getFirstName() + "1")
                 .setLastName(userDtoResponse.getLastName() + "1")
                 .setPatronymic(userDtoResponse.getPatronymic() + "1");
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.exchange(fullUrl(USERS_URL + ME_URL), HttpMethod.PUT,
-                        new HttpEntity<>(editUserDtoRequest), UserDtoResponse.class));
-        assertEquals(401, exc.getStatusCode().value());
+        checkUnauthorizedError(() -> template.exchange(fullUrl(USERS_URL + ME_URL),
+                HttpMethod.PUT, new HttpEntity<>(editUserDtoRequest), UserDtoResponse.class));
     }
 
     @Test
@@ -108,7 +102,7 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
                 .setPassword(password + "1");
         ResponseEntity<String> response = template.exchange(fullUrl(USERS_URL + ME_URL + PASSWORD_URL),
                 HttpMethod.PUT, new HttpEntity<>(changePasswordDtoRequest, login(email1)), String.class);
-        assertEquals(200, response.getStatusCode().value());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
@@ -116,25 +110,21 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
         ChangePasswordDtoRequest changePasswordDtoRequest = new ChangePasswordDtoRequest()
                 .setOldPassword(password)
                 .setPassword(password + "1");
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.exchange(fullUrl(USERS_URL + ME_URL + PASSWORD_URL),
+        checkUnauthorizedError(() -> template.exchange(fullUrl(USERS_URL + ME_URL + PASSWORD_URL),
                 HttpMethod.PUT, new HttpEntity<>(changePasswordDtoRequest), String.class));
-        assertEquals(401, exc.getStatusCode().value());
     }
 
     @Test
     public void testDeleteUserOk() {
         ResponseEntity<String> response = template.exchange(fullUrl(USERS_URL + ME_URL),
                 HttpMethod.DELETE, new HttpEntity<>(login(email1)), String.class);
-        assertEquals(200, response.getStatusCode().value());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         // todo check all user data is deleted
     }
 
     @Test
     public void testDeleteUserUnauthorized() {
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
-                () -> template.delete(fullUrl(USERS_URL + ME_URL)));
-        assertEquals(401, exc.getStatusCode().value());
+        checkUnauthorizedError(() -> template.delete(fullUrl(USERS_URL + ME_URL)));
     }
 
 }

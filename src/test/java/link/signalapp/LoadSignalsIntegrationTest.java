@@ -52,7 +52,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
         ResponseEntity<IdDtoResponse> response = template.exchange(fullUrl(SIGNALS_URL),
                 HttpMethod.POST, createHttpEntity(signalDtoRequest, testWav), IdDtoResponse.class);
         assertAll(
-                () -> assertEquals(HttpStatus.OK.value(), response.getStatusCode().value()),
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertNotNull(response.getBody())
         );
         int signalId = response.getBody().getId();
@@ -74,7 +74,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalNullName() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest().setName(null), getTestWav());
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "NotEmpty", "name");
     }
@@ -83,7 +83,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalEmptyName() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest().setName(""), getTestWav());
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "NotEmpty", "name");
     }
@@ -92,7 +92,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalNullMaxAbsY() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest().setMaxAbsY(null), getTestWav());
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "NotNull", "maxAbsY");
     }
@@ -101,7 +101,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalZeroMaxAbsY() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest().setMaxAbsY(BigDecimal.ZERO), getTestWav());
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "Positive", "maxAbsY");
     }
@@ -110,7 +110,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalNullXMin() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest().setXMin(null), getTestWav());
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "NotNull", "xMin");
     }
@@ -119,7 +119,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalNullSampleRate() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest().setSampleRate(null), getTestWav());
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "NotNull", "sampleRate");
     }
@@ -128,7 +128,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalEmptySampleRate() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest().setSampleRate(BigDecimal.ZERO), getTestWav());
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "Positive", "sampleRate");
     }
@@ -137,7 +137,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalNullJson() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 null, getTestWav());
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "MISSING_REQUEST_PART", "json");
     }
@@ -146,7 +146,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalNullData() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest(), null);
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "MISSING_REQUEST_PART", "data");
     }
@@ -155,7 +155,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     public void uploadSignalEmptyData() throws IOException {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest(), new byte[0]);
-        checkBadRequestError(
+        checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "MISSING_REQUEST_PART", "data");
     }

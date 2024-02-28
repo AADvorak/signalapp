@@ -3,19 +3,18 @@ package link.signalapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.LoginDtoRequest;
 import link.signalapp.dto.request.UserDtoRequest;
+import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpHeaders;
 
 import java.util.Objects;
 
@@ -71,24 +70,39 @@ public class IntegrationTestBase {
                 .setPassword(password);
     }
 
-    protected void checkBadRequestError(Executable executable, String expectedErrorCode, String expectedErrorField)
+    protected void checkBadRequestFieldError(Executable executable, String expectedErrorCode, String expectedErrorField)
             throws JsonProcessingException {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
         FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
         assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST.value(), exc.getStatusCode().value()),
+                () -> assertEquals(HttpStatus.BAD_REQUEST, exc.getStatusCode()),
                 () -> assertEquals(expectedErrorCode, error.getCode()),
                 () -> assertEquals(expectedErrorField, error.getField())
+        );
+    }
+
+    protected void checkBadRequestFieldError(Executable executable, String expectedErrorCode)
+            throws JsonProcessingException {
+        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
+        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+        assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, exc.getStatusCode()),
+                () -> assertEquals(expectedErrorCode, error.getCode())
         );
     }
 
     protected void checkBadRequestError(Executable executable, String expectedErrorCode)
             throws JsonProcessingException {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
         assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST.value(), exc.getStatusCode().value()),
+                () -> assertEquals(HttpStatus.BAD_REQUEST, exc.getStatusCode()),
                 () -> assertEquals(expectedErrorCode, error.getCode())
         );
+    }
+
+    protected void checkUnauthorizedError(Executable executable) {
+        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
+        assertEquals(HttpStatus.UNAUTHORIZED, exc.getStatusCode());
     }
 }

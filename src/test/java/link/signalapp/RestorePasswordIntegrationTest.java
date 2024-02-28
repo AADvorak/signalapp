@@ -3,15 +3,14 @@ package link.signalapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.RestorePasswordDtoRequest;
 import link.signalapp.dto.response.ErrorDtoResponse;
-import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.model.User;
 import link.signalapp.security.PasswordEncoder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
 import javax.mail.MessagingException;
@@ -39,86 +38,67 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                 restorePasswordDtoRequest(), String.class);
         CapturedEmailArguments arguments = captureEmailArguments();
         User user = userRepository.findByEmail(email1);
-        assertAll(() -> assertEquals(200, response.getStatusCode().value()),
-                () -> assertTrue(passwordEncoder.matches(arguments.getBody(), user.getPassword())));
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertTrue(passwordEncoder.matches(arguments.getBody(), user.getPassword()))
+        );
     }
 
     @Test
     public void restorePasswordNotConfirmedEmail() throws JsonProcessingException {
         setEmailConfirmed(false);
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+        checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
-                        restorePasswordDtoRequest(), String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("email", error.getField()),
-                () -> assertEquals("WRONG_EMAIL", error.getCode()));
+                        restorePasswordDtoRequest(), String.class),
+                "WRONG_EMAIL", "email");
     }
 
     @Test
     public void restorePasswordNotExistingEmail() throws JsonProcessingException {
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+        checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
-                        restorePasswordDtoRequest().setEmail("notexisting@email"), String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("email", error.getField()),
-                () -> assertEquals("WRONG_EMAIL", error.getCode()));
+                        restorePasswordDtoRequest().setEmail("notexisting@email"), String.class),
+                "WRONG_EMAIL", "email");
     }
 
     @Test
     public void restorePasswordNotValidEmail() throws JsonProcessingException {
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+        checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
-                        restorePasswordDtoRequest().setEmail("notvalid"), String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("email", error.getField()),
-                () -> assertEquals("Email", error.getCode()));
+                        restorePasswordDtoRequest().setEmail("notvalid"), String.class),
+                "Email", "email");
     }
 
     @Test
     public void restorePasswordEmptyEmail() throws JsonProcessingException {
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+        checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
-                        restorePasswordDtoRequest().setEmail(""), String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("email", error.getField()),
-                () -> assertEquals("NotEmpty", error.getCode()));
+                        restorePasswordDtoRequest().setEmail(""), String.class),
+                "NotEmpty", "email");
     }
 
     @Test
     public void restorePasswordNullEmail() throws JsonProcessingException {
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+        checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
-                        restorePasswordDtoRequest().setEmail(null), String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("email", error.getField()),
-                () -> assertEquals("NotEmpty", error.getCode()));
+                        restorePasswordDtoRequest().setEmail(null), String.class),
+                "NotEmpty", "email");
     }
 
     @Test
     public void restorePasswordEmptyLocaleTitle() throws JsonProcessingException {
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+        checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
-                        restorePasswordDtoRequest().setLocaleTitle(""), String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("localeTitle", error.getField()),
-                () -> assertEquals("NotEmpty", error.getCode()));
+                        restorePasswordDtoRequest().setLocaleTitle(""), String.class),
+                "NotEmpty", "localeTitle");
     }
 
     @Test
     public void restorePasswordEmptyLocaleMsg() throws JsonProcessingException {
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class,
+        checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
-                        restorePasswordDtoRequest().setLocaleMsg(""), String.class));
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
-        assertAll(() -> assertEquals(400, exc.getStatusCode().value()),
-                () -> assertEquals("localeMsg", error.getField()),
-                () -> assertEquals("NotEmpty", error.getCode()));
+                        restorePasswordDtoRequest().setLocaleMsg(""), String.class),
+                "NotEmpty", "localeMsg");
     }
 
     @Test
@@ -131,9 +111,11 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
                         restorePasswordDtoRequest(), String.class));
         ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
         String afterRequestPassword = userRepository.findByEmail(email1).getPassword();
-        assertAll(() -> assertEquals(500, exc.getStatusCode().value()),
+        assertAll(
+                () -> assertEquals(500, exc.getStatusCode().value()),
                 () -> assertEquals("INTERNAL_SERVER_ERROR", error.getCode()),
-                () -> assertEquals(beforeRequestPassword, afterRequestPassword));
+                () -> assertEquals(beforeRequestPassword, afterRequestPassword)
+        );
     }
 
     private RestorePasswordDtoRequest restorePasswordDtoRequest() {
