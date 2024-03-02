@@ -5,6 +5,7 @@ import link.signalapp.dto.response.IdDtoResponse;
 import link.signalapp.file.FileManager;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.SignalRepository;
+import link.signalapp.service.SignalService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,12 @@ import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.io.File;
+import javax.sound.sampled.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LoadSignalsIntegrationTest extends IntegrationTestBase {
 
     private static final String SIGNALS_URL = "/api/signals";
+    private static final int SMALL_WAV_LENGTH = 1000;
+    private static final int AVAILABLE_CHANNELS_NUMBER = 1;
 
     @Autowired
     private SignalRepository signalRepository;
@@ -161,13 +166,21 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void uploadSignalTooLong() {
-
+    public void uploadSignalTooLong() throws IOException {
+        HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(createSignalDtoRequest(),
+                generateWav(SignalService.MAX_SIGNAL_LENGTH + 1, AVAILABLE_CHANNELS_NUMBER));
+        checkBadRequestError(
+                () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
+                "TOO_LONG_SIGNAL");
     }
 
     @Test
-    public void uploadSignalMoreThenOneChannel() {
-
+    public void uploadSignalMoreThenOneChannel() throws IOException {
+        HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(createSignalDtoRequest(),
+                generateWav(SMALL_WAV_LENGTH, 2));
+        checkBadRequestError(
+                () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
+                "WRONG_VAW_FORMAT");
     }
 
     @Test
@@ -191,9 +204,31 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     private byte[] getTestWav() throws IOException {
-        String path = "src/test/resources/wav/air.wav";
-        File file = new File(path);
-        return Files.readAllBytes(file.toPath());
+        return generateWav(SMALL_WAV_LENGTH, AVAILABLE_CHANNELS_NUMBER);
+    }
+
+    private byte[] generateWav(int length, int channels) throws IOException {
+        final double sampleRate = 8000.0;
+        float[] buffer = new float[length];
+        for (int sample = 0; sample < buffer.length; sample++) {
+            buffer[sample] = new Random().nextFloat();
+        }
+        final byte[] byteBuffer = new byte[buffer.length * 2];
+        int bufferIndex = 0;
+        for (int i = 0; i < byteBuffer.length; i++) {
+            final int x = (int)(buffer[bufferIndex++] * 32767.0);
+            byteBuffer[i++] = (byte)x;
+            byteBuffer[i] = (byte)(x >>> 8);
+        }
+        final boolean bigEndian = false;
+        final boolean signed = true;
+        final int bits = 16;
+        AudioFormat format = new AudioFormat((float)sampleRate, bits, channels, signed, bigEndian);
+        ByteArrayInputStream bais = new ByteArrayInputStream(byteBuffer);
+        AudioInputStream audioInputStream = new AudioInputStream(bais, format, buffer.length);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, baos);
+        return baos.toByteArray();
     }
 
     private HttpEntity<MultiValueMap<String, Object>> createHttpEntity(SignalDtoRequest signalDtoRequest, byte[] testWav) {
