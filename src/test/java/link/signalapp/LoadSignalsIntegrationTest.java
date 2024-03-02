@@ -6,6 +6,7 @@ import link.signalapp.file.FileManager;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.SignalRepository;
 import link.signalapp.service.SignalService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     private static final String SIGNALS_URL = "/api/signals";
     private static final int SMALL_WAV_LENGTH = 1000;
     private static final int AVAILABLE_CHANNELS_NUMBER = 1;
+    private static final double SAMPLE_RATE = 8000.0;
 
     @Autowired
     private SignalRepository signalRepository;
@@ -184,8 +186,15 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void uploadSignalMaxUserStoredNumber() {
-
+    public void uploadSignalMaxUserStoredNumber() throws IOException {
+        int userId = userRepository.findByEmail(email1).getId();
+        for (int i = 0; i < SignalService.MAX_USER_STORED_SIGNALS_NUMBER; i++) {
+            signalRepository.save(createRandomSignal(userId));
+        }
+        HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(createSignalDtoRequest(), getTestWav());
+        checkConflictError(
+                () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
+                "TOO_MANY_SIGNALS_STORED");
     }
 
     private HttpHeaders createHeaders() {
@@ -198,7 +207,17 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
         return new SignalDtoRequest()
                 .setName("Name")
                 .setDescription("Description")
-                .setSampleRate(BigDecimal.valueOf(8000))
+                .setSampleRate(BigDecimal.valueOf(SAMPLE_RATE))
+                .setMaxAbsY(BigDecimal.ONE)
+                .setXMin(BigDecimal.ZERO);
+    }
+
+    private Signal createRandomSignal(int userId) {
+        return new Signal()
+                .setName(RandomStringUtils.randomAlphanumeric(10))
+                .setDescription(RandomStringUtils.randomAlphanumeric(10))
+                .setUserId(userId)
+                .setSampleRate(BigDecimal.valueOf(SAMPLE_RATE))
                 .setMaxAbsY(BigDecimal.ONE)
                 .setXMin(BigDecimal.ZERO);
     }
@@ -208,7 +227,6 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     private byte[] generateWav(int length, int channels) throws IOException {
-        final double sampleRate = 8000.0;
         float[] buffer = new float[length];
         for (int sample = 0; sample < buffer.length; sample++) {
             buffer[sample] = new Random().nextFloat();
@@ -223,7 +241,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
         final boolean bigEndian = false;
         final boolean signed = true;
         final int bits = 16;
-        AudioFormat format = new AudioFormat((float)sampleRate, bits, channels, signed, bigEndian);
+        AudioFormat format = new AudioFormat((float)SAMPLE_RATE, bits, channels, signed, bigEndian);
         ByteArrayInputStream bais = new ByteArrayInputStream(byteBuffer);
         AudioInputStream audioInputStream = new AudioInputStream(bais, format, buffer.length);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

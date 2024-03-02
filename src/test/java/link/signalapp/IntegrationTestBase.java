@@ -93,16 +93,27 @@ public class IntegrationTestBase {
 
     protected void checkBadRequestError(Executable executable, String expectedErrorCode)
             throws JsonProcessingException {
-        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
-        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
-        assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, exc.getStatusCode()),
-                () -> assertEquals(expectedErrorCode, error.getCode())
-        );
+        checkHttpStatusAndErrorCode(executable, HttpStatus.BAD_REQUEST, expectedErrorCode);
+    }
+
+    protected void checkConflictError(Executable executable, String expectedErrorCode)
+            throws JsonProcessingException {
+        checkHttpStatusAndErrorCode(executable, HttpStatus.CONFLICT, expectedErrorCode);
     }
 
     protected void checkUnauthorizedError(Executable executable) {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
         assertEquals(HttpStatus.UNAUTHORIZED, exc.getStatusCode());
+    }
+
+    private void checkHttpStatusAndErrorCode(
+            Executable executable, HttpStatus expectedHttpStatus, String expectedErrorCode
+    ) throws JsonProcessingException {
+        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
+        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
+        assertAll(
+                () -> assertEquals(expectedHttpStatus, exc.getStatusCode()),
+                () -> assertEquals(expectedErrorCode, error.getCode())
+        );
     }
 }
