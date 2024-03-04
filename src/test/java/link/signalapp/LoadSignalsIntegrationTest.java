@@ -2,6 +2,7 @@ package link.signalapp;
 
 import link.signalapp.dto.request.SignalDtoRequest;
 import link.signalapp.dto.response.IdDtoResponse;
+import link.signalapp.dto.response.SignalDtoResponse;
 import link.signalapp.file.FileManager;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.SignalRepository;
@@ -21,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,16 +67,16 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
         int signalId = response.getBody().getId();
         int userId = userRepository.findByEmail(email1).getId();
         Signal signal = signalRepository.findByIdAndUserId(signalId, userId);
+        byte[] writtenWav = fileManager.readWavFromFile(userId, signalId);
         assertNotNull(signal);
         assertAll(
                 () -> assertEquals(signalDtoRequest.getName(), signal.getName()),
                 () -> assertEquals(signalDtoRequest.getDescription(), signal.getDescription()),
                 () -> assertEquals(signalDtoRequest.getSampleRate(), signal.getSampleRate()),
                 () -> assertEquals(signalDtoRequest.getMaxAbsY(), signal.getMaxAbsY()),
-                () -> assertEquals(signalDtoRequest.getXMin(), signal.getXMin())
+                () -> assertEquals(signalDtoRequest.getXMin(), signal.getXMin()),
+                () -> assertArrayEquals(testWav, writtenWav)
         );
-        byte[] writtenWav = fileManager.readWavFromFile(userId, signalId);
-        assertArrayEquals(testWav, writtenWav);
     }
 
     @Test
@@ -195,6 +197,93 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
         checkConflictError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "TOO_MANY_SIGNALS_STORED");
+    }
+
+    @Test
+    public void updateSignalOk() throws IOException {
+        SignalDtoRequest signalDtoRequest = createSignalDtoRequest();
+        ResponseEntity<IdDtoResponse> response = template.exchange(fullUrl(SIGNALS_URL),
+                HttpMethod.POST, createHttpEntity(signalDtoRequest, getTestWav()), IdDtoResponse.class);
+        int signalId = Objects.requireNonNull(response.getBody()).getId();
+        int userId = userRepository.findByEmail(email1).getId();
+        signalDtoRequest
+                .setName(signalDtoRequest.getName() + " updated")
+                .setDescription(signalDtoRequest.getDescription() + " updated")
+                .setMaxAbsY(BigDecimal.TEN)
+                .setXMin(BigDecimal.ONE);
+        byte[] updateWav = getTestWav();
+        ResponseEntity<String> updateResponse = template.exchange(fullUrl(SIGNALS_URL + "/" + signalId),
+                HttpMethod.PUT, createHttpEntity(signalDtoRequest, updateWav), String.class);
+        Signal signal = signalRepository.findByIdAndUserId(signalId, userId);
+        byte[] writtenWav = fileManager.readWavFromFile(userId, signalId);
+        assertNotNull(signal);
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, updateResponse.getStatusCode()),
+                () -> assertEquals(signalDtoRequest.getName(), signal.getName()),
+                () -> assertEquals(signalDtoRequest.getDescription(), signal.getDescription()),
+                () -> assertEquals(signalDtoRequest.getSampleRate(), signal.getSampleRate()),
+                () -> assertEquals(signalDtoRequest.getMaxAbsY(), signal.getMaxAbsY()),
+                () -> assertEquals(signalDtoRequest.getXMin(), signal.getXMin()),
+                () -> assertArrayEquals(updateWav, writtenWav)
+        );
+    }
+
+    @Test
+    public void updateSignalNotFound() {
+        checkNotFoundError(() -> template.exchange(fullUrl(SIGNALS_URL + "/1"),
+                HttpMethod.PUT, createHttpEntity(createSignalDtoRequest(), getTestWav()), String.class));
+    }
+
+    @Test
+    public void getSignalOk() throws IOException {
+        int userId = userRepository.findByEmail(email1).getId();
+        Signal signal = signalRepository.save(createRandomSignal(userId));
+        HttpHeaders headers = login(email1);
+        ResponseEntity<SignalDtoResponse> signalResponse = template.exchange(
+                fullUrl(SIGNALS_URL + "/" + signal.getId()), HttpMethod.GET,
+                new HttpEntity<>(headers), SignalDtoResponse.class);
+        SignalDtoResponse signalDtoResponse = signalResponse.getBody();
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, signalResponse.getStatusCode()),
+                () -> assertNotNull(signalDtoResponse)
+        );
+        assertAll(
+                () -> assertEquals(signal.getName(), signalDtoResponse.getName()),
+                () -> assertEquals(signal.getDescription(), signalDtoResponse.getDescription()),
+                () -> assertEquals(signal.getSampleRate(), signalDtoResponse.getSampleRate()),
+                () -> assertEquals(signal.getMaxAbsY(), signalDtoResponse.getMaxAbsY()),
+                () -> assertEquals(signal.getXMin(), signalDtoResponse.getXMin())
+        );
+    }
+
+    @Test
+    public void getWavOk() throws IOException {
+        SignalDtoRequest signalDtoRequest = createSignalDtoRequest();
+        byte[] testWav = getTestWav();
+        ResponseEntity<IdDtoResponse> response = template.exchange(fullUrl(SIGNALS_URL),
+                HttpMethod.POST, createHttpEntity(signalDtoRequest, testWav), IdDtoResponse.class);
+        int signalId = Objects.requireNonNull(response.getBody()).getId();
+        HttpHeaders headers = login(email1);
+        ResponseEntity<byte[]> wavResponse = template.exchange(
+                fullUrl(SIGNALS_URL + "/" + signalId + "/wav"), HttpMethod.GET,
+                new HttpEntity<>(headers), byte[].class);
+        byte[] wavResponseBody = wavResponse.getBody();
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, wavResponse.getStatusCode()),
+                () -> assertArrayEquals(testWav, wavResponseBody)
+        );
+    }
+
+    @Test
+    public void getSignalNotFound() {
+        checkNotFoundError(() -> template.exchange(fullUrl(SIGNALS_URL + "/1"), HttpMethod.GET,
+                new HttpEntity<>(login(email1)), SignalDtoResponse.class));
+    }
+
+    @Test
+    public void getWavNotFound() {
+        checkNotFoundError(() -> template.exchange(fullUrl(SIGNALS_URL + "/1/wav"), HttpMethod.GET,
+                new HttpEntity<>(login(email1)), byte[].class));
     }
 
     private HttpHeaders createHeaders() {

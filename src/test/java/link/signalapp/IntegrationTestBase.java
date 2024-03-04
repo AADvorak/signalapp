@@ -106,6 +106,11 @@ public class IntegrationTestBase {
         assertEquals(HttpStatus.UNAUTHORIZED, exc.getStatusCode());
     }
 
+    protected void checkNotFoundError(Executable executable) {
+        HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
+        assertEquals(HttpStatus.NOT_FOUND, exc.getStatusCode());
+    }
+
     private void checkHttpStatusAndErrorCode(
             Executable executable, HttpStatus expectedHttpStatus, String expectedErrorCode
     ) throws JsonProcessingException {
