@@ -1,5 +1,6 @@
-package link.signalapp;
+package link.signalapp.integration.users;
 
+import link.signalapp.integration.IntegrationTestBase;
 import link.signalapp.mail.MailTransport;
 import link.signalapp.model.User;
 import lombok.Data;

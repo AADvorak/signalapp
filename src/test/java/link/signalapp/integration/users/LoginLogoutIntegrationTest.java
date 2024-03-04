@@ -1,4 +1,4 @@
-package link.signalapp;
+package link.signalapp.integration.users;
 
 import link.signalapp.dto.request.LoginDtoRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;

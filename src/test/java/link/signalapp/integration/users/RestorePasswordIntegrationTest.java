@@ -1,4 +1,4 @@
-package link.signalapp;
+package link.signalapp.integration.users;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.RestorePasswordDtoRequest;

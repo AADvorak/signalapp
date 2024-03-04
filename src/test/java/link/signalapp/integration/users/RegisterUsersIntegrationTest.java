@@ -1,8 +1,6 @@
-package link.signalapp;
+package link.signalapp.integration.users;
 
 import link.signalapp.dto.request.UserDtoRequest;
-import link.signalapp.dto.response.ErrorDtoResponse;
-import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Objects;
 

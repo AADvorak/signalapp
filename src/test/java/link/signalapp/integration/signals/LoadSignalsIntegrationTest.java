@@ -1,9 +1,10 @@
-package link.signalapp;
+package link.signalapp.integration.signals;
 
 import link.signalapp.dto.request.SignalDtoRequest;
 import link.signalapp.dto.response.IdDtoResponse;
 import link.signalapp.dto.response.SignalDtoResponse;
 import link.signalapp.file.FileManager;
+import link.signalapp.integration.IntegrationTestBase;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.SignalRepository;
 import link.signalapp.service.SignalService;

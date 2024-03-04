@@ -1,14 +1,13 @@
-package link.signalapp;
+package link.signalapp.integration.users;
 
 import link.signalapp.dto.request.ChangePasswordDtoRequest;
 import link.signalapp.dto.request.EditUserDtoRequest;
-import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import link.signalapp.integration.IntegrationTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.*;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Objects;
 

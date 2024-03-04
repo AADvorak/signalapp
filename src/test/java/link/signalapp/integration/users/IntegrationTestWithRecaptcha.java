@@ -1,8 +1,9 @@
-package link.signalapp;
+package link.signalapp.integration.users;
 
 import link.signalapp.captcha.RecaptchaVerifier;
 import link.signalapp.error.SignalAppErrorCode;
 import link.signalapp.error.SignalAppException;
+import link.signalapp.integration.IntegrationTestBase;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.mockito.Mockito.doNothing;
