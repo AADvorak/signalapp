@@ -32,6 +32,8 @@ public class SignalService extends ServiceBase {
 
     public static final int MAX_SIGNAL_LENGTH = 1024000;
     public static final int MAX_USER_STORED_SIGNALS_NUMBER = 50;
+    private static final String DEFAULT_SORT_FIELD = "createTime";
+    private static final List<String> AVAILABLE_SORT_FIELDS = List.of("name", "description", "sampleRate");
 
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
@@ -113,9 +115,13 @@ public class SignalService extends ServiceBase {
     }
 
     private Sort getSort(SignalFilterDto filter) {
-        Sort sort = Sort.by(camelToSnake(filter.getSortBy() != null && !filter.getSortBy().isEmpty()
-                ? filter.getSortBy() : "createTime"));
-        return filter.getSortDir() != null && filter.getSortDir().equals("asc") ? sort : sort.descending();
+        Sort sort = Sort.by(camelToSnake(getSortByOrDefault(filter.getSortBy())));
+        return "asc".equals(filter.getSortDir()) ? sort : sort.descending();
+    }
+
+    private String getSortByOrDefault(String sortBy) {
+        return sortBy != null && !sortBy.isEmpty() && AVAILABLE_SORT_FIELDS.contains(sortBy)
+                ? sortBy : DEFAULT_SORT_FIELD;
     }
 
     private void checkStoredByUserSignalsNumber(int userId) throws SignalAppConflictException {
