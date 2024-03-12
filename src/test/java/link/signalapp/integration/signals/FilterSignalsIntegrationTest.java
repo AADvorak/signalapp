@@ -18,10 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -130,14 +127,14 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     public void filterFoldersVariant1() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setFolderIds(toFolderIdList(List.of(0)));
-        filterAndCheckCounts(signalFilterDto, 30, 3, 10);
+        filterAndCheckCounts(signalFilterDto, 20, 2, 10);
     }
 
     @Test
     public void filterFoldersVariant2() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setFolderIds(toFolderIdList(List.of(1)));
-        filterAndCheckCounts(signalFilterDto, 20, 2, 10);
+        filterAndCheckCounts(signalFilterDto, 10, 1, 10);
     }
 
     @Test
@@ -147,8 +144,136 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
         filterAndCheckCounts(signalFilterDto, 10, 1, 10);
     }
 
+    @Test
+    public void filterFoldersVariant4() {
+        SignalFilterDto signalFilterDto = createSignalFilterDto()
+                .setFolderIds(toFolderIdList(List.of(0, 1)));
+        filterAndCheckCounts(signalFilterDto, 30, 3, 10);
+    }
+
+    @Test
+    public void filterFoldersVariant5() {
+        SignalFilterDto signalFilterDto = createSignalFilterDto()
+                .setFolderIds(toFolderIdList(List.of(0, 2)));
+        filterAndCheckCounts(signalFilterDto, 30, 3, 10);
+    }
+
+    @Test
+    public void filterFoldersVariant6() {
+        SignalFilterDto signalFilterDto = createSignalFilterDto()
+                .setFolderIds(toFolderIdList(List.of(1, 2)));
+        filterAndCheckCounts(signalFilterDto, 10, 1, 10);
+    }
+
+    @Test
+    public void filterSearchAndSampleRates() {
+
+    }
+
+    @Test
+    public void filterSampleRatesAndFolders() {
+
+    }
+
+    @Test
+    public void filterSearchAndFolders() {
+
+    }
+
+    @Test
+    public void filterSearchAndSampleRatesAndFolders() {
+
+    }
+
+    @Test
+    public void sortDefault() {
+        filterAndCheckSort(createSignalFilterDto(), Comparator.comparing(SignalDtoResponse::getId).reversed());
+    }
+
+    @Test
+    public void sortByNameAsc() {
+        filterAndCheckSort(createSignalFilterDto().setSortBy("name").setSortDir("asc"),
+                Comparator.comparing(SignalDtoResponse::getName));
+    }
+
+    @Test
+    public void sortByNameDesc() {
+        filterAndCheckSort(createSignalFilterDto().setSortBy("name").setSortDir("desc"),
+                Comparator.comparing(SignalDtoResponse::getName).reversed());
+    }
+
+    @Test
+    public void sortByDescriptionAsc() {
+        filterAndCheckSort(createSignalFilterDto().setSortBy("description").setSortDir("asc"),
+                Comparator.comparing(SignalDtoResponse::getDescription));
+    }
+
+    @Test
+    public void sortByDescriptionDesc() {
+        filterAndCheckSort(createSignalFilterDto().setSortBy("description").setSortDir("desc"),
+                Comparator.comparing(SignalDtoResponse::getDescription).reversed());
+    }
+
+    @Test
+    public void sortBySampleRateAsc() {
+        filterAndCheckSort(createSignalFilterDto().setSortBy("sampleRate").setSortDir("asc"),
+                Comparator.comparing(SignalDtoResponse::getSampleRate));
+    }
+
+    @Test
+    public void sortBySampleRateDesc() {
+        filterAndCheckSort(createSignalFilterDto().setSortBy("sampleRate").setSortDir("desc"),
+                Comparator.comparing(SignalDtoResponse::getSampleRate).reversed());
+    }
+
+    @Test
+    public void sortByWrongField() {
+        filterAndCheckSort(createSignalFilterDto().setSortBy("wrongField").setSortDir("asc"),
+                Comparator.comparing(SignalDtoResponse::getId));
+    }
+
+    @Test
+    public void sortByWrongDirection() {
+        filterAndCheckSort(createSignalFilterDto().setSortBy("name").setSortDir("wrongDirection"),
+                Comparator.comparing(SignalDtoResponse::getName).reversed());
+    }
+
+    @Test
+    public void filterWrongPage() {
+
+    }
+
+    @Test
+    public void filterWrongSize() {
+
+    }
+
+    @Test
+    public void getSampleRates() {
+
+    }
+
     private void filterAndCheckCounts(SignalFilterDto signalFilterDto,
                                       long expectedElements, long expectedPages, long expectedDataSize) {
+        SignalsPage signalsPage = getSignalsPageAndCheck(signalFilterDto);
+        assertAll(
+                () -> assertEquals(expectedElements, signalsPage.getElements()),
+                () -> assertEquals(expectedPages, signalsPage.getPages()),
+                () -> assertEquals(expectedDataSize, signalsPage.getData().size())
+        );
+    }
+
+    private void filterAndCheckSort(SignalFilterDto signalFilterDto, Comparator<SignalDtoResponse> expectedSortComparator) {
+        SignalsPage signalsPage = getSignalsPageAndCheck(signalFilterDto);
+        List<Integer> actualIds = signalsPage.getData().stream()
+                .map(SignalDtoResponse::getId).toList();
+        List<Integer> expectedIds = signalsPage.getData().stream()
+                .sorted(expectedSortComparator)
+                .map(SignalDtoResponse::getId).toList();
+        assertEquals(expectedIds, actualIds);
+    }
+
+    private SignalsPage getSignalsPageAndCheck(SignalFilterDto signalFilterDto) {
         ResponseEntity<SignalsPage> response = template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
                 new HttpEntity<>(signalFilterDto, login(email1)), SignalsPage.class);
         SignalsPage signalsPage = response.getBody();
@@ -156,11 +281,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertNotNull(signalsPage)
         );
-        assertAll(
-                () -> assertEquals(expectedElements, signalsPage.getElements()),
-                () -> assertEquals(expectedPages, signalsPage.getPages()),
-                () -> assertEquals(expectedDataSize, signalsPage.getData().size())
-        );
+        return signalsPage;
     }
 
     private void createFoldersInDB(int userId) {
@@ -190,11 +311,11 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     private Set<Folder> getPartOfFolders(int number) {
-        Set<Folder> currentFolders = new HashSet<>();
-        for (int i = 0; i < number; i++) {
-            currentFolders.add(folders.get(i));
-        }
-        return currentFolders;
+        return switch (number) {
+            case 1, 2 -> Set.of(folders.get(0));
+            case 3 -> Set.of(folders.get(1), folders.get(2));
+            default -> new HashSet<>();
+        };
     }
 
     private SignalFilterDto createSignalFilterDto() {
