@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class SignalFilterDto {
 
     private List<BigDecimal> sampleRates;
 
-    @Positive
+    @PositiveOrZero
     private int page;
 
     @Min(5)

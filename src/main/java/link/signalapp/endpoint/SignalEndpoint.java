@@ -48,7 +48,7 @@ public class SignalEndpoint extends EndpointBase {
 
     @PostMapping(path = "/filter", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseWithTotalCounts<SignalDtoResponse> filter(
-            @RequestBody SignalFilterDto filter
+            @RequestBody @Valid SignalFilterDto filter
     ) throws SignalAppUnauthorizedException {
         return signalService.filter(filter);
     }
