@@ -1,5 +1,6 @@
 package link.signalapp.integration.signals;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.SignalFilterDto;
 import link.signalapp.dto.response.ResponseWithTotalCounts;
 import link.signalapp.dto.response.SignalDtoResponse;
@@ -239,18 +240,32 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void filterWrongPage() {
-
+    public void filterWrongPage() throws JsonProcessingException {
+        SignalFilterDto signalFilterDto = createSignalFilterDto().setPage(-1);
+        checkBadRequestFieldError(() -> template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
+                new HttpEntity<>(signalFilterDto, login(email1)), SignalsPage.class),
+                "PositiveOrZero", "page");
     }
 
     @Test
-    public void filterWrongSize() {
-
+    public void filterWrongSize() throws JsonProcessingException {
+        SignalFilterDto signalFilterDto = createSignalFilterDto().setSize(30);
+        checkBadRequestFieldError(() -> template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
+                        new HttpEntity<>(signalFilterDto, login(email1)), SignalsPage.class),
+                "Max", "size");
     }
 
     @Test
     public void getSampleRates() {
-
+        ResponseEntity<BigDecimal[]> response = template.exchange(fullUrl("/api/signals/sample-rates"),
+                HttpMethod.GET, new HttpEntity<>(login(email1)), BigDecimal[].class);
+        BigDecimal[] sampleRates = response.getBody();
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertNotNull(sampleRates)
+        );
+        assertEquals(List.of(3000, 8000, 16000, 22000, 44000),
+                Arrays.stream(sampleRates).sorted().map(BigDecimal::intValue).toList());
     }
 
     private void filterAndCheckCounts(SignalFilterDto signalFilterDto,
