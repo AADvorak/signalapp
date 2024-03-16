@@ -167,23 +167,52 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void filterSearchAndSampleRates() {
+    public void filterSearchAndSampleRatesVariant1() {
+        SignalFilterDto signalFilterDto = createSignalFilterDto()
+                .setSearch("abc")
+                .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)));
+        filterAndCheckCounts(signalFilterDto, 8, 1, 8);
+    }
 
+    @Test
+    public void filterSearchAndSampleRatesVariant2() {
+        SignalFilterDto signalFilterDto = createSignalFilterDto()
+                .setSearch("abc")
+                .setSampleRates(toBigDecimalList(Stream.of(44000)));
+        filterAndCheckCounts(signalFilterDto, 4, 1, 4);
+    }
+
+    @Test
+    public void filterSearchAndSampleRatesVariant3() {
+        SignalFilterDto signalFilterDto = createSignalFilterDto()
+                .setSearch("abcdef")
+                .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)));
+        filterAndCheckCounts(signalFilterDto, 0, 0, 0);
     }
 
     @Test
     public void filterSampleRatesAndFolders() {
-
+        SignalFilterDto signalFilterDto = createSignalFilterDto()
+                .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)))
+                .setFolderIds(toFolderIdList(List.of(2)));
+        filterAndCheckCounts(signalFilterDto, 4, 1, 4);
     }
 
     @Test
     public void filterSearchAndFolders() {
-
+        SignalFilterDto signalFilterDto = createSignalFilterDto()
+                .setSearch("abc")
+                .setFolderIds(toFolderIdList(List.of(2)));
+        filterAndCheckCounts(signalFilterDto, 5, 1, 5);
     }
 
     @Test
     public void filterSearchAndSampleRatesAndFolders() {
-
+        SignalFilterDto signalFilterDto = createSignalFilterDto()
+                .setSearch("abc")
+                .setSampleRates(toBigDecimalList(Stream.of(3000)))
+                .setFolderIds(toFolderIdList(List.of(2)));
+        filterAndCheckCounts(signalFilterDto, 1, 1, 1);
     }
 
     @Test
