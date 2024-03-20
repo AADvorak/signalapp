@@ -42,16 +42,18 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     @Autowired
     private FileManager fileManager;
 
+    private int userId;
+
     @BeforeAll
     public void beforeAll() {
         userRepository.deleteAll();
         registerUsers();
+        userId = userRepository.findByEmail(email1).getId();
     }
 
     @BeforeEach
     public void clearSignals() {
         signalRepository.deleteAll();
-        int userId = userRepository.findByEmail(email1).getId();
         fileManager.deleteAllUserData(userId);
     }
 
@@ -66,7 +68,6 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
                 () -> assertNotNull(response.getBody())
         );
         int signalId = response.getBody().getId();
-        int userId = userRepository.findByEmail(email1).getId();
         Signal signal = signalRepository.findByIdAndUserId(signalId, userId);
         byte[] writtenWav = fileManager.readWavFromFile(userId, signalId);
         assertNotNull(signal);
@@ -190,7 +191,6 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void uploadSignalMaxUserStoredNumber() throws IOException {
-        int userId = userRepository.findByEmail(email1).getId();
         for (int i = 0; i < SignalService.MAX_USER_STORED_SIGNALS_NUMBER; i++) {
             signalRepository.save(createRandomSignal(userId));
         }
@@ -206,7 +206,6 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
         ResponseEntity<IdDtoResponse> response = template.exchange(fullUrl(SIGNALS_URL),
                 HttpMethod.POST, createHttpEntity(signalDtoRequest, getTestWav()), IdDtoResponse.class);
         int signalId = Objects.requireNonNull(response.getBody()).getId();
-        int userId = userRepository.findByEmail(email1).getId();
         signalDtoRequest
                 .setName(signalDtoRequest.getName() + " updated")
                 .setDescription(signalDtoRequest.getDescription() + " updated")
@@ -237,7 +236,6 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void getSignalOk() {
-        int userId = userRepository.findByEmail(email1).getId();
         Signal signal = signalRepository.save(createRandomSignal(userId));
         HttpHeaders headers = login(email1);
         ResponseEntity<SignalDtoResponse> signalResponse = template.exchange(
