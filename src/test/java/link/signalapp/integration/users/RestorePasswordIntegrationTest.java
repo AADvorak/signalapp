@@ -1,6 +1,5 @@
 package link.signalapp.integration.users;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.RestorePasswordDtoRequest;
 import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.model.User;
@@ -14,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpServerErrorException;
 
 import javax.mail.MessagingException;
+
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,7 +46,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void restorePasswordNotConfirmedEmail() throws JsonProcessingException {
+    public void restorePasswordNotConfirmedEmail() {
         setEmailConfirmed(false);
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
@@ -54,7 +55,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void restorePasswordNotExistingEmail() throws JsonProcessingException {
+    public void restorePasswordNotExistingEmail() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setEmail("notexisting@email"), String.class),
@@ -62,7 +63,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void restorePasswordNotValidEmail() throws JsonProcessingException {
+    public void restorePasswordNotValidEmail() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setEmail("notvalid"), String.class),
@@ -70,7 +71,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void restorePasswordEmptyEmail() throws JsonProcessingException {
+    public void restorePasswordEmptyEmail() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setEmail(""), String.class),
@@ -78,7 +79,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void restorePasswordNullEmail() throws JsonProcessingException {
+    public void restorePasswordNullEmail() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setEmail(null), String.class),
@@ -86,7 +87,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void restorePasswordEmptyLocaleTitle() throws JsonProcessingException {
+    public void restorePasswordEmptyLocaleTitle() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setLocaleTitle(""), String.class),
@@ -94,7 +95,7 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void restorePasswordEmptyLocaleMsg() throws JsonProcessingException {
+    public void restorePasswordEmptyLocaleMsg() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest().setLocaleMsg(""), String.class),
@@ -102,14 +103,14 @@ public class RestorePasswordIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void restorePasswordThrowMessagingException() throws JsonProcessingException, MessagingException {
+    public void restorePasswordThrowMessagingException() throws MessagingException {
         prepareMailTransportThrowMessagingException();
         setEmailConfirmed(true);
         String beforeRequestPassword = userRepository.findByEmail(email1).getPassword();
         HttpServerErrorException exc = assertThrows(HttpServerErrorException.class,
                 () -> template.postForEntity(fullUrl(USERS_URL + RESTORE_URL),
                         restorePasswordDtoRequest(), String.class));
-        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
+        ErrorDtoResponse error = Objects.requireNonNull(exc.getResponseBodyAs(ErrorDtoResponse[].class))[0];
         String afterRequestPassword = userRepository.findByEmail(email1).getPassword();
         assertAll(
                 () -> assertEquals(500, exc.getStatusCode().value()),

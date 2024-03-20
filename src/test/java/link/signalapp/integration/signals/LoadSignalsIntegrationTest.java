@@ -153,7 +153,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void uploadSignalNullData() throws IOException {
+    public void uploadSignalNullData() {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest(), null);
         checkBadRequestFieldError(
@@ -162,7 +162,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void uploadSignalEmptyData() throws IOException {
+    public void uploadSignalEmptyData() {
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(
                 createSignalDtoRequest(), new byte[0]);
         checkBadRequestFieldError(
@@ -236,7 +236,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void getSignalOk() throws IOException {
+    public void getSignalOk() {
         int userId = userRepository.findByEmail(email1).getId();
         Signal signal = signalRepository.save(createRandomSignal(userId));
         HttpHeaders headers = login(email1);

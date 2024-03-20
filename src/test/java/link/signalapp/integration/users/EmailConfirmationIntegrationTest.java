@@ -1,6 +1,5 @@
 package link.signalapp.integration.users;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.EmailConfirmDtoRequest;
 import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.model.User;
@@ -58,7 +57,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void confirmEmailAlreadyConfirmed() throws JsonProcessingException {
+    public void confirmEmailAlreadyConfirmed() {
         setEmailConfirmed(true);
         HttpHeaders headers = login(email1);
         checkBadRequestFieldError(
@@ -97,7 +96,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void confirmEmailEmptyOrigin() throws JsonProcessingException {
+    public void confirmEmailEmptyOrigin() {
         checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest().setOrigin("")), String.class),
@@ -105,7 +104,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void confirmEmailEmptyLocaleTitle() throws JsonProcessingException {
+    public void confirmEmailEmptyLocaleTitle() {
         checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest().setLocaleTitle("")), String.class),
@@ -113,7 +112,7 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
     }
 
     @Test
-    public void confirmEmailEmptyLocaleMsg() throws JsonProcessingException {
+    public void confirmEmailEmptyLocaleMsg() {
         checkBadRequestFieldError(
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest().setLocaleMsg("")), String.class),
@@ -122,14 +121,14 @@ public class EmailConfirmationIntegrationTest extends IntegrationTestWithEmail {
 
     @Disabled
     @Test
-    public void confirmEmailThrowMessagingException() throws MessagingException, JsonProcessingException {
+    public void confirmEmailThrowMessagingException() throws MessagingException {
         setEmailConfirmed(false);
         prepareMailTransportThrowMessagingException();
         HttpHeaders headers = login(email1);
         HttpServerErrorException exc = assertThrows(HttpServerErrorException.class,
                 () -> template.exchange(fullUrl(USERS_URL + CONFIRM_URL),
                         HttpMethod.POST, new HttpEntity<>(emailConfirmDtoRequest(), headers), String.class));
-        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
+        ErrorDtoResponse error = Objects.requireNonNull(exc.getResponseBodyAs(ErrorDtoResponse[].class))[0];
         // todo true while must be false
         boolean userConfirmExists = userConfirmRepository.findAll().stream()
                 .anyMatch(userConfirm -> email1.equals(userConfirm.getId().getUser().getEmail()));

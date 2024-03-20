@@ -1,7 +1,6 @@
 package link.signalapp.integration.users;
 
 import link.signalapp.dto.request.LoginDtoRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.model.UserToken;
 import link.signalapp.repository.UserTokenRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,7 +38,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void loginWithEmptyEmail() throws JsonProcessingException {
+    public void loginWithEmptyEmail() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail("").setPassword(password), String.class),
@@ -47,7 +46,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void loginWithEmptyPassword() throws JsonProcessingException {
+    public void loginWithEmptyPassword() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail(email1).setPassword(""), String.class),
@@ -55,7 +54,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void loginWithWrongEmail() throws JsonProcessingException {
+    public void loginWithWrongEmail() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail("wrong").setPassword(password), String.class),
@@ -63,7 +62,7 @@ public class LoginLogoutIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void loginWithWrongPassword() throws JsonProcessingException {
+    public void loginWithWrongPassword() {
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(SESSIONS_URL),
                         new LoginDtoRequest().setEmail(email1).setPassword("wrong"), String.class),

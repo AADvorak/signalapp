@@ -1,13 +1,11 @@
 package link.signalapp.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.ApplicationProperties;
 import link.signalapp.dto.request.LoginDtoRequest;
 import link.signalapp.dto.request.UserDtoRequest;
 import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.dto.response.FieldErrorDtoResponse;
 import link.signalapp.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,8 +41,6 @@ public class IntegrationTestBase {
 
     protected final RestTemplate template = new RestTemplate();
 
-    protected final ObjectMapper mapper = new ObjectMapper();
-
     protected String fullUrl(String contextUrl) {
         return BASE_URL + "8080" + contextUrl;
     }
@@ -71,10 +67,9 @@ public class IntegrationTestBase {
                 .setPassword(password);
     }
 
-    protected void checkBadRequestFieldError(Executable executable, String expectedErrorCode, String expectedErrorField)
-            throws JsonProcessingException {
+    protected void checkBadRequestFieldError(Executable executable, String expectedErrorCode, String expectedErrorField) {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+        FieldErrorDtoResponse error = Objects.requireNonNull(exc.getResponseBodyAs(FieldErrorDtoResponse[].class))[0];
         assertAll(
                 () -> assertEquals(HttpStatus.BAD_REQUEST, exc.getStatusCode()),
                 () -> assertEquals(expectedErrorCode, error.getCode()),
@@ -82,23 +77,20 @@ public class IntegrationTestBase {
         );
     }
 
-    protected void checkBadRequestFieldError(Executable executable, String expectedErrorCode)
-            throws JsonProcessingException {
+    protected void checkBadRequestFieldError(Executable executable, String expectedErrorCode) {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
-        FieldErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), FieldErrorDtoResponse[].class)[0];
+        FieldErrorDtoResponse error = Objects.requireNonNull(exc.getResponseBodyAs(FieldErrorDtoResponse[].class))[0];
         assertAll(
                 () -> assertEquals(HttpStatus.BAD_REQUEST, exc.getStatusCode()),
                 () -> assertEquals(expectedErrorCode, error.getCode())
         );
     }
 
-    protected void checkBadRequestError(Executable executable, String expectedErrorCode)
-            throws JsonProcessingException {
+    protected void checkBadRequestError(Executable executable, String expectedErrorCode) {
         checkHttpStatusAndErrorCode(executable, HttpStatus.BAD_REQUEST, expectedErrorCode);
     }
 
-    protected void checkConflictError(Executable executable, String expectedErrorCode)
-            throws JsonProcessingException {
+    protected void checkConflictError(Executable executable, String expectedErrorCode) {
         checkHttpStatusAndErrorCode(executable, HttpStatus.CONFLICT, expectedErrorCode);
     }
 
@@ -114,9 +106,9 @@ public class IntegrationTestBase {
 
     private void checkHttpStatusAndErrorCode(
             Executable executable, HttpStatus expectedHttpStatus, String expectedErrorCode
-    ) throws JsonProcessingException {
+    ) {
         HttpClientErrorException exc = assertThrows(HttpClientErrorException.class, executable);
-        ErrorDtoResponse error = mapper.readValue(exc.getResponseBodyAsString(), ErrorDtoResponse[].class)[0];
+        ErrorDtoResponse error = Objects.requireNonNull(exc.getResponseBodyAs(ErrorDtoResponse[].class))[0];
         assertAll(
                 () -> assertEquals(expectedHttpStatus, exc.getStatusCode()),
                 () -> assertEquals(expectedErrorCode, error.getCode())

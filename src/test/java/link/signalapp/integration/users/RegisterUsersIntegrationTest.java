@@ -3,7 +3,6 @@ package link.signalapp.integration.users;
 import link.signalapp.dto.request.UserDtoRequest;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +53,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void registerNullEmail() throws JsonProcessingException {
+    public void registerNullEmail() {
         UserDtoRequest userDtoRequest = createUser(null);
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
@@ -62,7 +61,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void registerEmptyEmail() throws JsonProcessingException {
+    public void registerEmptyEmail() {
         UserDtoRequest userDtoRequest = createUser("");
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
@@ -70,7 +69,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void registerInvalidEmail() throws JsonProcessingException {
+    public void registerInvalidEmail() {
         UserDtoRequest userDtoRequest = createUser("aaa");
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
@@ -78,7 +77,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void registerNullPassword() throws JsonProcessingException {
+    public void registerNullPassword() {
         UserDtoRequest userDtoRequest = createUser(email1).setPassword(null);
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
@@ -86,7 +85,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void registerEmptyPassword() throws JsonProcessingException {
+    public void registerEmptyPassword() {
         UserDtoRequest userDtoRequest = createUser(email1).setPassword("");
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
@@ -94,7 +93,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void registerShortPassword() throws JsonProcessingException {
+    public void registerShortPassword() {
         UserDtoRequest userDtoRequest = createUser(email1).setPassword("0000");
         checkBadRequestFieldError(
                 () -> template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class),
@@ -102,7 +101,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void registerLongPassword() throws JsonProcessingException {
+    public void registerLongPassword() {
         UserDtoRequest userDtoRequest = createUser(email1)
                 .setPassword(RandomStringUtils.randomAlphanumeric(UserService.MAX_PASSWORD_LENGTH + 1));
         checkBadRequestFieldError(
@@ -111,7 +110,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void registerLongName() throws JsonProcessingException {
+    public void registerLongName() {
         UserDtoRequest userDtoRequest = createUser(email1)
                 .setFirstName(RandomStringUtils.randomAlphanumeric(applicationProperties.getMaxNameLength() + 1));
         checkBadRequestFieldError(
@@ -120,7 +119,7 @@ public class RegisterUsersIntegrationTest extends IntegrationTestWithRecaptcha {
     }
 
     @Test
-    public void registerEmailAlreadyExists() throws JsonProcessingException {
+    public void registerEmailAlreadyExists() {
         UserDtoRequest userDtoRequest = createUser(email1);
         template.postForEntity(fullUrl(USERS_URL), userDtoRequest, String.class);
         checkBadRequestFieldError(

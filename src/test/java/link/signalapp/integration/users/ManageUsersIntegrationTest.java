@@ -3,7 +3,6 @@ package link.signalapp.integration.users;
 import link.signalapp.dto.request.ChangePasswordDtoRequest;
 import link.signalapp.dto.request.EditUserDtoRequest;
 import link.signalapp.dto.response.UserDtoResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.integration.IntegrationTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +62,7 @@ public class ManageUsersIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testEditUserInfoExistingEmail() throws JsonProcessingException {
+    public void testEditUserInfoExistingEmail() {
         HttpHeaders headers = login(email1);
         ResponseEntity<UserDtoResponse> response = template.exchange(fullUrl(USERS_URL + ME_URL),
                 HttpMethod.GET, new HttpEntity<>(headers), UserDtoResponse.class);

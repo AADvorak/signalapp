@@ -1,6 +1,5 @@
 package link.signalapp.integration.signals;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import link.signalapp.dto.request.SignalFilterDto;
 import link.signalapp.dto.response.ResponseWithTotalCounts;
 import link.signalapp.dto.response.SignalDtoResponse;
@@ -269,7 +268,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void filterWrongPage() throws JsonProcessingException {
+    public void filterWrongPage() {
         SignalFilterDto signalFilterDto = createSignalFilterDto().setPage(-1);
         checkBadRequestFieldError(() -> template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
                 new HttpEntity<>(signalFilterDto, login(email1)), SignalsPage.class),
@@ -277,7 +276,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    public void filterWrongSize() throws JsonProcessingException {
+    public void filterWrongSize() {
         SignalFilterDto signalFilterDto = createSignalFilterDto().setSize(30);
         checkBadRequestFieldError(() -> template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
                         new HttpEntity<>(signalFilterDto, login(email1)), SignalsPage.class),
