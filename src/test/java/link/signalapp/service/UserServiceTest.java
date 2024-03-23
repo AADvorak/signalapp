@@ -5,7 +5,11 @@ import link.signalapp.captcha.RecaptchaVerifier;
 import link.signalapp.dto.request.*;
 import link.signalapp.dto.response.ResponseWithToken;
 import link.signalapp.dto.response.UserDtoResponse;
-import link.signalapp.error.*;
+import link.signalapp.error.code.SignalAppDataErrorCode;
+import link.signalapp.error.code.SignalAppErrorCode;
+import link.signalapp.error.exception.SignalAppDataException;
+import link.signalapp.error.exception.SignalAppException;
+import link.signalapp.error.exception.SignalAppUnauthorizedException;
 import link.signalapp.file.FileManager;
 import link.signalapp.mail.MailTransport;
 import link.signalapp.model.User;
@@ -83,7 +87,7 @@ public class UserServiceTest {
     private ArgumentCaptor<String> bodyCaptor;
 
     @Test
-    public void registerOk() throws Exception {
+    public void registerOk() {
         when(applicationProperties.isVerifyCaptcha()).thenReturn(true);
         when(userRepository.save(any(User.class))).then(returnsFirstArg());
         UserDtoRequest request = data.userDtoRequest();
@@ -114,7 +118,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void registerTokenNotVerifiedException() throws Exception {
+    public void registerTokenNotVerifiedException() {
         when(applicationProperties.isVerifyCaptcha()).thenReturn(true);
         prepareThrowRecaptchaTokenNotVerifiedException();
         SignalAppException exc = assertThrows(SignalAppException.class,
@@ -133,7 +137,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void loginOk() throws Exception {
+    public void loginOk() {
         when(applicationProperties.isVerifyCaptcha()).thenReturn(true);
         LoginDtoRequest request = data.loginDtoRequest();
         User user = data.userWithUnconfirmedEmail();
@@ -155,7 +159,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void loginTokenNotVerifiedException() throws Exception {
+    public void loginTokenNotVerifiedException() {
         when(applicationProperties.isVerifyCaptcha()).thenReturn(true);
         prepareThrowRecaptchaTokenNotVerifiedException();
         SignalAppException exc = assertThrows(SignalAppException.class,
@@ -369,7 +373,7 @@ public class UserServiceTest {
         // todo more assertions
     }
 
-    private void prepareThrowRecaptchaTokenNotVerifiedException() throws Exception {
+    private void prepareThrowRecaptchaTokenNotVerifiedException() {
         doThrow(new SignalAppException(SignalAppErrorCode.RECAPTCHA_TOKEN_NOT_VERIFIED, null))
                 .when(recaptchaVerifier).verify(any(String.class));
     }

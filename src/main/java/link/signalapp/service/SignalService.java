@@ -6,7 +6,12 @@ import link.signalapp.dto.request.SignalFilterDto;
 import link.signalapp.dto.response.IdDtoResponse;
 import link.signalapp.dto.response.ResponseWithTotalCounts;
 import link.signalapp.dto.response.SignalDtoResponse;
-import link.signalapp.error.*;
+import link.signalapp.error.code.SignalAppErrorCode;
+import link.signalapp.error.exception.SignalAppConflictException;
+import link.signalapp.error.exception.SignalAppException;
+import link.signalapp.error.exception.SignalAppNotFoundException;
+import link.signalapp.error.params.MaxNumberExceptionParams;
+import link.signalapp.error.params.MaxSizeExceptionParams;
 import link.signalapp.file.FileManager;
 import link.signalapp.mapper.SignalMapper;
 import link.signalapp.model.Signal;
@@ -38,8 +43,7 @@ public class SignalService extends ServiceBase {
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
 
-    public ResponseWithTotalCounts<SignalDtoResponse> filter(SignalFilterDto filter)
-            throws SignalAppUnauthorizedException {
+    public ResponseWithTotalCounts<SignalDtoResponse> filter(SignalFilterDto filter) {
         int userId = getUserFromContext().getId();
         Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize() > MAX_USER_STORED_SIGNALS_NUMBER
                 || filter.getSize() <= 0
@@ -56,8 +60,8 @@ public class SignalService extends ServiceBase {
     }
 
     @Transactional(rollbackFor = IOException.class)
-    public IdDtoResponse add(SignalDtoRequest request, byte[] data) throws SignalAppUnauthorizedException,
-            IOException, SignalAppException, UnsupportedAudioFileException {
+    public IdDtoResponse add(SignalDtoRequest request, byte[] data)
+            throws IOException, UnsupportedAudioFileException {
         checkAudioData(data);
         int userId = getUserFromContext().getId();
         checkStoredByUserSignalsNumber(userId);
@@ -67,8 +71,8 @@ public class SignalService extends ServiceBase {
     }
 
     @Transactional(rollbackFor = IOException.class)
-    public void update(SignalDtoRequest request, byte[] data, int id) throws SignalAppUnauthorizedException,
-            IOException, SignalAppNotFoundException, UnsupportedAudioFileException, SignalAppException {
+    public void update(SignalDtoRequest request, byte[] data, int id)
+            throws IOException, UnsupportedAudioFileException {
         checkAudioData(data);
         int userId = getUserFromContext().getId();
         Signal signal = getSignalById(id)
@@ -82,7 +86,7 @@ public class SignalService extends ServiceBase {
     }
 
     @Transactional
-    public void delete(int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+    public void delete(int id) {
         int userId = getUserFromContext().getId();
         if (signalRepository.deleteByIdAndUserId(id, userId) == 0) {
             throw new SignalAppNotFoundException();
@@ -91,22 +95,21 @@ public class SignalService extends ServiceBase {
         }
     }
 
-    public SignalDtoResponse getSignal(int id) throws SignalAppNotFoundException, SignalAppUnauthorizedException {
+    public SignalDtoResponse getSignal(int id) {
         Signal signal = getSignalById(id);
         return SignalMapper.INSTANCE.signalToDto(signal);
     }
 
-    public byte[] getWav(int id) throws SignalAppUnauthorizedException, SignalAppNotFoundException, IOException {
+    public byte[] getWav(int id) throws IOException {
         Signal signal = getSignalById(id);
         return fileManager.readWavFromFile(signal.getUserId(), signal.getId());
     }
 
-    public List<BigDecimal> getSampleRates() throws SignalAppUnauthorizedException {
+    public List<BigDecimal> getSampleRates() {
         return signalRepository.sampleRatesByUserId(getUserFromContext().getId());
     }
 
-    private Signal getSignalById(int id)
-            throws SignalAppNotFoundException, SignalAppUnauthorizedException {
+    private Signal getSignalById(int id) {
         Signal signal = signalRepository.findByIdAndUserId(id, getUserFromContext().getId());
         if (signal == null) {
             throw new SignalAppNotFoundException();
@@ -124,15 +127,14 @@ public class SignalService extends ServiceBase {
                 ? sortBy : DEFAULT_SORT_FIELD;
     }
 
-    private void checkStoredByUserSignalsNumber(int userId) throws SignalAppConflictException {
+    private void checkStoredByUserSignalsNumber(int userId) {
         if (signalRepository.countByUserId(userId) >= MAX_USER_STORED_SIGNALS_NUMBER) {
             throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_SIGNALS_STORED,
                     new MaxNumberExceptionParams(SignalService.MAX_USER_STORED_SIGNALS_NUMBER));
         }
     }
 
-    private void checkAudioData(byte[] data) throws UnsupportedAudioFileException,
-            IOException, SignalAppException {
+    private void checkAudioData(byte[] data) throws UnsupportedAudioFileException, IOException {
         AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(data));
         long sampleCount = asr.getSampleCount();
         if (sampleCount > MAX_SIGNAL_LENGTH) {

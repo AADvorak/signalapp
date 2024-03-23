@@ -1,4 +1,4 @@
-package link.signalapp.error;
+package link.signalapp.error.code;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

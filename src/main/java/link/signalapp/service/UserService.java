@@ -5,9 +5,9 @@ import link.signalapp.captcha.RecaptchaVerifier;
 import link.signalapp.dto.request.*;
 import link.signalapp.dto.response.ResponseWithToken;
 import link.signalapp.dto.response.UserDtoResponse;
-import link.signalapp.error.SignalAppDataErrorCode;
-import link.signalapp.error.SignalAppDataException;
-import link.signalapp.error.SignalAppUnauthorizedException;
+import link.signalapp.error.code.SignalAppDataErrorCode;
+import link.signalapp.error.exception.SignalAppDataException;
+import link.signalapp.error.exception.SignalAppUnauthorizedException;
 import link.signalapp.file.FileManager;
 import link.signalapp.mail.MailTransport;
 import link.signalapp.mapper.UserMapper;
@@ -48,7 +48,7 @@ public class UserService extends ServiceBase {
     private final ApplicationProperties applicationProperties;
     private final UserTokenRepository userTokenRepository;
 
-    public ResponseWithToken<UserDtoResponse> register(UserDtoRequest request) throws Exception {
+    public ResponseWithToken<UserDtoResponse> register(UserDtoRequest request) {
         if (applicationProperties.isVerifyCaptcha()) {
             recaptchaVerifier.verify(request.getToken());
         }
@@ -65,7 +65,7 @@ public class UserService extends ServiceBase {
     }
 
     @Transactional
-    public ResponseWithToken<UserDtoResponse> login(LoginDtoRequest request) throws Exception {
+    public ResponseWithToken<UserDtoResponse> login(LoginDtoRequest request) {
         if (applicationProperties.isVerifyCaptcha()) {
             recaptchaVerifier.verify(request.getToken());
         }
@@ -81,7 +81,7 @@ public class UserService extends ServiceBase {
     }
 
     @Transactional
-    public void logout() throws SignalAppUnauthorizedException {
+    public void logout() {
         if (userTokenRepository.deleteByToken(getTokenFromContext()) == 0) {
             throw new SignalAppUnauthorizedException();
         }
@@ -89,7 +89,7 @@ public class UserService extends ServiceBase {
     }
 
     @Transactional
-    public void deleteCurrentUser() throws SignalAppUnauthorizedException {
+    public void deleteCurrentUser() {
         SignalAppUserDetails userDetails = getUserDetailsFromContext();
         if (userRepository.deleteByToken(userDetails.getToken()) == 0) {
             throw new SignalAppUnauthorizedException();
@@ -98,8 +98,7 @@ public class UserService extends ServiceBase {
         }
     }
 
-    public UserDtoResponse editCurrentUser(EditUserDtoRequest request) throws SignalAppUnauthorizedException,
-            SignalAppDataException {
+    public UserDtoResponse editCurrentUser(EditUserDtoRequest request) {
         User user = getUserFromContext();
         if (!Objects.equals(user.getEmail(), request.getEmail())) {
             user.setEmailConfirmed(false);
@@ -116,8 +115,7 @@ public class UserService extends ServiceBase {
         return UserMapper.INSTANCE.userToDto(user);
     }
 
-    public void changePasswordCurrentUser(ChangePasswordDtoRequest request)
-            throws SignalAppUnauthorizedException, SignalAppDataException {
+    public void changePasswordCurrentUser(ChangePasswordDtoRequest request) {
         User user = getUserFromContext();
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_OLD_PASSWORD);
@@ -126,13 +124,12 @@ public class UserService extends ServiceBase {
         userRepository.save(user);
     }
 
-    public UserDtoResponse getCurrentUserInfo() throws SignalAppUnauthorizedException {
+    public UserDtoResponse getCurrentUserInfo() {
         return UserMapper.INSTANCE.userToDto(getUserFromContext());
     }
 
     @Transactional(rollbackFor = MessagingException.class)
-    public void makeUserEmailConfirmation(EmailConfirmDtoRequest request) throws SignalAppUnauthorizedException,
-            MessagingException, SignalAppDataException {
+    public void makeUserEmailConfirmation(EmailConfirmDtoRequest request) throws MessagingException {
         User user = getUserFromContext();
         if (user.isEmailConfirmed()) {
             throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_CONFIRMED);
@@ -150,7 +147,8 @@ public class UserService extends ServiceBase {
     @Transactional
     public String confirmEmail(String code) {
         UserConfirm userConfirm = userConfirmRepository.findByCode(code);
-        if (userConfirm == null || userRepository.updateSetEmailConfirmedTrue(userConfirm.getId().getUser().getId()) == 0) {
+        if (userConfirm == null
+                || userRepository.updateSetEmailConfirmedTrue(userConfirm.getId().getUser().getId()) == 0) {
             return EMAIL_CONFIRM_ERROR;
         }
         userConfirmRepository.delete(userConfirm);
@@ -158,7 +156,7 @@ public class UserService extends ServiceBase {
     }
 
     @Transactional(rollbackFor = MessagingException.class)
-    public void restorePassword(RestorePasswordDtoRequest request) throws SignalAppDataException, MessagingException {
+    public void restorePassword(RestorePasswordDtoRequest request) throws MessagingException {
         User user = userRepository.findByEmailAndEmailConfirmedTrue(request.getEmail());
         if (user == null) {
             throw new SignalAppDataException(SignalAppDataErrorCode.WRONG_EMAIL);

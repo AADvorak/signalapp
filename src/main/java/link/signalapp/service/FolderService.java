@@ -2,7 +2,12 @@ package link.signalapp.service;
 
 import link.signalapp.dto.request.FolderDtoRequest;
 import link.signalapp.dto.response.FolderDtoResponse;
-import link.signalapp.error.*;
+import link.signalapp.error.code.SignalAppDataErrorCode;
+import link.signalapp.error.code.SignalAppErrorCode;
+import link.signalapp.error.exception.SignalAppConflictException;
+import link.signalapp.error.exception.SignalAppDataException;
+import link.signalapp.error.exception.SignalAppNotFoundException;
+import link.signalapp.error.params.MaxNumberExceptionParams;
 import link.signalapp.file.FileManager;
 import link.signalapp.mapper.FolderMapper;
 import link.signalapp.model.Folder;
@@ -25,13 +30,12 @@ public class FolderService extends ServiceBase {
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
 
-    public List<FolderDtoResponse> get() throws SignalAppUnauthorizedException {
+    public List<FolderDtoResponse> get() {
         return folderRepository.findByUserId(getUserFromContext().getId())
                 .stream().map(FolderMapper.INSTANCE::folderToDto).toList();
     }
 
-    public FolderDtoResponse add(FolderDtoRequest request)
-            throws SignalAppUnauthorizedException, SignalAppConflictException, SignalAppDataException {
+    public FolderDtoResponse add(FolderDtoRequest request) {
         int userId = getUserFromContext().getId();
         if (folderRepository.countByUserId(userId) >= MAX_USER_FOLDERS_NUMBER) {
             throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_FOLDERS_CREATED,
@@ -46,8 +50,7 @@ public class FolderService extends ServiceBase {
         }
     }
 
-    public FolderDtoResponse update(FolderDtoRequest request, int id)
-            throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+    public FolderDtoResponse update(FolderDtoRequest request, int id) {
         Folder folder = folderRepository.findByIdAndUserId(id, getUserFromContext().getId())
                 .orElseThrow(SignalAppNotFoundException::new)
                 .setName(request.getName())
@@ -56,8 +59,7 @@ public class FolderService extends ServiceBase {
     }
 
     @Transactional
-    public void delete(int id, boolean deleteSignals)
-            throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+    public void delete(int id, boolean deleteSignals) {
         int userId = getUserFromContext().getId();
         Folder folder = folderRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(SignalAppNotFoundException::new);

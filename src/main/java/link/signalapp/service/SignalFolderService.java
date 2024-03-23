@@ -1,7 +1,6 @@
 package link.signalapp.service;
 
-import link.signalapp.error.SignalAppNotFoundException;
-import link.signalapp.error.SignalAppUnauthorizedException;
+import link.signalapp.error.exception.SignalAppNotFoundException;
 import link.signalapp.model.Folder;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.FolderRepository;
@@ -19,14 +18,12 @@ public class SignalFolderService extends ServiceBase {
     private final SignalRepository signalRepository;
     private final FolderRepository folderRepository;
 
-    public List<Integer> getFolderIds(int id)
-            throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+    public List<Integer> getFolderIds(int id) {
         return getSignalByIdAndUserId(id, getUserFromContext().getId()).getFolders()
                 .stream().map(Folder::getId).toList();
     }
 
-    public void addFolder(int id, int folderId)
-            throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+    public void addFolder(int id, int folderId) {
         int userId = getUserFromContext().getId();
         Signal signal = getSignalByIdAndUserId(id, userId);
         if (signal.getFolders().stream().anyMatch(folder -> folder.getId() == folderId)) {
@@ -40,8 +37,7 @@ public class SignalFolderService extends ServiceBase {
         } catch (DataIntegrityViolationException ignore) {}
     }
 
-    public void deleteFolder(int id, int folderId)
-            throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+    public void deleteFolder(int id, int folderId) {
         int userId = getUserFromContext().getId();
         Signal signal = getSignalByIdAndUserId(id, userId);
         Folder folder = signal.getFolders()
@@ -53,7 +49,7 @@ public class SignalFolderService extends ServiceBase {
         signalRepository.save(signal);
     }
 
-    private Signal getSignalByIdAndUserId(int id, int userId) throws SignalAppNotFoundException {
+    private Signal getSignalByIdAndUserId(int id, int userId) {
         Signal signal = signalRepository.findByIdAndUserId(id, userId);
         if (signal == null) {
             throw new SignalAppNotFoundException();

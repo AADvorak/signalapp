@@ -3,8 +3,8 @@ package link.signalapp.endpoint;
 import link.signalapp.dto.request.*;
 import link.signalapp.dto.response.ResponseWithToken;
 import link.signalapp.dto.response.UserDtoResponse;
-import link.signalapp.error.SignalAppDataException;
-import link.signalapp.error.SignalAppUnauthorizedException;
+import link.signalapp.error.exception.SignalAppDataException;
+import link.signalapp.error.exception.SignalAppUnauthorizedException;
 import link.signalapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -22,19 +22,19 @@ public class UserEndpoint extends EndpointBase {
     private final UserService userService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserDtoResponse post(@Valid @RequestBody UserDtoRequest user, HttpServletResponse response) throws Exception {
+    public UserDtoResponse post(@Valid @RequestBody UserDtoRequest user, HttpServletResponse response) {
         ResponseWithToken<UserDtoResponse> responseWithToken = userService.register(user);
         setCookieWithTokenToResponse(responseWithToken.getToken(), response);
         return responseWithToken.getResponse();
     }
 
     @DeleteMapping("/me")
-    public void deleteCurrentUser() throws SignalAppUnauthorizedException {
+    public void deleteCurrentUser() {
         userService.deleteCurrentUser();
     }
 
     @GetMapping(path = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserDtoResponse getCurrentUserInfo() throws SignalAppUnauthorizedException {
+    public UserDtoResponse getCurrentUserInfo() {
         return userService.getCurrentUserInfo();
     }
 
@@ -46,23 +46,17 @@ public class UserEndpoint extends EndpointBase {
     }
 
     @PutMapping(path = "/me/password", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void editCurrentUserPassword(
-            @Valid @RequestBody ChangePasswordDtoRequest request
-    ) throws SignalAppUnauthorizedException, SignalAppDataException {
+    public void editCurrentUserPassword(@Valid @RequestBody ChangePasswordDtoRequest request) {
         userService.changePasswordCurrentUser(request);
     }
 
     @PostMapping("/confirm")
-    public void postMailConfirm(
-            @Valid @RequestBody EmailConfirmDtoRequest request
-    ) throws SignalAppUnauthorizedException, MessagingException, SignalAppDataException {
+    public void postMailConfirm(@Valid @RequestBody EmailConfirmDtoRequest request) throws MessagingException {
         userService.makeUserEmailConfirmation(request);
     }
 
     @PostMapping(path = "/restore")
-    public void restorePassword(
-            @Valid @RequestBody RestorePasswordDtoRequest request
-    ) throws MessagingException, SignalAppDataException {
+    public void restorePassword(@Valid @RequestBody RestorePasswordDtoRequest request) throws MessagingException {
         userService.restorePassword(request);
     }
 

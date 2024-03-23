@@ -1,7 +1,7 @@
 package link.signalapp.captcha;
 
-import link.signalapp.error.SignalAppErrorCode;
-import link.signalapp.error.SignalAppException;
+import link.signalapp.error.code.SignalAppErrorCode;
+import link.signalapp.error.exception.SignalAppException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +19,15 @@ public class RecaptchaVerifier {
 
     private final RecaptchaParams params;
 
-    public void verify(String token) throws Exception {
+    public void verify(String token) {
         ResponseEntity<Response> responseEntity = new RestTemplate().postForEntity(
                 String.format("%s?secret=%s&response=%s", params.getUrl(), params.getSecret(), token),
                 null, Response.class);
         if (responseEntity.getStatusCode().value() != 200) {
-            throw new Exception("Recaptcha server response error");
+            throw new RuntimeException("Recaptcha server response error");
         }
         if (!responseEntity.hasBody() || responseEntity.getBody() == null) {
-            throw new Exception("Recaptcha server empty response");
+            throw new RuntimeException("Recaptcha server empty response");
         }
         if (!responseEntity.getBody().isSuccess()) {
             throw new SignalAppException(SignalAppErrorCode.RECAPTCHA_TOKEN_NOT_VERIFIED, null);

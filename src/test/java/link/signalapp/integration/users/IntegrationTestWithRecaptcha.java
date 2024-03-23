@@ -1,8 +1,8 @@
 package link.signalapp.integration.users;
 
 import link.signalapp.captcha.RecaptchaVerifier;
-import link.signalapp.error.SignalAppErrorCode;
-import link.signalapp.error.SignalAppException;
+import link.signalapp.error.code.SignalAppErrorCode;
+import link.signalapp.error.exception.SignalAppException;
 import link.signalapp.integration.IntegrationTestBase;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -17,7 +17,7 @@ public class IntegrationTestWithRecaptcha extends IntegrationTestBase {
     @MockBean
     protected RecaptchaVerifier recaptchaVerifier;
 
-    protected void prepareRecaptchaVerifier() throws Exception {
+    protected void prepareRecaptchaVerifier() {
         doNothing().when(recaptchaVerifier).verify(PROPER_TOKEN);
         doThrow(new SignalAppException(SignalAppErrorCode.RECAPTCHA_TOKEN_NOT_VERIFIED, null))
                 .when(recaptchaVerifier).verify(WRONG_TOKEN);

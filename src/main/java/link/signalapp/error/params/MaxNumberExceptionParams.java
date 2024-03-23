@@ -1,4 +1,4 @@
-package link.signalapp.error;
+package link.signalapp.error.params;
 
 public record MaxNumberExceptionParams(int maxNumber) {
 }

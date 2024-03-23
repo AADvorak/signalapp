@@ -1,4 +1,4 @@
-package link.signalapp.error;
+package link.signalapp.error.code;
 
 import link.signalapp.service.FolderService;
 import link.signalapp.service.SignalService;

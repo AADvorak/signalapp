@@ -2,10 +2,6 @@ package link.signalapp.endpoint;
 
 import link.signalapp.dto.request.FolderDtoRequest;
 import link.signalapp.dto.response.FolderDtoResponse;
-import link.signalapp.error.SignalAppConflictException;
-import link.signalapp.error.SignalAppDataException;
-import link.signalapp.error.SignalAppNotFoundException;
-import link.signalapp.error.SignalAppUnauthorizedException;
 import link.signalapp.service.FolderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -22,22 +18,17 @@ public class FolderEndpoint extends EndpointBase {
     private final FolderService folderService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<FolderDtoResponse> get() throws SignalAppUnauthorizedException {
+    public List<FolderDtoResponse> get() {
         return folderService.get();
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public FolderDtoResponse post(
-            @RequestBody @Valid FolderDtoRequest request
-    ) throws SignalAppConflictException, SignalAppUnauthorizedException, SignalAppDataException {
+    public FolderDtoResponse post(@RequestBody @Valid FolderDtoRequest request) {
         return folderService.add(request);
     }
 
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void put(
-            @RequestBody @Valid FolderDtoRequest request,
-            @PathVariable int id
-    ) throws SignalAppNotFoundException, SignalAppUnauthorizedException {
+    public void put(@RequestBody @Valid FolderDtoRequest request, @PathVariable int id) {
         folderService.update(request, id);
     }
 
@@ -45,7 +36,7 @@ public class FolderEndpoint extends EndpointBase {
     void delete(
             @PathVariable int id,
             @RequestParam(required = false, defaultValue = "false") boolean deleteSignals
-    ) throws SignalAppUnauthorizedException, SignalAppNotFoundException {
+    ) {
         folderService.delete(id, deleteSignals);
     }
 
