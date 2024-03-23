@@ -9,22 +9,16 @@ import link.signalapp.model.Signal;
 import link.signalapp.repository.SignalRepository;
 import link.signalapp.service.SignalService;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import javax.sound.sampled.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,7 +28,7 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     private static final String SIGNALS_URL = "/api/signals";
     private static final int SMALL_WAV_LENGTH = 1000;
     private static final int AVAILABLE_CHANNELS_NUMBER = 1;
-    private static final double SAMPLE_RATE = 8000.0;
+    private static final float SAMPLE_RATE = 8000.0F;
 
     @Autowired
     private SignalRepository signalRepository;
@@ -49,6 +43,11 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
         userRepository.deleteAll();
         registerUsers();
         userId = userRepository.findByEmail(email1).getId();
+    }
+
+    @AfterAll
+    public void afterAll() {
+        fileManager.deleteDirRecursively(new File(applicationProperties.getDataPath() + "signals"));
     }
 
     @BeforeEach
@@ -235,6 +234,29 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    public void deleteSignalOk() throws IOException {
+        SignalDtoRequest signalDtoRequest = createSignalDtoRequest();
+        ResponseEntity<IdDtoResponse> response = template.exchange(fullUrl(SIGNALS_URL),
+                HttpMethod.POST, createHttpEntity(signalDtoRequest, getTestWav()), IdDtoResponse.class);
+        int signalId = Objects.requireNonNull(response.getBody()).getId();
+        ResponseEntity<Void> deleteResponse = template.exchange(fullUrl(SIGNALS_URL + "/" + signalId),
+                HttpMethod.DELETE, new HttpEntity<>(login(email1)), Void.class);
+        Signal deletedSignal = signalRepository.findById(signalId).orElse(null);
+        byte[] deletedWav = readWavFromFile(signalId);
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, deleteResponse.getStatusCode()),
+                () -> assertNull(deletedSignal),
+                () -> assertEquals(0, deletedWav.length)
+        );
+    }
+
+    @Test
+    public void deleteSignalNotFound() {
+        checkNotFoundError(() -> template.exchange(fullUrl(SIGNALS_URL + "/1"),
+                HttpMethod.DELETE, new HttpEntity<>(login(email1)), Void.class));
+    }
+
+    @Test
     public void getSignalOk() {
         Signal signal = signalRepository.save(createRandomSignal(userId));
         HttpHeaders headers = login(email1);
@@ -285,10 +307,12 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
                 new HttpEntity<>(login(email1)), byte[].class));
     }
 
-    private HttpHeaders createHeaders() {
-        HttpHeaders headers = login(email1);
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        return headers;
+    private byte[] readWavFromFile(int signalId) {
+        try {
+            return fileManager.readWavFromFile(userId, signalId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private SignalDtoRequest createSignalDtoRequest() {
@@ -315,32 +339,15 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     private byte[] generateWav(int length, int channels) throws IOException {
-        float[] buffer = new float[length];
-        for (int sample = 0; sample < buffer.length; sample++) {
-            buffer[sample] = new Random().nextFloat();
-        }
-        final byte[] byteBuffer = new byte[buffer.length * 2];
-        int bufferIndex = 0;
-        for (int i = 0; i < byteBuffer.length; i++) {
-            final int x = (int)(buffer[bufferIndex++] * 32767.0);
-            byteBuffer[i++] = (byte)x;
-            byteBuffer[i] = (byte)(x >>> 8);
-        }
-        final boolean bigEndian = false;
-        final boolean signed = true;
-        final int bits = 16;
-        AudioFormat format = new AudioFormat((float)SAMPLE_RATE, bits, channels, signed, bigEndian);
-        ByteArrayInputStream bais = new ByteArrayInputStream(byteBuffer);
-        AudioInputStream audioInputStream = new AudioInputStream(bais, format, buffer.length);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, baos);
-        return baos.toByteArray();
+        return SignalsTestUtils.generateWav(length, channels, SAMPLE_RATE);
     }
 
     private HttpEntity<MultiValueMap<String, Object>> createHttpEntity(SignalDtoRequest signalDtoRequest, byte[] testWav) {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("json", signalDtoRequest);
         body.add("data", testWav);
-        return new HttpEntity<>(body, createHeaders());
+        HttpHeaders headers = login(email1);
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        return new HttpEntity<>(body, headers);
     }
 }
