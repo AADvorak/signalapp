@@ -1,6 +1,6 @@
 package link.signalapp.integration;
 
-import link.signalapp.ApplicationProperties;
+import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.dto.request.LoginDtoRequest;
 import link.signalapp.dto.request.UserDtoRequest;
 import link.signalapp.dto.response.ErrorDtoResponse;

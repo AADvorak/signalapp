@@ -15,6 +15,7 @@ import link.signalapp.error.params.MaxSizeExceptionParams;
 import link.signalapp.file.FileManager;
 import link.signalapp.mapper.SignalMapper;
 import link.signalapp.model.Signal;
+import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.SignalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,19 +36,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SignalService extends ServiceBase {
 
-    public static final int MAX_SIGNAL_LENGTH = 1024000;
-    public static final int MAX_USER_STORED_SIGNALS_NUMBER = 50;
     private static final String DEFAULT_SORT_FIELD = "createTime";
     private static final List<String> AVAILABLE_SORT_FIELDS = List.of("name", "description", "sampleRate");
 
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
+    private final ApplicationProperties applicationProperties;
 
     public ResponseWithTotalCounts<SignalDtoResponse> filter(SignalFilterDto filter) {
         int userId = getUserFromContext().getId();
-        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize() > MAX_USER_STORED_SIGNALS_NUMBER
+        int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber();
+        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize() > maxUserSignalsNumber
                 || filter.getSize() <= 0
-                ? MAX_USER_STORED_SIGNALS_NUMBER
+                ? maxUserSignalsNumber
                 : filter.getSize(), getSort(filter));
         String search = filter.getSearch() == null || filter.getSearch().isEmpty() ? "" : "%" + filter.getSearch() + "%";
         Page<Signal> signalPage = signalRepository.findByUserIdAndFilter(userId, search,
@@ -128,18 +129,20 @@ public class SignalService extends ServiceBase {
     }
 
     private void checkStoredByUserSignalsNumber(int userId) {
-        if (signalRepository.countByUserId(userId) >= MAX_USER_STORED_SIGNALS_NUMBER) {
+        int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber();
+        if (signalRepository.countByUserId(userId) >= maxUserSignalsNumber) {
             throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_SIGNALS_STORED,
-                    new MaxNumberExceptionParams(SignalService.MAX_USER_STORED_SIGNALS_NUMBER));
+                    new MaxNumberExceptionParams(maxUserSignalsNumber));
         }
     }
 
     private void checkAudioData(byte[] data) throws UnsupportedAudioFileException, IOException {
         AudioSampleReader asr = new AudioSampleReader(new ByteArrayInputStream(data));
         long sampleCount = asr.getSampleCount();
-        if (sampleCount > MAX_SIGNAL_LENGTH) {
+        int maxSignalLength = applicationProperties.getLimits().getMaxSignalLength();
+        if (sampleCount > maxSignalLength) {
             throw new SignalAppException(SignalAppErrorCode.TOO_LONG_SIGNAL,
-                    new MaxSizeExceptionParams(MAX_SIGNAL_LENGTH));
+                    new MaxSizeExceptionParams(maxSignalLength));
         }
         AudioFormat format = asr.getFormat();
         if (format.getChannels() > 1) {

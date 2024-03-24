@@ -1,6 +1,6 @@
 package link.signalapp.service;
 
-import link.signalapp.ApplicationProperties;
+import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.captcha.RecaptchaVerifier;
 import link.signalapp.dto.request.*;
 import link.signalapp.dto.response.ResponseWithToken;

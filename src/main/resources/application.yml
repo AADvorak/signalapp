@@ -1,15 +1,19 @@
 application:
     data_path: signalappdata/
     debug: false
-    max_name_length: 100
-    min_password_length: 5
-    user_idle_timeout: 3600
-    verify_captcha: true
-    secure_random_seed: ${SECURE_RANDOM_SEED}
+    max-name-length: 100
+    min-password-length: 5
+    user-idle-timeout: 3600
+    verify-captcha: true
+    secure-random-seed: ${SECURE_RANDOM_SEED}
+    limits:
+        max-signal-length: 1024000
+        max-user-signals-number: 50
+        max-user-folders-number: 10
 mailing:
     password: ${MAILING_PASSWORD}
-    smtp_port: ${MAILING_SMTP_PORT}
-    smtp_host: ${MAILING_SMTP_HOST}
+    smtp-port: ${MAILING_SMTP_PORT}
+    smtp-host: ${MAILING_SMTP_HOST}
     username: ${MAILING_USERNAME}
 recaptcha:
     secret: ${RECAPTCHA_SECRET}

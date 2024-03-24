@@ -1,6 +1,6 @@
 package link.signalapp.file;
 
-import link.signalapp.ApplicationProperties;
+import link.signalapp.properties.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;

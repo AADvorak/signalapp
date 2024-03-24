@@ -1,6 +1,6 @@
 package link.signalapp.security;
 
-import link.signalapp.ApplicationProperties;
+import link.signalapp.properties.ApplicationProperties;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 

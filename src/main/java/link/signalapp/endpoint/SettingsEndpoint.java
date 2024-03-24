@@ -1,6 +1,6 @@
 package link.signalapp.endpoint;
 
-import link.signalapp.ApplicationProperties;
+import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.dto.response.SettingsDtoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

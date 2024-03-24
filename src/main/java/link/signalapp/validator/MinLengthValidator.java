@@ -1,6 +1,6 @@
 package link.signalapp.validator;
 
-import link.signalapp.ApplicationProperties;
+import link.signalapp.properties.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
 
 import jakarta.validation.ConstraintValidator;

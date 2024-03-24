@@ -1,13 +1,15 @@
-package link.signalapp;
+package link.signalapp.properties;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(prefix = "application")
 @Component
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 public class ApplicationProperties {
 
@@ -24,5 +26,7 @@ public class ApplicationProperties {
     private String dataPath;
 
     private String secureRandomSeed;
+
+    private ApplicationLimits limits;
 
 }

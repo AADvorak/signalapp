@@ -8,7 +8,6 @@ import link.signalapp.model.Folder;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.FolderRepository;
 import link.signalapp.repository.SignalRepository;
-import link.signalapp.service.FolderService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +122,7 @@ public class FoldersIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void addToManyFolders() {
-        createFoldersInDB(FolderService.MAX_USER_FOLDERS_NUMBER);
+        createFoldersInDB(applicationProperties.getLimits().getMaxUserFoldersNumber());
         checkConflictError(() -> template.exchange(fullUrl(FOLDERS_URL), HttpMethod.POST,
                         new HttpEntity<>(createFolderDtoRequest(), login(email1)), FolderDtoResponse.class),
                 "TOO_MANY_FOLDERS_CREATED");

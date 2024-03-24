@@ -11,6 +11,7 @@ import link.signalapp.error.params.MaxNumberExceptionParams;
 import link.signalapp.file.FileManager;
 import link.signalapp.mapper.FolderMapper;
 import link.signalapp.model.Folder;
+import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.FolderRepository;
 import link.signalapp.repository.SignalRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FolderService extends ServiceBase {
 
-    public static final int MAX_USER_FOLDERS_NUMBER = 10;
-
     private final FolderRepository folderRepository;
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
+    private final ApplicationProperties applicationProperties;
 
     public List<FolderDtoResponse> get() {
         return folderRepository.findByUserId(getUserFromContext().getId())
@@ -37,9 +37,10 @@ public class FolderService extends ServiceBase {
 
     public FolderDtoResponse add(FolderDtoRequest request) {
         int userId = getUserFromContext().getId();
-        if (folderRepository.countByUserId(userId) >= MAX_USER_FOLDERS_NUMBER) {
+        int maxUserFoldersNumber = applicationProperties.getLimits().getMaxUserFoldersNumber();
+        if (folderRepository.countByUserId(userId) >= maxUserFoldersNumber) {
             throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_FOLDERS_CREATED,
-                    new MaxNumberExceptionParams(MAX_USER_FOLDERS_NUMBER));
+                    new MaxNumberExceptionParams(maxUserFoldersNumber));
         }
         Folder folder = FolderMapper.INSTANCE.dtoToFolder(request)
                 .setUserId(userId);

@@ -7,7 +7,6 @@ import link.signalapp.file.FileManager;
 import link.signalapp.integration.IntegrationTestBase;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.SignalRepository;
-import link.signalapp.service.SignalService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,8 +171,9 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void uploadSignalTooLong() throws IOException {
+        int maxSignalLength = applicationProperties.getLimits().getMaxSignalLength();
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(createSignalDtoRequest(),
-                generateWav(SignalService.MAX_SIGNAL_LENGTH + 1, AVAILABLE_CHANNELS_NUMBER));
+                generateWav(maxSignalLength + 1, AVAILABLE_CHANNELS_NUMBER));
         checkBadRequestError(
                 () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
                 "TOO_LONG_SIGNAL");
@@ -190,7 +190,8 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void uploadSignalMaxUserStoredNumber() throws IOException {
-        for (int i = 0; i < SignalService.MAX_USER_STORED_SIGNALS_NUMBER; i++) {
+        int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber();
+        for (int i = 0; i < maxUserSignalsNumber; i++) {
             signalRepository.save(createRandomSignal(userId));
         }
         HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(createSignalDtoRequest(), getTestWav());
