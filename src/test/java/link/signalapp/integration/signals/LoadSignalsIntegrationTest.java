@@ -66,9 +66,8 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
                 () -> assertNotNull(response.getBody())
         );
         int signalId = response.getBody().getId();
-        Signal signal = signalRepository.findByIdAndUserId(signalId, userId);
+        Signal signal = signalRepository.findByIdAndUserId(signalId, userId).orElseThrow();
         byte[] writtenWav = fileManager.readWavFromFile(userId, signalId);
-        assertNotNull(signal);
         assertAll(
                 () -> assertEquals(signalDtoRequest.getName(), signal.getName()),
                 () -> assertEquals(signalDtoRequest.getDescription(), signal.getDescription()),
@@ -214,9 +213,8 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
         byte[] updateWav = getTestWav();
         ResponseEntity<String> updateResponse = template.exchange(fullUrl(SIGNALS_URL + "/" + signalId),
                 HttpMethod.PUT, createHttpEntity(signalDtoRequest, updateWav), String.class);
-        Signal signal = signalRepository.findByIdAndUserId(signalId, userId);
+        Signal signal = signalRepository.findByIdAndUserId(signalId, userId).orElseThrow();
         byte[] writtenWav = fileManager.readWavFromFile(userId, signalId);
-        assertNotNull(signal);
         assertAll(
                 () -> assertEquals(HttpStatus.OK, updateResponse.getStatusCode()),
                 () -> assertEquals(signalDtoRequest.getName(), signal.getName()),

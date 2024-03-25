@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -45,7 +46,7 @@ public interface SignalRepository extends PagingAndSortingRepository<Signal, Int
             Pageable pageable
     );
 
-    Signal findByIdAndUserId(int id, int userId);
+    Optional<Signal> findByIdAndUserId(int id, int userId);
 
     int deleteByIdAndUserId(int id, int userId);
 

@@ -111,11 +111,8 @@ public class SignalService extends ServiceBase {
     }
 
     private Signal getSignalById(int id) {
-        Signal signal = signalRepository.findByIdAndUserId(id, getUserFromContext().getId());
-        if (signal == null) {
-            throw new SignalAppNotFoundException();
-        }
-        return signal;
+        return signalRepository.findByIdAndUserId(id, getUserFromContext().getId())
+                .orElseThrow(SignalAppNotFoundException::new);
     }
 
     private Sort getSort(SignalFilterDto filter) {

@@ -50,10 +50,6 @@ public class SignalFolderService extends ServiceBase {
     }
 
     private Signal getSignalByIdAndUserId(int id, int userId) {
-        Signal signal = signalRepository.findByIdAndUserId(id, userId);
-        if (signal == null) {
-            throw new SignalAppNotFoundException();
-        }
-        return signal;
+        return signalRepository.findByIdAndUserId(id, userId).orElseThrow(SignalAppNotFoundException::new);
     }
 }
