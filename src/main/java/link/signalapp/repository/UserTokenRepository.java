@@ -11,10 +11,12 @@ import java.time.LocalDateTime;
 
 public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenPK> {
 
-    @Query(value = "select user_id, token, last_action_time " +
-            "from user_token " +
-            "where token = :token and extract(epoch from (:currentTime - last_action_time)) < :userIdleTimeout",
-            nativeQuery = true)
+    @Query(value = """
+            select user_id, token, last_action_time
+            from user_token
+            where token = :token
+                and extract(epoch from (:currentTime - last_action_time)) < :userIdleTimeout
+            """, nativeQuery = true)
     UserToken findActiveToken(
             @Param("token") String token,
             @Param("currentTime") LocalDateTime currentTime,
@@ -22,9 +24,11 @@ public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenP
     );
 
     @Modifying
-    @Query(value = "delete from user_token where user_id = :userId " +
-            "and extract(epoch from (:currentTime - last_action_time)) > :userIdleTimeout",
-            nativeQuery = true)
+    @Query(value = """
+            delete from user_token
+            where user_id = :userId
+                and extract(epoch from (:currentTime - last_action_time)) > :userIdleTimeout
+            """, nativeQuery = true)
     int deleteOldTokens(
             @Param("userId") int userId,
             @Param("currentTime") LocalDateTime currentTime,
@@ -32,8 +36,10 @@ public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenP
     );
 
     @Modifying
-    @Query(value = "delete from user_token where token = :token",
-            nativeQuery = true)
+    @Query(value = """
+            delete from user_token
+            where token = :token
+            """, nativeQuery = true)
     int deleteByToken(@Param("token") String token);
 
 }

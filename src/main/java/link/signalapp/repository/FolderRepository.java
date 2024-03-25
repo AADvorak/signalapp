@@ -10,8 +10,11 @@ import java.util.Optional;
 
 public interface FolderRepository extends JpaRepository<Folder, Integer> {
 
-    @Query(value = "select count(1) from folder " +
-            "where user_id = :userId", nativeQuery = true)
+    @Query(value = """
+            select count(1)
+            from folder
+            where user_id = :userId
+            """, nativeQuery = true)
     int countByUserId(@Param("userId") int userId);
 
     List<Folder> findByUserId(int userId);
