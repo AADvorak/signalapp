@@ -1,5 +1,8 @@
 package link.signalapp.integration.signals;
 
+import link.signalapp.model.Signal;
+import org.apache.commons.lang3.RandomStringUtils;
+
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -7,6 +10,7 @@ import javax.sound.sampled.AudioSystem;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Random;
 
 public class SignalsTestUtils {
@@ -32,5 +36,13 @@ public class SignalsTestUtils {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, baos);
         return baos.toByteArray();
+    }
+
+    public static Signal createRandomSignal() {
+        return new Signal()
+                .setName(RandomStringUtils.randomAlphanumeric(10))
+                .setDescription(RandomStringUtils.randomAlphanumeric(10))
+                .setMaxAbsY(BigDecimal.ONE)
+                .setXMin(BigDecimal.ZERO);
     }
 }

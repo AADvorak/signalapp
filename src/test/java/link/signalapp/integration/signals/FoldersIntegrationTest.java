@@ -234,14 +234,12 @@ public class FoldersIntegrationTest extends IntegrationTestBase {
 
     private Pair<Integer, List<Integer>> createFolderWithSignalsInDB() throws IOException {
         Set<Folder> folderSet = new HashSet<>(createFoldersInDB(1).values());
-        List<Signal> signals = Stream.of(3000, 8000).map(sampleRate -> signalRepository.save(new Signal()
-                .setName("Name " + sampleRate)
-                .setDescription("description " + sampleRate)
-                .setSampleRate(BigDecimal.valueOf(sampleRate))
-                .setXMin(BigDecimal.ZERO)
-                .setMaxAbsY(BigDecimal.ONE)
-                .setUserId(userId)
-                .setFolders(folderSet))).toList();
+        List<Signal> signals = Stream.of(3000, 8000).map(sampleRate -> signalRepository.save(
+                SignalsTestUtils.createRandomSignal()
+                        .setUserId(userId)
+                        .setSampleRate(BigDecimal.valueOf(sampleRate))
+                        .setFolders(folderSet)
+        )).toList();
         for (Signal signal : signals) {
             fileManager.writeWavToFile(userId, signal.getId(),
                     SignalsTestUtils.generateWav(1000, 1, signal.getSampleRate().floatValue()));

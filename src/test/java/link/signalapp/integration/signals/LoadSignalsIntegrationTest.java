@@ -324,13 +324,9 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     private Signal createRandomSignal(int userId) {
-        return new Signal()
-                .setName(RandomStringUtils.randomAlphanumeric(10))
-                .setDescription(RandomStringUtils.randomAlphanumeric(10))
+        return SignalsTestUtils.createRandomSignal()
                 .setUserId(userId)
-                .setSampleRate(BigDecimal.valueOf(SAMPLE_RATE))
-                .setMaxAbsY(BigDecimal.ONE)
-                .setXMin(BigDecimal.ZERO);
+                .setSampleRate(BigDecimal.valueOf(SAMPLE_RATE));
     }
 
     private byte[] getTestWav() throws IOException {
