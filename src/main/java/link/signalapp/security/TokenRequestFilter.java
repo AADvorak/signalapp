@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,40 +26,25 @@ public class TokenRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        try {
-            tryToAuthorizeUser(request);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        if (request.getCookies() != null) {
+            Arrays.stream(request.getCookies())
+                    .filter(cookie -> "JAVASESSIONID".equals(cookie.getName()))
+                    .findAny()
+                    .map(Cookie::getValue)
+                    .ifPresent(this::authorizeUser);
         }
         chain.doFilter(request, response);
     }
 
-    private void tryToAuthorizeUser(HttpServletRequest request) {
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            return;
+    private void authorizeUser(String token) {
+        User user = userTokenService.getUserByToken(token);
+        if (user != null) {
+            UserDetails userDetails = new SignalAppUserDetails(user).setToken(token);
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext()
+                    .setAuthentication(usernamePasswordAuthenticationToken);
         }
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return;
-        }
-        String requestToken = Arrays.stream(cookies)
-                .filter(cookie -> "JAVASESSIONID".equals(cookie.getName())).findAny()
-                .map(Cookie::getValue).orElse(null);
-        if (requestToken == null) {
-            return;
-        }
-        User user = userTokenService.getUserByToken(requestToken);
-        if (user == null) {
-            return;
-        }
-        UserDetails userDetails = new SignalAppUserDetails(user).setToken(requestToken);
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-        usernamePasswordAuthenticationToken
-                .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext()
-                .setAuthentication(usernamePasswordAuthenticationToken);
     }
-
 }
