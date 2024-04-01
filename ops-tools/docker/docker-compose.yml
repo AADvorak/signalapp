@@ -20,7 +20,7 @@ services:
       SECURE_RANDOM_SEED: seed
     env_file: ./secrets/secrets.env
     volumes:
-      - ../../target/signalapp-1.3.0.jar:/signalapp/signalapp.jar
+      - ../../target/signalapp-1.4.0.jar:/signalapp/signalapp.jar
       - ../../../signalappdata/:/signalapp/signalappdata
     stdin_open: true
     tty: true
