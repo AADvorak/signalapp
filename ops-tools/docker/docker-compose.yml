@@ -59,7 +59,6 @@ services:
     volumes:
       - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
       - ../../nginx/mime.types:/etc/nginx/mime.types
-      - ../../frontend-old/:/usr/share/nginx/static
     networks:
       signalapp-net:
 
