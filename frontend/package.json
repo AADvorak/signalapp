@@ -8,25 +8,25 @@
     "start": "nuxt start"
   },
   "devDependencies": {
-    "@mdi/font": "^6.9.96",
-    "@mdi/js": "^6.6.96",
-    "nuxt": "npm:nuxt3@latest",
-    "sass": "^1.51.0"
+    "@mdi/font": "^7.4.47",
+    "@mdi/js": "^7.4.47",
+    "nuxt": "npm:nuxt3@^3.8.0-28284309.b3d3d7f4",
+    "sass": "^1.74.1"
   },
   "dependencies": {
-    "@intlify/unplugin-vue-i18n": "^0.10.0",
-    "@pinia/nuxt": "^0.4.1",
-    "highcharts": "^10.3.2",
-    "highcharts-vue": "^1.4.0",
+    "@intlify/unplugin-vue-i18n": "^4.0.0",
+    "@pinia/nuxt": "^0.5.1",
+    "highcharts": "^11.4.1",
+    "highcharts-vue": "^2.0.1",
     "inline-worker": "^1.1.0",
-    "mitt": "^3.0.0",
-    "pinia": "^2.0.20",
-    "vue": "^3.2.33",
-    "vue-draggable-next": "^2.1.1",
-    "vue-i18n": "^9.2.2",
+    "mitt": "^3.0.1",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.21",
+    "vue-draggable-next": "^2.2.1",
+    "vue-i18n": "^9.11.0",
     "vue-recaptcha-v3": "^2.0.1",
     "vuedraggable": "^2.24.3",
-    "vuetify": "^3.0.1",
+    "vuetify": "^3.5.14",
     "wav-decoder": "^1.3.0"
   }
 }
