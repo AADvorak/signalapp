@@ -8,8 +8,17 @@
         accept=".txt,.csv,.json,.xml,.wav"
         :label="_t('fromTextOrWavFile')"/>
   </v-card-text>
-  <select-dialog :items="selectItems" :opened="select.opened" :text="select.text" @select="select.select" @cancel="select.cancel"/>
-  <message :opened="message.opened" :text="message.text" @hide="message.onHide"/>
+  <select-dialog
+      :items="selectItems"
+      :opened="select.opened"
+      :text="select.text"
+      :ask-remember="true"
+      @select="select.select"
+      @cancel="select.cancel"/>
+  <message
+      :opened="message.opened"
+      :text="message.text"
+      @hide="message.onHide"/>
 </template>
 
 <script>
@@ -19,10 +28,11 @@ import WavCoder from "../audio/wav-coder";
 import SignalUtils from "../utils/signal-utils";
 import SignalActions from "../mixins/signal-actions";
 import {SignalRequests} from "~/api/signal-requests";
+import {ImportSignalActions, SelectsWithSaving} from "~/utils/select-utils";
 
 const ACTION_SELECT_ITEMS = [
-  {name: 'open', color: 'primary'},
-  {name: 'save', color: 'success'},
+  {name: ImportSignalActions.open, color: 'primary'},
+  {name: ImportSignalActions.save, color: 'success'},
 ]
 
 export default {
@@ -48,11 +58,12 @@ export default {
     async importFromFile(file, openFunc, saveFunc) {
       this.selectItems = ACTION_SELECT_ITEMS
       this.askSelect({
+        key: SelectsWithSaving.importSignalActions.key,
         text: this._t('selectAction'),
         select: async (action) => {
-          if (action === 'open') {
+          if (action === ImportSignalActions.open) {
             await openFunc(file)
-          } else if (action === 'save') {
+          } else if (action === ImportSignalActions.save) {
             await saveFunc(file)
           }
           // todo clear file input

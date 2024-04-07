@@ -25,7 +25,11 @@ const en = {
       stop: 'Stop',
       folders: 'Add to folders',
       clear: 'Clear',
-      change: 'Change'
+      change: 'Change',
+      toSignalManager: 'Go to signal manager',
+      toSignalGenerator: 'Go to signal generator',
+      continueWorkingWithSignal: 'Continue working with signal',
+      askSelect: 'Show select dialog'
     },
     validation: {
       required: 'This field is required',
@@ -74,7 +78,8 @@ const en = {
     title: 'Message'
   },
   'select-dialog': {
-    title: 'Selection'
+    title: 'Selection',
+    rememberSelection: 'Remember selection'
   },
   'select-processor': {
     title: 'Select processor',
@@ -116,6 +121,10 @@ const en = {
     restorePasswordMailTitle: 'SignalApp - restore password',
     restorePasswordMailMsg: 'Your new password for SignalApp: $newPassword$. It is recommended to change it immediately after sign in.',
   },
+  'selects-settings': {
+    afterSaveSignalActions: 'After save signal actions',
+    importSignalActions: 'Actions with imported signal'
+  },
   'signal': {
     name: 'Signal',
     saveAsNew: 'Save as new',
@@ -124,7 +133,8 @@ const en = {
     processSignalError: 'Error while processing signal',
     signalDataSaveError: 'Error while saving signal data',
     signalSaveError: 'Error while saving signal',
-    signalNotFound: 'Signal is not found'
+    signalNotFound: 'Signal is not found',
+    signalIsSaved: 'Signal is saved'
   },
   'signal-importer': {
     'import': 'Import',

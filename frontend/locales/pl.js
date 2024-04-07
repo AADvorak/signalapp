@@ -25,7 +25,11 @@ const pl = {
       stop: 'Stop',
       folders: 'Dodaj do folderów',
       clear: 'Wyczyść',
-      change: 'Zmień'
+      change: 'Zmień',
+      toSignalManager: 'Do menadżera sygnałów',
+      toSignalGenerator: 'Do generatora sygnałów',
+      continueWorkingWithSignal: 'Przedłuż pracę z sygnałem',
+      askSelect: 'Pokaż okno wyboru'
     },
     validation: {
       required: 'To pole jest wymagane',
@@ -74,7 +78,8 @@ const pl = {
     title: 'Wiadomość'
   },
   'select-dialog': {
-    title: 'Wybór'
+    title: 'Wybór',
+    rememberSelection: 'Zapamiętaj wybór'
   },
   'select-processor': {
     title: 'Wybór przetwarzacza',
@@ -116,6 +121,10 @@ const pl = {
     restorePasswordMailTitle: 'SignalApp - przywrócenie hasła',
     restorePasswordMailMsg: 'Twoje nowe hasło: $newPassword$. Zaleca się zmienić go natychmiast po zalogowaniu.',
   },
+  'selects-settings': {
+    afterSaveSignalActions: 'Działania po zapisywaniu sygnału',
+    importSignalActions: 'Działania z zaimportowanym sygnałem'
+  },
   'signal': {
     name: 'Sygnał',
     saveAsNew: 'Zapisz jako nowy',
@@ -124,7 +133,8 @@ const pl = {
     processSignalError: 'Błąd podczas przetwarzania sygnału',
     signalDataSaveError: 'Błąd podczas zapisywania danych sygnału',
     signalSaveError: 'Błąd podczas zapisywania sygnału',
-    signalNotFound: 'Nie znaleziono sygnału'
+    signalNotFound: 'Nie znaleziono sygnału',
+    signalIsSaved: 'Sygnał został zapisany pomyślnie'
   },
   'signal-importer': {
     'import': 'Importuj',

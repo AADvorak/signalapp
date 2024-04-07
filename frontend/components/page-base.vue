@@ -5,6 +5,7 @@ import Message from "./message";
 import LoadingOverlay from "./loading-overlay";
 import ComponentBase from "./component-base"
 import SelectDialog from "./select-dialog";
+import {SelectUtils} from "~/utils/select-utils";
 
 export default {
   name: "page-base",
@@ -66,13 +67,19 @@ export default {
         }
       }
     },
-    askSelect({text, select, cancel}) {
+    askSelect({key, text, select, cancel}) {
+      const selectedItemName = SelectUtils.getSelected(key)
+      if (selectedItemName) {
+        select && select(selectedItemName)
+        return
+      }
       this.select = {
         opened: true,
         text,
-        select: (itemName) => {
+        select: ({rememberSelection, selectedItemName}) => {
+          rememberSelection && SelectUtils.setSelected(key, selectedItemName)
           this.select.opened = false
-          select && select(itemName)
+          select && select(selectedItemName)
         },
         cancel: () => {
           this.select.opened = false

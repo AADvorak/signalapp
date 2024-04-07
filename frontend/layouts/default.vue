@@ -81,6 +81,7 @@
                       item-value="code"
                       :items="numberInputTypes"
                       :label="_t('numberInputType')"/>
+                  <selects-settings/>
                 </v-form>
               </v-card-text>
             </v-card>

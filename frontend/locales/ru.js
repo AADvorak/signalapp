@@ -25,7 +25,11 @@ const ru = {
       stop: 'Остановить',
       folders: 'Добавить в папки',
       clear: 'Очистить',
-      change: 'Поменять'
+      change: 'Поменять',
+      toSignalManager: 'В менеджер сигналов',
+      toSignalGenerator: 'В генератор сигналов',
+      continueWorkingWithSignal: 'Продолжить работу с сигналом',
+      askSelect: 'Показать диалог с выбором'
     },
     validation: {
       required: 'Поле обязательно к заполнению',
@@ -74,7 +78,8 @@ const ru = {
     title: 'Сообщение'
   },
   'select-dialog': {
-    title: 'Выбор'
+    title: 'Выбор',
+    rememberSelection: 'Запомнить выбор'
   },
   'select-processor': {
     title: 'Выбор преобразователя',
@@ -116,6 +121,10 @@ const ru = {
     restorePasswordMailTitle: 'SignalApp - восстановление пароля',
     restorePasswordMailMsg: 'Ваш новый пароль: $newPassword$. Рекомендуется изменить его сразу после входа в учетную запись.',
   },
+  'selects-settings': {
+    afterSaveSignalActions: 'Действия после сохрения сигнала',
+    importSignalActions: 'Действия при импорте сигнала'
+  },
   'signal': {
     name: 'Сигнал',
     saveAsNew: 'Сохранить как новый',
@@ -124,7 +133,8 @@ const ru = {
     processSignalError: 'Ошибка при преобразовании сигнала',
     signalDataSaveError: 'Ошибка при сохранении данных сигнала',
     signalSaveError: 'Ошибка при сохранении сигнала',
-    signalNotFound: 'Сигнал не найден'
+    signalNotFound: 'Сигнал не найден',
+    signalIsSaved: 'Сигнал сохранен'
   },
   'signal-importer': {
     'import': 'Импортировать',

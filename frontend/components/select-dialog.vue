@@ -10,13 +10,16 @@
         <div class="d-flex mb-4">
           {{ text }}
         </div>
-        <div class="d-flex">
+        <div class="d-flex flex-wrap">
           <v-btn v-for="item in items" :color="item.color" class="mr-4" @click="() => select(item.name)">
             {{ getButtonText(item) }}
           </v-btn>
-          <v-btn @click="cancel">
+          <v-btn v-if="!noCancel" @click="cancel">
             {{ _tc('buttons.cancel') }}
           </v-btn>
+        </div>
+        <div v-if="askRemember">
+          <v-checkbox v-model="rememberSelection" :label="_t('rememberSelection')"/>
         </div>
       </v-card-text>
     </v-card>
@@ -41,12 +44,26 @@ export default {
     items: {
       type: Array,
       required: true
+    },
+    noCancel: {
+      type: Boolean,
+      default: false
+    },
+    askRemember: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['select', 'cancel'],
+  data: () => ({
+    rememberSelection: false
+  }),
   methods: {
-    select(itemName) {
-      this.$emit('select', itemName)
+    select(selectedItemName) {
+      this.$emit('select', {
+        selectedItemName,
+        rememberSelection: this.rememberSelection
+      })
     },
     cancel() {
       this.$emit('cancel')

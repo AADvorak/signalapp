@@ -81,6 +81,14 @@
     </template>
     <template #dialogs>
       <single-processor-dialog :bus="bus" :signal="signal"/>
+      <select-dialog
+          :items="selectItems"
+          :opened="select.opened"
+          :text="select.text"
+          :no-cancel="true"
+          :ask-remember="true"
+          @select="select.select"
+          @cancel="select.cancel"/>
     </template>
   </card-with-layout>
 </template>
@@ -97,6 +105,7 @@ import SignalPlayer from "../../../audio/signal-player";
 import {mdiPlay, mdiStop} from "@mdi/js";
 import NumberUtils from "~/utils/number-utils";
 import {SignalRequests} from "~/api/signal-requests";
+import {AfterSaveSignalActions, SelectsWithSaving} from "~/utils/select-utils";
 
 export default {
   name: "signal",
@@ -110,6 +119,11 @@ export default {
       name: {},
       description: {}
     },
+    selectItems: [
+      {name: AfterSaveSignalActions.toSignalManager, color: 'primary'},
+      {name: AfterSaveSignalActions.toSignalGenerator, color: 'primary'},
+      {name: AfterSaveSignalActions.continueWorkingWithSignal, color: 'secondary'},
+    ],
     bus: new mitt(),
     isSignalPlayed: false,
     mdiPlay,
@@ -198,10 +212,29 @@ export default {
             : await SignalRequests.saveNewSignal(this.signal)
         if (response.ok) {
           this.signalIsSaved && dataStore().updateSignalInHistory(this.signal, this.historyKey)
-          await useRouter().push('/signal-manager')
+          this.askAfterSaveAction()
         } else {
           this.parseValidation(response.errors)
           this.showErrorsFromResponse(response, this._t('signalSaveError'))
+        }
+      })
+    },
+    askAfterSaveAction() {
+      this.askSelect({
+        key: SelectsWithSaving.afterSaveSignalActions.key,
+        text: this._t('signalIsSaved'),
+        select: async (action) => {
+          switch (action) {
+            case AfterSaveSignalActions.toSignalManager:
+              await useRouter().push('/signal-manager')
+              break
+            case AfterSaveSignalActions.toSignalGenerator:
+              await useRouter().push('/signal-generator')
+              break
+            case AfterSaveSignalActions.continueWorkingWithSignal:
+              // todo work with signal id
+              break
+          }
         }
       })
     },
