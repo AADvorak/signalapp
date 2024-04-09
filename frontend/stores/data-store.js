@@ -81,6 +81,9 @@ export const dataStore = defineStore('dataStore', {
         return JSON.parse(value)
       }
     },
+    clearHistoryForSignal(signalId) {
+      this.signalHistory[String(signalId)] = []
+    },
     setRecordedAudio(recordedAudio) {
       this.recordedAudio = recordedAudio
     },

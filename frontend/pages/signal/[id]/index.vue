@@ -212,14 +212,14 @@ export default {
             : await SignalRequests.saveNewSignal(this.signal)
         if (response.ok) {
           this.signalIsSaved && dataStore().updateSignalInHistory(this.signal, this.historyKey)
-          this.askAfterSaveAction()
+          this.askAfterSaveAction(response.data?.id)
         } else {
           this.parseValidation(response.errors)
           this.showErrorsFromResponse(response, this._t('signalSaveError'))
         }
       })
     },
-    askAfterSaveAction() {
+    askAfterSaveAction(newSignalId) {
       this.askSelect({
         key: SelectsWithSaving.afterSaveSignalActions.key,
         text: this._t('signalIsSaved'),
@@ -232,11 +232,16 @@ export default {
               await useRouter().push('/signal-generator')
               break
             case AfterSaveSignalActions.continueWorkingWithSignal:
-              // todo work with signal id
+              newSignalId && await this.processNewSignalId(newSignalId)
               break
           }
         }
       })
+    },
+    async processNewSignalId(newSignalId) {
+      this.signal.id = newSignalId
+      const historyKey = dataStore().addSignalToHistory(this.signal)
+      await useRouter().push(`/signal/${newSignalId}?history=${historyKey}`)
     },
     signalNotFound() {
       this.showMessage({
