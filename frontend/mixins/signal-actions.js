@@ -1,5 +1,4 @@
 import SignalUtils from "~/utils/signal-utils";
-import {dataStore} from "~/stores/data-store";
 
 export default {
   methods: {
@@ -22,7 +21,7 @@ export default {
     saveSignalToHistoryAndOpen(signal) {
       SignalUtils.calculateMaxAbsY(signal)
       SignalUtils.calculateSignalParams(signal)
-      useRouter().push('/signal/0?history=' + dataStore().addSignalToHistory(signal))
+      useRouter().push('/signal/0?history=' + signalStore().addSignalToHistory(signal))
     },
   }
 }

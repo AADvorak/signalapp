@@ -7,7 +7,6 @@ export const dataStore = defineStore('dataStore', {
       settings: undefined,
       folders: [],
       waitingForAuthorization: null,
-      signalHistory: {},
       recordedAudio: null,
       darkMode: localStorage.getItem('darkMode') === 'true',
       emailForPasswordRestore: null,
@@ -58,31 +57,6 @@ export const dataStore = defineStore('dataStore', {
     },
     clearWaitingForAuthorization() {
       this.waitingForAuthorization = null
-    },
-    addSignalToHistory(signal, currentHistoryKey) {
-      const signalId = String(signal.id || 0)
-      if (!this.signalHistory[signalId]) {
-        this.signalHistory[signalId] = []
-      }
-      const historyKey = currentHistoryKey ? parseInt(currentHistoryKey) + 1 : 0
-      this.signalHistory[signalId][historyKey] = JSON.stringify(signal)
-      return historyKey
-    },
-    updateSignalInHistory(signal, historyKey) {
-      if (!historyKey) {
-        return
-      }
-      const signalId = String(signal.id || 0)
-      this.signalHistory[signalId][historyKey] = JSON.stringify(signal)
-    },
-    getSignalFromHistory(signalId, historyKey) {
-      const value = this.signalHistory[signalId]?.[parseInt(historyKey)]
-      if (value) {
-        return JSON.parse(value)
-      }
-    },
-    clearHistoryForSignal(signalId) {
-      this.signalHistory[String(signalId)] = []
     },
     setRecordedAudio(recordedAudio) {
       this.recordedAudio = recordedAudio

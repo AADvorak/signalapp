@@ -470,7 +470,7 @@ export default {
       this.formValue('sampleRates', [])
     },
     openSignal(signal) {
-      dataStore().clearHistoryForSignal(signal.id)
+      signalStore().clearHistoryForSignal(signal.id)
       useRouter().push(`/signal/${signal.id}?history=0`)
     },
     openFolderManager() {

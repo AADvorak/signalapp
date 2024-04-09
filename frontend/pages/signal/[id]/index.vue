@@ -173,7 +173,7 @@ export default {
       const route = useRoute()
       this.signalId = route.params.id
       this.historyKey = route.query.history
-      const signal = dataStore().getSignalFromHistory(this.signalId, this.historyKey)
+      const signal = signalStore().getSignalFromHistory(this.signalId, this.historyKey)
       if (signal) {
         this.signal = signal
       } else if (!isNaN(this.signalId) && this.signalId !== '0' && (!this.historyKey || this.historyKey === '0')) {
@@ -188,7 +188,7 @@ export default {
       try {
         const signal = await SignalRequests.loadSignalWithData(this.signalId)
         SignalUtils.calculateSignalParams(signal)
-        const historyKey = dataStore().addSignalToHistory(signal)
+        const historyKey = signalStore().addSignalToHistory(signal)
         if (this.historyKey === '0') {
           this.signal = signal
         } else {
@@ -211,7 +211,7 @@ export default {
             ? await SignalRequests.saveExistingSignal(this.signal)
             : await SignalRequests.saveNewSignal(this.signal)
         if (response.ok) {
-          this.signalIsSaved && dataStore().updateSignalInHistory(this.signal, this.historyKey)
+          this.signalIsSaved && signalStore().updateSignalInHistory(this.signal, this.historyKey)
           this.askAfterSaveAction(response.data?.id)
         } else {
           this.parseValidation(response.errors)
@@ -240,7 +240,7 @@ export default {
     },
     async processNewSignalId(newSignalId) {
       this.signal.id = newSignalId
-      const historyKey = dataStore().addSignalToHistory(this.signal)
+      const historyKey = signalStore().addSignalToHistory(this.signal)
       await useRouter().push(`/signal/${newSignalId}?history=${historyKey}`)
     },
     signalNotFound() {

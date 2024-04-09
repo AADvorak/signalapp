@@ -10,7 +10,6 @@
 
 <script>
 import formValidation from "../../mixins/form-validation";
-import {dataStore} from "~/stores/data-store";
 import formValuesSaving from "../../mixins/form-values-saving";
 import formNumberValues from "../../mixins/form-number-values";
 import ComponentBase from "../component-base";
@@ -124,7 +123,7 @@ export default {
     addSignalToHistoryAndOpen(signal) {
       const route = useRoute()
       const signalId = route.params.id || signal.id || '0', currentHistoryKey = route.query.history || '0'
-      const historyKey = dataStore().addSignalToHistory(signal, currentHistoryKey)
+      const historyKey = signalStore().addSignalToHistory(signal, currentHistoryKey)
       useRouter().push(`/signal/${signalId}?history=${historyKey}`)
       this.bus.emit('processed')
     },
