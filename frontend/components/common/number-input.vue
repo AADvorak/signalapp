@@ -19,6 +19,7 @@
         :step="fieldObj.params.step"
         :error="!!fieldObj.validation?.length"
         :error-messages="fieldObj.validation"
+        @update:model-value="v => $emit('update', v)"
         thumb-label/>
   </div>
 </template>
