@@ -92,7 +92,9 @@ const en = {
     startPage: 'Start page',
     on: 'on',
     off: 'off',
-    darkMode: 'Dark mode: {darkModeState}',
+    darkMode: 'Dark mode: {darkModeState}'
+  },
+  'number-input-type-select': {
     numberInputType: 'Number input',
     numberInputTypes: {
       text: 'Text',

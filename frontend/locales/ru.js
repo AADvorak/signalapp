@@ -92,7 +92,9 @@ const ru = {
     startPage: 'Стартовая страница',
     on: 'вкл',
     off: 'выкл',
-    darkMode: 'Темный режим: {darkModeState}',
+    darkMode: 'Темный режим: {darkModeState}'
+  },
+  'number-input-type-select': {
     numberInputType: 'Ввод чисел',
     numberInputTypes: {
       text: 'Текст',

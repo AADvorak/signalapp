@@ -70,12 +70,7 @@
                 <v-switch hide-details v-model="darkMode" :label="_t('darkMode', {darkModeState})"/>
                 <v-form>
                   <locale-select/>
-                  <v-select
-                      v-model="numberInputType"
-                      item-title="name"
-                      item-value="code"
-                      :items="numberInputTypes"
-                      :label="_t('numberInputType')"/>
+                  <number-input-type-select/>
                   <selects-settings/>
                 </v-form>
               </v-card-text>
@@ -100,10 +95,11 @@ import DeviceUtils from "../utils/device-utils";
 import ComponentBase from "../components/base/component-base.vue";
 import LocaleSelect from "~/components/layout/locale-select.vue";
 import SelectsSettings from "~/components/layout/selects-settings.vue";
+import NumberInputTypeSelect from "~/components/layout/number-input-type-select.vue";
 
 export default {
   name: 'default',
-  components: {SelectsSettings, LocaleSelect},
+  components: {NumberInputTypeSelect, SelectsSettings, LocaleSelect},
   extends: ComponentBase,
   data() {
     return {
@@ -116,8 +112,7 @@ export default {
       darkMode: dataStore().darkMode,
       header: '',
       showMainMenu: false,
-      isMobile: DeviceUtils.isMobile(),
-      numberInputType: dataStore().numberInputType
+      isMobile: DeviceUtils.isMobile()
     }
   },
   computed: {
@@ -147,13 +142,6 @@ export default {
     },
     pageColsSm() {
       return this.showMainMenu ? 12 - this.mainMenuColsSm : 12
-    },
-    numberInputTypes() {
-      let items = []
-      for (const code of dataStore().numberInputTypes) {
-        items.push({code, name: this._t('numberInputTypes.' + code)})
-      }
-      return items
     }
   },
   watch: {
@@ -162,9 +150,6 @@ export default {
     },
     '$i18n.locale'() {
       this.setHeaderByRoute()
-    },
-    numberInputType(newValue) {
-      dataStore().setNumberInputType(newValue)
     }
   },
   mounted() {

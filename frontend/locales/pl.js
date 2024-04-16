@@ -92,7 +92,9 @@ const pl = {
     startPage: 'Strona startowa',
     on: 'wł',
     off: 'wył',
-    darkMode: 'Tryb ciemny: {darkModeState}',
+    darkMode: 'Tryb ciemny: {darkModeState}'
+  },
+  'number-input-type-select': {
     numberInputType: 'Wprowadzanie liczb',
     numberInputTypes: {
       text: 'Tekst',
