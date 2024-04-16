@@ -1,6 +1,6 @@
 <script>
-import ComponentBase from "./component-base";
-import StringUtils from "../utils/string-utils";
+import ComponentBase from "../base/component-base.vue";
+import StringUtils from "../../utils/string-utils";
 
 export default {
   name: "processor-dialog-base",

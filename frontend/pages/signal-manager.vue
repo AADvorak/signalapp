@@ -170,7 +170,7 @@
 <script>
 import {mdiDelete, mdiPlay, mdiStop, mdiFileEdit, mdiFolder, mdiFolderEdit, mdiFolderPlus, mdiFilterOff} from "@mdi/js";
 import SignalPlayer from "../audio/signal-player";
-import PageBase from "../components/page-base";
+import PageBase from "../components/base/page-base.vue";
 import mitt from "mitt";
 import SignalUtils from "../utils/signal-utils";
 import formNumberValues from "../mixins/form-number-values";
@@ -183,9 +183,24 @@ import FolderRequests from "~/api/folder-requests";
 import NumberUtils from "~/utils/number-utils";
 import uiParamsSaving from "~/mixins/ui-params-saving";
 import {SignalRequests} from "~/api/signal-requests";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
+import FixedWidthWrapper from "~/components/common/fixed-width-wrapper.vue";
+import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
+import NumberInput from "~/components/common/number-input.vue";
+import TextInput from "~/components/common/text-input.vue";
+import TableOrList from "~/components/common/table-or-list.vue";
+import SelectProcessor from "~/components/processor-selection/select-processor.vue";
+import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue";
+import DoubleProcessorDialog from "~/components/processor-selection/double-processor-dialog.vue";
+import SingleProcessorDialog from "~/components/processor-selection/single-processor-dialog.vue";
 
 export default {
   name: "signal-manager",
+  components: {
+    SingleProcessorDialog, DoubleProcessorDialog, ToolbarWithCloseBtn,
+    SelectProcessor, TableOrList, TextInput, NumberInput, BtnWithTooltip,
+    FixedWidthWrapper, CardWithLayout
+  },
   extends: PageBase,
   mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving],
   data: () => ({

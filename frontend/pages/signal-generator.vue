@@ -43,11 +43,14 @@
 import formValidation from "../mixins/form-validation";
 import formValuesSaving from "../mixins/form-values-saving";
 import formNumberValues from "../mixins/form-number-values";
-import PageBase from "../components/page-base";
+import PageBase from "../components/base/page-base.vue";
 import SignalUtils from "../utils/signal-utils";
 import {mdiEye, mdiEyeOff} from "@mdi/js";
 import actionWithTimeout from "../mixins/action-with-timeout";
 import SignalActions from "../mixins/signal-actions";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
+import NumberInput from "~/components/common/number-input.vue";
+import SignalImporter from "~/components/import/signal-importer.vue";
 
 const PREVIEW_KEY = 'SignalGeneratorPreview'
 const SIGNAL_FORMS = {
@@ -89,6 +92,7 @@ const VALIDATION_FUNCTIONS = {
 
 export default {
   name: "signal-generator",
+  components: {SignalImporter, NumberInput, CardWithLayout},
   extends: PageBase,
   mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout, SignalActions],
   data: () => ({

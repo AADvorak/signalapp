@@ -19,10 +19,12 @@
 </template>
 
 <script>
-import ComponentBase from "./component-base";
+import ComponentBase from "../base/component-base.vue";
+import SelectProcessor from "~/components/processor-selection/select-processor.vue";
 
 export default {
   name: "select-processor-dialog",
+  components: {SelectProcessor},
   extends: ComponentBase,
   props: {
     bus: Object,

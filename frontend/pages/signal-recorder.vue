@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import PageBase from "../components/page-base";
+import PageBase from "../components/base/page-base.vue";
 import formValidation from "../mixins/form-validation";
 import formValuesSaving from "../mixins/form-values-saving";
 import {dataStore} from "~/stores/data-store";
@@ -63,9 +63,12 @@ import SignalPlayer from "../audio/signal-player";
 import WavCoder from "../audio/wav-coder";
 import SignalActions from "../mixins/signal-actions";
 import {SignalRequests} from "~/api/signal-requests";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
+import NumberInput from "~/components/common/number-input.vue";
 
 export default {
   name: "signal-recorder",
+  components: {NumberInput, CardWithLayout},
   extends: PageBase,
   mixins: [formValidation, formValuesSaving, formNumberValues, SignalActions],
   data: () => ({

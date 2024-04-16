@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import ComponentBase from "~/components/component-base.vue";
+import ComponentBase from "~/components/base/component-base.vue";
 import {SelectsWithSaving, SelectUtils} from "~/utils/select-utils";
 
 const ASK_SELECT_VALUE = 'askSelect'

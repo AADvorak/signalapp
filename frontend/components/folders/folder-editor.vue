@@ -35,13 +35,15 @@
 </template>
 
 <script>
-import PageBase from "~/components/page-base";
+import PageBase from "~/components/base/page-base.vue";
 import FolderRequests from "~/api/folder-requests";
 import formValues from "~/mixins/form-values";
 import formValidation from "~/mixins/form-validation";
+import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue";
 
 export default {
   name: "folder-editor",
+  components: {ToolbarWithCloseBtn},
   extends: PageBase,
   mixins: [formValues, formValidation],
   props: {

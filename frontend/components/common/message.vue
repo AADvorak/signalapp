@@ -7,15 +7,12 @@
     <v-card width="100%">
       <v-card-title>{{ _t('title') }}</v-card-title>
       <v-card-text>
-        <div class="d-flex mb-4">
+        <div class="d-flex">
           {{ text }}
         </div>
-        <div class="d-flex">
-          <v-btn :color="okColor" class="mr-4" @click="ok">
+        <div class="d-flex mt-4">
+          <v-btn color="primary" @click="hide">
             {{ _tc('buttons.ok') }}
-          </v-btn>
-          <v-btn @click="cancel">
-            {{ _tc('buttons.cancel') }}
           </v-btn>
         </div>
       </v-card-text>
@@ -24,10 +21,10 @@
 </template>
 
 <script>
-import ComponentBase from "./component-base";
+import ComponentBase from "../base/component-base.vue";
 
 export default {
-  name: "confirm-dialog",
+  name: "message",
   extends: ComponentBase,
   props: {
     opened: {
@@ -38,18 +35,11 @@ export default {
       type: String,
       default: ''
     },
-    okColor: {
-      type: String,
-      default: 'error'
-    }
   },
-  emits: ['ok', 'cancel'],
+  emits: ['hide'],
   methods: {
-    ok() {
-      this.$emit('ok')
-    },
-    cancel() {
-      this.$emit('cancel')
+    hide() {
+      this.$emit('hide')
     }
   }
 }

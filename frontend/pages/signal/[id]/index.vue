@@ -97,7 +97,7 @@
 import {dataStore} from "~/stores/data-store";
 import mitt from 'mitt'
 import formValidation from "../../../mixins/form-validation";
-import PageBase from "../../../components/page-base";
+import PageBase from "../../../components/base/page-base.vue";
 import FileUtils from "../../../utils/file-utils";
 import SignalUtils from "../../../utils/signal-utils";
 import WavCoder from "../../../audio/wav-coder";
@@ -106,9 +106,14 @@ import {mdiPlay, mdiStop} from "@mdi/js";
 import NumberUtils from "~/utils/number-utils";
 import {SignalRequests} from "~/api/signal-requests";
 import {AfterSaveSignalActions, SelectsWithSaving} from "~/utils/select-utils";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
+import FixedWidthWrapper from "~/components/common/fixed-width-wrapper.vue";
+import SelectProcessorDialog from "~/components/processor-selection/select-processor-dialog.vue";
+import SingleProcessorDialog from "~/components/processor-selection/single-processor-dialog.vue";
 
 export default {
   name: "signal",
+  components: {SingleProcessorDialog, SelectProcessorDialog, FixedWidthWrapper, CardWithLayout},
   extends: PageBase,
   mixins: [formValidation],
   data: () => ({

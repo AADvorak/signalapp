@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import ComponentBase from "~/components/component-base.vue";
+import ComponentBase from "~/components/base/component-base.vue";
 import {dataStore} from "~/stores/data-store";
 
 export default {

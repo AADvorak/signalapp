@@ -36,16 +36,19 @@
 
 <script>
 import {mdiDelete} from "@mdi/js";
-import PageBase from "../components/page-base";
+import PageBase from "../components/base/page-base.vue";
 import formValidation from "../mixins/form-validation";
 import {dataStore} from "~/stores/data-store";
 import formValues from "../mixins/form-values";
 import filterPatronymicField from "../mixins/filter-patronymic-field";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
+import TextInput from "~/components/common/text-input.vue";
 
 const ME_URL = '/api/users/me'
 
 export default {
   name: "user-settings",
+  components: {TextInput, CardWithLayout},
   extends: PageBase,
   mixins: [formValidation, formValues, filterPatronymicField],
   data: () => ({

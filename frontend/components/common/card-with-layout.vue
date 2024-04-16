@@ -16,8 +16,13 @@
 </template>
 
 <script>
+import Message from "~/components/common/message.vue";
+import ConfirmDialog from "~/components/common/confirm-dialog.vue";
+import LoadingOverlay from "~/components/common/loading-overlay.vue";
+
 export default {
   name: "card-with-layout",
+  components: {LoadingOverlay, ConfirmDialog, Message},
   props: {
     fullWidth: {
       type: Boolean,

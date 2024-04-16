@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import ComponentBase from "./component-base";
+import ComponentBase from "../base/component-base.vue";
 
 export default {
   name: "select-dialog",

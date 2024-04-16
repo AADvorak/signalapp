@@ -41,12 +41,17 @@
 
 <script>
 import {mdiDelete, mdiFileEdit} from "@mdi/js";
-import PageBase from "~/components/page-base.vue";
+import PageBase from "~/components/base/page-base.vue";
 import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
+import FixedWidthWrapper from "~/components/common/fixed-width-wrapper.vue";
+import TableOrList from "~/components/common/table-or-list.vue";
+import FolderEditor from "~/components/folders/folder-editor.vue";
 
 export default {
   name: "folder-manager",
+  components: {FolderEditor, TableOrList, FixedWidthWrapper, CardWithLayout},
   extends: PageBase,
   data: () => ({
     tableOrListConfig: {

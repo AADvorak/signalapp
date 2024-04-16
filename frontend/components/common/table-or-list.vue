@@ -94,7 +94,9 @@
 import {mdiSortAscending, mdiSortDescending} from "@mdi/js";
 import DeviceUtils from "~/utils/device-utils";
 import StringUtils from "~/utils/string-utils";
-import ComponentBase from "~/components/component-base.vue";
+import ComponentBase from "~/components/base/component-base.vue";
+import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
+import SignalFoldersMenu from "~/components/folders/signal-folders-menu.vue";
 
 const SORT_DIRS = {
   DESC: 'desc',
@@ -103,6 +105,7 @@ const SORT_DIRS = {
 
 export default {
   name: "table-or-list",
+  components: {SignalFoldersMenu, BtnWithTooltip},
   extends: ComponentBase,
   props: {
     dataName: {

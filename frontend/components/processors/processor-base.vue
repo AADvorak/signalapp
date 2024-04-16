@@ -12,12 +12,14 @@
 import formValidation from "../../mixins/form-validation";
 import formValuesSaving from "../../mixins/form-values-saving";
 import formNumberValues from "../../mixins/form-number-values";
-import ComponentBase from "../component-base";
+import ComponentBase from "../base/component-base.vue";
 import actionWithTimeout from "../../mixins/action-with-timeout";
 import {toRaw, isProxy} from "vue";
+import NumberInput from "~/components/common/number-input.vue";
 
 export default {
   name: "processor-base",
+  components: {NumberInput},
   extends: ComponentBase,
   mixins: [formValidation, formValuesSaving, formNumberValues, actionWithTimeout],
   props: {

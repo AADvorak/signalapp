@@ -1,10 +1,10 @@
 <script>
-import ApiProvider from "../api/api-provider";
-import ConfirmDialog from "./confirm-dialog";
-import Message from "./message";
-import LoadingOverlay from "./loading-overlay";
-import ComponentBase from "./component-base"
-import SelectDialog from "./select-dialog";
+import ApiProvider from "../../api/api-provider";
+import ConfirmDialog from "../common/confirm-dialog.vue";
+import Message from "../common/message.vue";
+import LoadingOverlay from "../common/loading-overlay.vue";
+import ComponentBase from "./component-base.vue"
+import SelectDialog from "../common/select-dialog.vue";
 import {SelectUtils} from "~/utils/select-utils";
 
 export default {

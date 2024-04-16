@@ -10,10 +10,11 @@
 import DescriptionEn from '../locales/description-en'
 import DescriptionRu from '../locales/description-ru'
 import DescriptionPl from '../locales/description-pl'
+import CardWithLayout from "~/components/common/card-with-layout.vue";
 
 export default {
   components: {
-    DescriptionEn, DescriptionRu, DescriptionPl
+    CardWithLayout, DescriptionEn, DescriptionRu, DescriptionPl
   }
 }
 </script>

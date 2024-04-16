@@ -3,10 +3,10 @@
 </template>
 
 <script>
-import SignalUtils from "../utils/signal-utils";
-import StringUtils from "../utils/string-utils";
+import SignalUtils from "~/utils/signal-utils";
+import StringUtils from "~/utils/string-utils";
 import {Chart} from 'highcharts-vue'
-import {dataStore} from "../stores/data-store";
+import {dataStore} from "~/stores/data-store";
 
 export default {
   name: "chart-drawer",

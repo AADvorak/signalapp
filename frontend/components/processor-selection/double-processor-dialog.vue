@@ -54,14 +54,15 @@
 
 <script>
 import {mdiRotate360} from "@mdi/js";
-import ProcessorDialogBase from "./processor-dialog-base";
-import Adder from "~/components/processors/adder";
-import Correlator from "~/components/processors/correlator";
-import TwoSignalAmplitudeModulator from "~/components/processors/two-signal-amplitude-modulator";
+import ProcessorDialogBase from "./processor-dialog-base.vue";
+import Adder from "~/components/processors/adder.vue";
+import Correlator from "~/components/processors/correlator.vue";
+import TwoSignalAmplitudeModulator from "~/components/processors/two-signal-amplitude-modulator.vue";
+import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
 
 export default {
   name: "double-processor-dialog",
-  components: {Adder, Correlator, TwoSignalAmplitudeModulator},
+  components: {BtnWithTooltip, Adder, Correlator, TwoSignalAmplitudeModulator},
   extends: ProcessorDialogBase,
   props: {
     signals: Array

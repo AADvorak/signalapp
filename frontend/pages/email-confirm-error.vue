@@ -8,10 +8,12 @@
 </template>
 
 <script>
-import ComponentBase from "../components/component-base";
+import ComponentBase from "../components/base/component-base.vue";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
 
 export default {
   name: "email-confirm-error",
+  components: {CardWithLayout},
   extends: ComponentBase
 }
 </script>

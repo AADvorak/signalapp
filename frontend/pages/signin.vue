@@ -1,6 +1,6 @@
 <script>
 import {dataStore} from "~/stores/data-store";
-import SignPageBase from "~/components/sign-page-base.vue";
+import SignPageBase from "~/components/base/sign-page-base.vue";
 
 export default {
   name: 'signin',

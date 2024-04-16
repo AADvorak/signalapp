@@ -52,14 +52,17 @@
 
 <script>
 import {mdiFilterOff} from "@mdi/js";
-import ComponentBase from "./component-base";
-import formValuesSaving from "../mixins/form-values-saving";
+import ComponentBase from "../base/component-base.vue";
+import formValuesSaving from "../../mixins/form-values-saving";
 import {moduleStore} from "~/stores/module-store";
+import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue";
+import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
 
 const PROCESSOR_TYPES = ['amplifier', 'modulator', 'filter', 'oscillator', 'math']
 
 export default {
   name: "select-processor",
+  components: {BtnWithTooltip, ToolbarWithCloseBtn},
   extends: ComponentBase,
   mixins: [formValuesSaving],
   props: {

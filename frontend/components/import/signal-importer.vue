@@ -22,11 +22,11 @@
 </template>
 
 <script>
-import PageBase from "./page-base";
-import FileUtils from "../utils/file-utils";
-import WavCoder from "../audio/wav-coder";
-import SignalUtils from "../utils/signal-utils";
-import SignalActions from "../mixins/signal-actions";
+import PageBase from "../base/page-base.vue";
+import FileUtils from "../../utils/file-utils";
+import WavCoder from "../../audio/wav-coder";
+import SignalUtils from "../../utils/signal-utils";
+import SignalActions from "../../mixins/signal-actions";
 import {SignalRequests} from "~/api/signal-requests";
 import {ImportSignalActions, SelectsWithSaving} from "~/utils/select-utils";
 
@@ -37,6 +37,7 @@ const ACTION_SELECT_ITEMS = [
 
 export default {
   name: "signal-importer",
+  // todo project structure violation, this is not a page
   extends: PageBase,
   mixins: [SignalActions],
   data: () => ({

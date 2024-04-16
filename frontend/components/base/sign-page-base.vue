@@ -28,16 +28,19 @@
 </template>
 
 <script>
-import PageBase from "~/components/page-base.vue";
+import PageBase from "~/components/base/page-base.vue";
 import formValidation from "~/mixins/form-validation";
 import formValues from "~/mixins/form-values";
 import showPassword from "~/mixins/show-password";
 import recaptcha from "~/mixins/recaptcha";
 import {dataStore} from "~/stores/data-store";
 import ApiProvider from "~/api/api-provider";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
+import TextInput from "~/components/common/text-input.vue";
 
 export default {
   name: 'sign-page-base',
+  components: {TextInput, CardWithLayout},
   extends: PageBase,
   mixins: [formValidation, formValues, showPassword, recaptcha],
   data: () => ({

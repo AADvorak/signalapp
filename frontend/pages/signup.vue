@@ -1,6 +1,6 @@
 <script>
 import filterPatronymicField from "../mixins/filter-patronymic-field";
-import SignPageBase from "~/components/sign-page-base.vue";
+import SignPageBase from "~/components/base/sign-page-base.vue";
 
 export default {
   name: 'signup',

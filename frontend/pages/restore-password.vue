@@ -21,11 +21,14 @@
 import formValidation from "../mixins/form-validation";
 import {dataStore} from "~/stores/data-store";
 import ApiProvider from "../api/api-provider";
-import PageBase from "../components/page-base";
+import PageBase from "../components/base/page-base.vue";
 import formValues from "../mixins/form-values";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
+import TextInput from "~/components/common/text-input.vue";
 
 export default {
   name: "restore-password",
+  components: {TextInput, CardWithLayout},
   extends: PageBase,
   mixins: [formValidation, formValues],
   data: () => ({

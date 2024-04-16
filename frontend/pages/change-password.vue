@@ -22,12 +22,15 @@
 
 <script>
 import formValidation from "../mixins/form-validation";
-import PageBase from "../components/page-base";
+import PageBase from "../components/base/page-base.vue";
 import formValues from "../mixins/form-values";
 import showPassword from "../mixins/show-password";
+import CardWithLayout from "~/components/common/card-with-layout.vue";
+import TextInput from "~/components/common/text-input.vue";
 
 export default {
   name: "change-password",
+  components: {TextInput, CardWithLayout},
   extends: PageBase,
   mixins: [formValidation, formValues, showPassword],
   data: () => ({

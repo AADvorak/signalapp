@@ -97,10 +97,13 @@ import {moduleStore} from "~/stores/module-store";
 import ApiProvider from "../api/api-provider";
 import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
-import ComponentBase from "../components/component-base";
+import ComponentBase from "../components/base/component-base.vue";
+import LocaleSelect from "~/components/layout/locale-select.vue";
+import SelectsSettings from "~/components/layout/selects-settings.vue";
 
 export default {
   name: 'default',
+  components: {SelectsSettings, LocaleSelect},
   extends: ComponentBase,
   data() {
     return {
