@@ -36,20 +36,20 @@
 </template>
 
 <script>
-import LinearAmp from "~/components/processors/linear-amp.vue";
-import PiecewiseLinearSymmetricSaturationAmp from "~/components/processors/piecewise-linear-symmetric-saturation-amp.vue";
-import PiecewiseLinearAsymmetricSaturationAmp from "~/components/processors/piecewise-linear-asymmetric-saturation-amp.vue";
-import Inverter from "~/components/processors/inverter.vue";
-import AmplitudeModulator from "~/components/processors/amplitude-modulator.vue";
-import FrequencyModulator from "~/components/processors/frequency-modulator.vue";
-import LpRcFilter from "~/components/processors/lp-rc-filter.vue";
-import HpRcFilter from "~/components/processors/hp-rc-filter.vue";
-import LinearOscillator from "~/components/processors/linear-oscillator.vue";
-import Integrator from "~/components/processors/integrator.vue";
-import Differentiator from "~/components/processors/differentiator.vue";
-import SelfCorrelator from "~/components/processors/self-correlator.vue";
-import SpectrumAnalyserDct from "~/components/processors/spectrum-analyser-dct.vue";
-import SpectrumAnalyserFft from "~/components/processors/spectrum-analyser-fft.vue";
+import LinearAmp from "~/components/processors/single/linear-amp.vue";
+import PiecewiseLinearSymmetricSaturationAmp from "~/components/processors/single/piecewise-linear-symmetric-saturation-amp.vue";
+import PiecewiseLinearAsymmetricSaturationAmp from "~/components/processors/single/piecewise-linear-asymmetric-saturation-amp.vue";
+import Inverter from "~/components/processors/single/inverter.vue";
+import AmplitudeModulator from "~/components/processors/single/amplitude-modulator.vue";
+import FrequencyModulator from "~/components/processors/single/frequency-modulator.vue";
+import LpRcFilter from "~/components/processors/single/lp-rc-filter.vue";
+import HpRcFilter from "~/components/processors/single/hp-rc-filter.vue";
+import LinearOscillator from "~/components/processors/single/linear-oscillator.vue";
+import Integrator from "~/components/processors/single/integrator.vue";
+import Differentiator from "~/components/processors/single/differentiator.vue";
+import SelfCorrelator from "~/components/processors/single/self-correlator.vue";
+import SpectrumAnalyserDct from "~/components/processors/single/spectrum-analyser-dct.vue";
+import SpectrumAnalyserFft from "~/components/processors/single/spectrum-analyser-fft.vue";
 import ProcessorDialogBase from "./processor-dialog-base.vue";
 
 export default {

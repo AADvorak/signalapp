@@ -1,5 +1,5 @@
 <script>
-import DoubleProcessorBase from "./double-processor-base";
+import DoubleProcessorBase from "./double-processor-base.vue";
 
 export default {
   name: "Correlator",

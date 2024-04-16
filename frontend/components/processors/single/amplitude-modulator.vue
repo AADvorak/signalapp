@@ -1,20 +1,20 @@
 <script>
-import ProcessorBase from "./processor-base";
+import ProcessorBase from "../processor-base.vue";
 
 export default {
-  name: "PiecewiseLinearAsymmetricSaturationAmp",
+  name: "AmplitudeModulator",
   extends: ProcessorBase,
   data: () => ({
     form: {
-      coefficient: {
-        value: 2,
+      frequency: {
+        value: 300,
         params: {
           min: 0,
-          max: 10,
-          step: 0.01
+          max: 20000,
+          step: 1
         }
       },
-      maxPositiveOutput: {
+      amplitude: {
         value: 1,
         params: {
           min: 0,
@@ -22,13 +22,13 @@ export default {
           step: 0.01
         }
       },
-      maxNegativeOutput: {
+      depth: {
         value: 0.5,
         params: {
           min: 0,
-          max: 10,
-          step: 0.01
-        }
+          max: 1,
+          step: 0.001
+        },
       },
     },
   })

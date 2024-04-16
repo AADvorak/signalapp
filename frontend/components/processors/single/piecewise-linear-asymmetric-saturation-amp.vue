@@ -1,8 +1,8 @@
 <script>
-import ProcessorBase from "./processor-base";
+import ProcessorBase from "../processor-base.vue";
 
 export default {
-  name: "PiecewiseLinearSymmetricSaturationAmp",
+  name: "PiecewiseLinearAsymmetricSaturationAmp",
   extends: ProcessorBase,
   data: () => ({
     form: {
@@ -14,8 +14,16 @@ export default {
           step: 0.01
         }
       },
-      maxOutput: {
+      maxPositiveOutput: {
         value: 1,
+        params: {
+          min: 0,
+          max: 10,
+          step: 0.01
+        }
+      },
+      maxNegativeOutput: {
+        value: 0.5,
         params: {
           min: 0,
           max: 10,

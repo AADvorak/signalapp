@@ -1,8 +1,8 @@
 <script>
-import ProcessorBase from "./processor-base";
+import ProcessorBase from "../processor-base.vue";
 
 export default {
-  name: "AmplitudeModulator",
+  name: "FrequencyModulator",
   extends: ProcessorBase,
   data: () => ({
     form: {
@@ -12,7 +12,7 @@ export default {
           min: 0,
           max: 20000,
           step: 1
-        }
+        },
       },
       amplitude: {
         value: 1,
@@ -20,14 +20,14 @@ export default {
           min: 0,
           max: 10,
           step: 0.01
-        }
+        },
       },
-      depth: {
-        value: 0.5,
+      coefficient: {
+        value: 2,
         params: {
           min: 0,
-          max: 1,
-          step: 0.001
+          max: 10,
+          step: 0.01
         },
       },
     },
