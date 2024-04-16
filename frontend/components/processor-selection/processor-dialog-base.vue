@@ -58,6 +58,9 @@ export default {
     this.bus.on('processed', () => {
       this.dialog = false
     })
+    this.bus.on('process', () => {
+      this.processing = true
+    })
   },
   beforeUnmount() {
     this.bus.off('validationFailed')
@@ -65,13 +68,13 @@ export default {
     this.bus.off('progress')
     this.bus.off('processorSelected')
     this.bus.off('processed')
+    this.bus.off('process')
   },
   methods: {
     _ton(key) {
       return this.$t(`operationNames.${key}`)
     },
     ok() {
-      this.processing = true
       this.bus.emit('process')
     },
     cancel() {

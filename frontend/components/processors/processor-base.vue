@@ -60,6 +60,9 @@ export default {
       this.worker && this.worker.terminate()
     })
     setTimeout(() => this.focusFirstFormField())
+    if (!this.formFields.length) {
+      this.bus.emit('process')
+    }
   },
   beforeUnmount() {
     this.bus.off('process')
