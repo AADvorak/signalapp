@@ -69,12 +69,7 @@
               <v-card-text>
                 <v-switch hide-details v-model="darkMode" :label="_t('darkMode', {darkModeState})"/>
                 <v-form>
-                  <v-select
-                      v-model="$i18n.locale"
-                      item-title="name"
-                      item-value="code"
-                      :items="localeItems"
-                      :label="$t('language')"/>
+                  <locale-select/>
                   <v-select
                       v-model="numberInputType"
                       item-title="name"
@@ -102,11 +97,7 @@ import {moduleStore} from "~/stores/module-store";
 import ApiProvider from "../api/api-provider";
 import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
-import en from '../locales/en'
-import ru from '../locales/ru'
-import pl from '../locales/pl'
 import ComponentBase from "../components/component-base";
-import Highcharts from "highcharts";
 
 export default {
   name: 'default',
@@ -123,7 +114,6 @@ export default {
       header: '',
       showMainMenu: false,
       isMobile: DeviceUtils.isMobile(),
-      locales: {en, ru, pl},
       numberInputType: dataStore().numberInputType
     }
   },
@@ -155,13 +145,6 @@ export default {
     pageColsSm() {
       return this.showMainMenu ? 12 - this.mainMenuColsSm : 12
     },
-    localeItems() {
-      let items = []
-      for (const code in this.locales) {
-        items.push({code, name: this.locales[code].name})
-      }
-      return items
-    },
     numberInputTypes() {
       let items = []
       for (const code of dataStore().numberInputTypes) {
@@ -174,10 +157,8 @@ export default {
     darkMode(newValue) {
       dataStore().setDarkMode(newValue)
     },
-    '$i18n.locale'(newValue) {
-      dataStore().setLocale(newValue)
+    '$i18n.locale'() {
       this.setHeaderByRoute()
-      this.makeChartLang()
     },
     numberInputType(newValue) {
       dataStore().setNumberInputType(newValue)
@@ -186,10 +167,9 @@ export default {
   mounted() {
     window.history.scrollRestoration = 'manual'
     this.setHeaderByRoute()
-    this.detectLocale()
-    this.makeChartLang()
     this.loadUserInfo()
     this.loadSettings()
+    useLocaleUtils(this.$i18n).detectLocale()
   },
   methods: {
     async signOut() {
@@ -236,43 +216,6 @@ export default {
     },
     getModuleIcon(module) {
       return this.moduleIcons[module.icon] || mdiCog
-    },
-    detectLocale() {
-      if (dataStore().locale) {
-        this.$i18n.locale = dataStore().locale
-        return
-      }
-      if (navigator) {
-        if (navigator.language) {
-          if (this.trySetLocaleFromLanguage(navigator.language)) {
-            return
-          }
-        }
-        if (navigator.languages) {
-          for (const language of navigator.languages) {
-            if (this.trySetLocaleFromLanguage(language)) {
-              return
-            }
-          }
-        }
-      }
-      this.$i18n.locale = dataStore().defaultLocale
-    },
-    trySetLocaleFromLanguage(language) {
-      const locale = this.localeFromLanguage(language)
-      if (this.locales.hasOwnProperty(locale)) {
-        this.$i18n.locale = locale
-        return true
-      }
-      return false
-    },
-    localeFromLanguage(language) {
-      return language.split('-')[0]
-    },
-    makeChartLang() {
-      Highcharts.setOptions({
-        lang: this.locales[this.$i18n.locale]?.chart
-      })
     }
   },
 }
