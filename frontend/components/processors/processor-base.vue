@@ -16,6 +16,7 @@ import ComponentBase from "../base/component-base.vue";
 import actionWithTimeout from "../../mixins/action-with-timeout";
 import {toRaw, isProxy} from "vue";
 import NumberInput from "~/components/common/number-input.vue";
+import {ProcessingEvents} from "~/dictionary/processing-events";
 
 export default {
   name: "processor-base",
@@ -38,35 +39,35 @@ export default {
   },
   watch: {
     formValues() {
-      this.bus.emit('validationFailed')
+      this.bus.emit(ProcessingEvents.VALIDATION_FAILED)
       this.actionWithTimeout(() => {
         this.clearValidation()
         this.parseFloatForm()
         if (!this.validateForm()) {
-          this.bus.emit('validationFailed')
+          this.bus.emit(ProcessingEvents.VALIDATION_FAILED)
           return
         }
-        this.bus.emit('validationPassed')
+        this.bus.emit(ProcessingEvents.VALIDATION_PASSED)
         this.saveFormValues()
       })
     }
   },
   mounted() {
     this.form && this.restoreFormValues()
-    this.bus.on('process', () => {
+    this.bus.on(ProcessingEvents.PROCESS, () => {
       this.doProcess()
     })
-    this.bus.on('cancel', () => {
+    this.bus.on(ProcessingEvents.CANCEL, () => {
       this.worker && this.worker.terminate()
     })
     setTimeout(() => this.focusFirstFormField())
     if (!this.formFields.length) {
-      this.bus.emit('process')
+      this.bus.emit(ProcessingEvents.PROCESS)
     }
   },
   beforeUnmount() {
-    this.bus.off('process')
-    this.bus.off('cancel')
+    this.bus.off(ProcessingEvents.PROCESS)
+    this.bus.off(ProcessingEvents.CANCEL)
   },
   methods: {
     _tpp(key, params) {
@@ -81,14 +82,15 @@ export default {
           this.addSignalToHistoryAndOpen(signal)
         }
         if (msg.data.progress) {
-          this.bus.emit('progress', msg.data.progress)
+          this.bus.emit(ProcessingEvents.PROGRESS_CHANGED, msg.data.progress)
         }
       }
       this.worker.onerror = e => {
-        this.bus.emit('processed')
-        this.bus.emit('error', e)
+        this.bus.emit(ProcessingEvents.PROCESSING_FINISHED)
+        this.bus.emit(ProcessingEvents.PROCESSING_ERROR, e)
       }
       this.worker.postMessage(this.makeWorkerMessage())
+      this.bus.emit(ProcessingEvents.PROCESSING_STARTED)
     },
     makeWorkerMessage() {
       return {
@@ -130,7 +132,7 @@ export default {
       const signalId = route.params.id || signal.id || '0', currentHistoryKey = route.query.history || '0'
       const historyKey = signalStore().addSignalToHistory(signal, currentHistoryKey)
       useRouter().push(`/signal/${signalId}?history=${historyKey}`)
-      this.bus.emit('processed')
+      this.bus.emit(ProcessingEvents.PROCESSING_FINISHED)
     },
     validateForm() {
       let validated = true

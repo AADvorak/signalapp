@@ -57,6 +57,7 @@ import formValuesSaving from "../../mixins/form-values-saving";
 import {moduleStore} from "~/stores/module-store";
 import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue";
 import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
+import {ProcessingEvents} from "~/dictionary/processing-events";
 
 const PROCESSOR_TYPES = ['amplifier', 'modulator', 'filter', 'oscillator', 'math']
 
@@ -121,7 +122,7 @@ export default {
   methods: {
     select(processor) {
       this.close()
-      this.bus.emit('processorSelected', processor)
+      this.bus.emit(ProcessingEvents.PROCESSOR_SELECTED, processor)
     },
     close() {
       this.$emit('close')

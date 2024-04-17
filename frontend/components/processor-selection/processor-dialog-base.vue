@@ -1,6 +1,7 @@
 <script>
 import ComponentBase from "../base/component-base.vue";
 import StringUtils from "../../utils/string-utils";
+import {ProcessingEvents} from "~/dictionary/processing-events";
 
 export default {
   name: "processor-dialog-base",
@@ -40,42 +41,42 @@ export default {
         }
         this.processingDisabled = false
       } else {
-        this.bus.emit('cancel')
+        this.bus.emit(ProcessingEvents.CANCEL)
       }
     }
   },
   mounted() {
-    this.bus.on('validationFailed', () => {
+    this.bus.on(ProcessingEvents.VALIDATION_FAILED, () => {
       this.processingDisabled = true
     })
-    this.bus.on('validationPassed', () => {
+    this.bus.on(ProcessingEvents.VALIDATION_PASSED, () => {
       this.processingDisabled = false
     })
-    this.bus.on('progress', progress => {
+    this.bus.on(ProcessingEvents.PROGRESS_CHANGED, progress => {
       this.progress = progress
     })
-    this.bus.on('processorSelected', processor => this.selectProcessor(processor))
-    this.bus.on('processed', () => {
+    this.bus.on(ProcessingEvents.PROCESSOR_SELECTED, processor => this.selectProcessor(processor))
+    this.bus.on(ProcessingEvents.PROCESSING_FINISHED, () => {
       this.dialog = false
     })
-    this.bus.on('process', () => {
+    this.bus.on(ProcessingEvents.PROCESSING_STARTED, () => {
       this.processing = true
     })
   },
   beforeUnmount() {
-    this.bus.off('validationFailed')
-    this.bus.off('validationPassed')
-    this.bus.off('progress')
-    this.bus.off('processorSelected')
-    this.bus.off('processed')
-    this.bus.off('process')
+    this.bus.off(ProcessingEvents.VALIDATION_FAILED)
+    this.bus.off(ProcessingEvents.VALIDATION_PASSED)
+    this.bus.off(ProcessingEvents.PROGRESS_CHANGED)
+    this.bus.off(ProcessingEvents.PROCESSOR_SELECTED)
+    this.bus.off(ProcessingEvents.PROCESSING_FINISHED)
+    this.bus.off(ProcessingEvents.PROCESSING_STARTED)
   },
   methods: {
     _ton(key) {
       return this.$t(`operationNames.${key}`)
     },
     ok() {
-      this.bus.emit('process')
+      this.bus.emit(ProcessingEvents.PROCESS)
     },
     cancel() {
       this.dialog = false

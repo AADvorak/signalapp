@@ -110,6 +110,7 @@ import CardWithLayout from "~/components/common/card-with-layout.vue";
 import FixedWidthWrapper from "~/components/common/fixed-width-wrapper.vue";
 import SelectProcessorDialog from "~/components/processor-selection/select-processor-dialog.vue";
 import SingleProcessorDialog from "~/components/processor-selection/single-processor-dialog.vue";
+import {ProcessingEvents} from "~/dictionary/processing-events";
 
 export default {
   name: "signal",
@@ -163,14 +164,14 @@ export default {
   mounted() {
     SignalRequests.setApiProvider(this.getApiProvider())
     this.getSignalFromHistoryOrLoad()
-    this.bus.on('error', error => {
+    this.bus.on(ProcessingEvents.PROCESSING_ERROR, error => {
       this.showMessage({
         text: `${this._t('processSignalError')}: ${error.message}`
       })
     })
   },
   beforeUnmount() {
-    this.bus.off('error')
+    this.bus.off(ProcessingEvents.PROCESSING_ERROR)
   },
   methods: {
     getSignalFromHistoryOrLoad() {
