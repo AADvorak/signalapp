@@ -1,4 +1,5 @@
-import {defineStore} from 'pinia'
+import {defineStore} from "pinia";
+import {ProcessorTypes} from "~/dictionary/processor-types";
 
 export const moduleStore = defineStore('moduleStore', {
   state: () => ({
@@ -16,29 +17,29 @@ export const moduleStore = defineStore('moduleStore', {
       {code: 'folder-manager', forMenu: false},
       // processors
       // amplifiers
-      {code: 'LinearAmp', forMenu: false, processor: true, type: 'amplifier'},
-      {code: 'PiecewiseLinearSymmetricSaturationAmp', forMenu: false, processor: true, type: 'amplifier'},
-      {code: 'PiecewiseLinearAsymmetricSaturationAmp', forMenu: false, processor: true, type: 'amplifier'},
-      {code: 'Inverter', forMenu: false, processor: true, type: 'amplifier'},
+      {code: 'LinearAmp', forMenu: false, processor: true, type: ProcessorTypes.AMPLIFIER},
+      {code: 'PiecewiseLinearSymmetricSaturationAmp', forMenu: false, processor: true, type: ProcessorTypes.AMPLIFIER},
+      {code: 'PiecewiseLinearAsymmetricSaturationAmp', forMenu: false, processor: true, type: ProcessorTypes.AMPLIFIER},
+      {code: 'Inverter', forMenu: false, processor: true, type: ProcessorTypes.AMPLIFIER},
       // modulators
-      {code: 'AmplitudeModulator', forMenu: false, processor: true, type: 'modulator'},
-      {code: 'FrequencyModulator', forMenu: false, processor: true, type: 'modulator'},
+      {code: 'AmplitudeModulator', forMenu: false, processor: true, type: ProcessorTypes.MODULATOR},
+      {code: 'FrequencyModulator', forMenu: false, processor: true, type: ProcessorTypes.MODULATOR},
       // filters
-      {code: 'LpRcFilter', forMenu: false, processor: true, type: 'filter'},
-      {code: 'HpRcFilter', forMenu: false, processor: true, type: 'filter'},
+      {code: 'LpRcFilter', forMenu: false, processor: true, type: ProcessorTypes.FILTER},
+      {code: 'HpRcFilter', forMenu: false, processor: true, type: ProcessorTypes.FILTER},
       // oscillator chains
-      {code: 'LinearOscillator', forMenu: false, processor: true, type: 'oscillator'},
+      {code: 'LinearOscillator', forMenu: false, processor: true, type: ProcessorTypes.OSCILLATOR},
       // math
-      {code: 'Integrator', forMenu: false, processor: true, type: 'math'},
-      {code: 'Differentiator', forMenu: false, processor: true, type: 'math'},
-      {code: 'SpectrumAnalyserDct', forMenu: false, processor: true, type: 'math'},
-      {code: 'SpectrumAnalyserFft', forMenu: false, processor: true, type: 'math'},
-      {code: 'SelfCorrelator', forMenu: false, processor: true, type: 'math'},
+      {code: 'Integrator', forMenu: false, processor: true, type: ProcessorTypes.MATH},
+      {code: 'Differentiator', forMenu: false, processor: true, type: ProcessorTypes.MATH},
+      {code: 'SpectrumAnalyserDct', forMenu: false, processor: true, type: ProcessorTypes.MATH},
+      {code: 'SpectrumAnalyserFft', forMenu: false, processor: true, type: ProcessorTypes.MATH},
+      {code: 'SelfCorrelator', forMenu: false, processor: true, type: ProcessorTypes.MATH},
       // double processors
-      {code: 'Adder', forMenu: false, doubleProcessor: true, type: 'amplifier'},
-      {code: 'Correlator', forMenu: false, doubleProcessor: true, type: 'math'},
+      {code: 'Adder', forMenu: false, doubleProcessor: true, type: ProcessorTypes.AMPLIFIER},
+      {code: 'Correlator', forMenu: false, doubleProcessor: true, type: ProcessorTypes.MATH},
       {
-        code: 'TwoSignalAmplitudeModulator', forMenu: false, doubleProcessor: true, type: 'modulator',
+        code: 'TwoSignalAmplitudeModulator', forMenu: false, doubleProcessor: true, type: ProcessorTypes.MODULATOR,
         signal1: 'carrierSignal', signal2: 'modulatingSignal'
       },
     ]

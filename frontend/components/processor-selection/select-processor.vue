@@ -58,8 +58,9 @@ import {moduleStore} from "~/stores/module-store";
 import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue";
 import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
 import {ProcessingEvents} from "~/dictionary/processing-events";
+import {ProcessorTypes} from "~/dictionary/processor-types";
 
-const PROCESSOR_TYPES = ['amplifier', 'modulator', 'filter', 'oscillator', 'math']
+const PROCESSOR_TYPES = Object.values(ProcessorTypes)
 
 export default {
   name: "select-processor",
