@@ -11,7 +11,7 @@
           {{ text }}
         </div>
         <div class="d-flex flex-wrap">
-          <v-btn v-for="item in items" :color="item.color" class="mr-4" @click="() => select(item.name)">
+          <v-btn v-for="item in items" :color="item.color" @click="() => select(item.name)">
             {{ getButtonText(item) }}
           </v-btn>
           <v-btn v-if="!noCancel" @click="cancel">
