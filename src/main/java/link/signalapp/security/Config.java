@@ -18,8 +18,7 @@ public class Config {
     public SecurityFilterChain filterChain(HttpSecurity http, TokenRequestFilter tokenRequestFilter) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/sessions").permitAll()
-                .requestMatchers("/api/settings").permitAll()
-                .requestMatchers("/api/modules").permitAll()
+                .requestMatchers("/api/application/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
                 .anyRequest().authenticated());
 

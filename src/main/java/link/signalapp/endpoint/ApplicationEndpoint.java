@@ -9,15 +9,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/settings")
+@RequestMapping("/api/application")
 @RequiredArgsConstructor
-public class SettingsEndpoint {
+public class ApplicationEndpoint {
 
     private final ApplicationProperties applicationProperties;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/settings", produces = MediaType.APPLICATION_JSON_VALUE)
     public SettingsDtoResponse get() {
         return new SettingsDtoResponse().setVerifyCaptcha(applicationProperties.isVerifyCaptcha());
+    }
+
+    @GetMapping(path = "/version", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getAppVersion() {
+        // todo keep this value in one place
+        return "1.5.0";
     }
 
 }

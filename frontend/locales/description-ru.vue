@@ -29,6 +29,7 @@
     <div class="desc-div">Автор: <linkedin-link>Антон Дворак</linkedin-link></div>
     <div class="desc-div">Исходный код: <github-link>SignalApp на гитхабе</github-link></div>
     <div class="desc-div">Электронная почта: <email-link/></div>
+    <div class="desc-div mt-4">Версия приложения: <app-version/></div>
   </div>
 </template>
 
@@ -36,8 +37,9 @@
 import LinkedinLink from "../components/links/linkedin-link";
 import GithubLink from "../components/links/github-link";
 import EmailLink from "../components/links/email-link";
+import AppVersion from "~/components/description/app-version.vue";
 export default {
   name: "description-ru",
-  components: {EmailLink, GithubLink, LinkedinLink}
+  components: {AppVersion, EmailLink, GithubLink, LinkedinLink}
 }
 </script>

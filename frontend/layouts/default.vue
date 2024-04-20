@@ -176,7 +176,7 @@ export default {
       if (dataStore().settings !== undefined) {
         return
       }
-      const response = await ApiProvider.get('/api/settings', true)
+      const response = await ApiProvider.get('/api/application/settings', true)
       dataStore().setSettings(response.ok ? response.data : null)
     },
     toMainPage() {
