@@ -1,67 +1,68 @@
 <template>
-  <div v-if="isMobile">
-    <div v-for="item in items">
-      <v-card >
-        <v-card-item>
-          <v-card-title>
-            <div style="height: 48px" class="d-flex justify-start">
-              <span v-if="select"><v-checkbox v-model="selectedIds" :value="item.id" @click.stop/></span>
-              <div style="margin: 13px 0;">{{ restrictCaptionLength(item) }}</div>
-            </div>
-          </v-card-title>
-        </v-card-item>
-        <v-card-text v-if="cardDescriptionExists(item)">
-          <template v-for="column in columns">
-            <div v-if="columnValue(column, item)">
-              {{ columnHeader(column) }}: {{ columnValue(column, item) }}
-            </div>
-          </template>
-        </v-card-text>
-        <v-card-actions v-if="buttons.length" class="justify-center">
-          <template v-for="button in buttons">
-            <v-btn v-if="checkCondition(button, item)" @click="buttonClick(button.name, item)">
-              <v-icon :color="button.color">
-                {{ makeIcon(button, item) }}
-              </v-icon>
-              <signal-folders-menu
-                  v-if="button.component === 'signal-folders-menu'"
-                  :signal-id="item.id"
-                  @changed="onSignalFoldersChanged"/>
-            </v-btn>
-          </template>
-        </v-card-actions>
-      </v-card>
-      <v-divider/>
+  <v-layout fluid v-resize="onResize">
+    <div v-if="isMobile" class="element-full-width">
+      <div v-for="item in items">
+        <v-card >
+          <v-card-item>
+            <v-card-title>
+              <div style="height: 48px" class="d-flex justify-start">
+                <span v-if="select"><v-checkbox v-model="selectedIds" :value="item.id" @click.stop/></span>
+                <div style="margin: 13px 0;">{{ restrictCaptionLength(item) }}</div>
+              </div>
+            </v-card-title>
+          </v-card-item>
+          <v-card-text v-if="cardDescriptionExists(item)">
+            <template v-for="column in columns">
+              <div v-if="columnValue(column, item)">
+                {{ columnHeader(column) }}: {{ columnValue(column, item) }}
+              </div>
+            </template>
+          </v-card-text>
+          <v-card-actions v-if="buttons.length" class="justify-center">
+            <template v-for="button in buttons">
+              <v-btn v-if="checkCondition(button, item)" @click="buttonClick(button.name, item)">
+                <v-icon :color="button.color">
+                  {{ makeIcon(button, item) }}
+                </v-icon>
+                <signal-folders-menu
+                    v-if="button.component === 'signal-folders-menu'"
+                    :signal-id="item.id"
+                    @changed="onSignalFoldersChanged"/>
+              </v-btn>
+            </template>
+          </v-card-actions>
+        </v-card>
+        <v-divider/>
+      </div>
     </div>
-  </div>
-  <v-table v-else fixed-header>
-    <thead>
-     <tr>
-       <th v-if="select" class="text-left no-padding">
-         <div style="height: 58px">
-           <v-checkbox v-model="selectAllItems"/>
-         </div>
-       </th>
-       <th class="text-left" @click="setSorting(caption)">
+    <v-table :height="elementHeight" class="element-full-width" v-else fixed-header>
+      <thead>
+      <tr>
+        <th v-if="select" class="text-left no-padding">
+          <div style="height: 58px">
+            <v-checkbox v-model="selectAllItems"/>
+          </div>
+        </th>
+        <th class="text-left" @click="setSorting(caption)">
          <span v-if="sortDirIcons[caption]">
            <v-icon>
             {{ sortDirIcons[caption] }}
            </v-icon>
          </span>
-         {{ columnHeader(caption) }}
-       </th>
-       <th v-for="column in columns" @click="setSorting(column)">
+          {{ columnHeader(caption) }}
+        </th>
+        <th v-for="column in columns" @click="setSorting(column)">
          <span v-if="sortDirIcons[columnName(column)]">
            <v-icon>
             {{ sortDirIcons[columnName(column)] }}
            </v-icon>
          </span>
-         {{ columnHeader(column) }}
-       </th>
-       <th v-for="_ in buttons" class="text-left"></th>
-     </tr>
-    </thead>
-    <tbody>
+          {{ columnHeader(column) }}
+        </th>
+        <th v-for="_ in buttons" class="text-left"></th>
+      </tr>
+      </thead>
+      <tbody>
       <tr v-for="item in items">
         <td v-if="select" class="no-padding">
           <div style="height: 58px">
@@ -86,8 +87,9 @@
           </btn-with-tooltip>
         </td>
       </tr>
-    </tbody>
-  </v-table>
+      </tbody>
+    </v-table>
+  </v-layout>
 </template>
 
 <script>
@@ -140,6 +142,10 @@ export default {
       type: Object,
       default: {}
     },
+    reservedHeight: {
+      type: Number,
+      default: 0
+    }
   },
   emits: ['click', 'change', 'select', 'sort'],
   data: () => ({
@@ -149,7 +155,8 @@ export default {
       by: '',
       dir: ''
     },
-    sortDirIcons: {}
+    sortDirIcons: {},
+    windowHeight: window.innerHeight
   }),
   computed: {
     isMobile() {
@@ -163,6 +170,9 @@ export default {
     },
     allItemIds() {
       return this.items.map(item => item.id)
+    },
+    elementHeight() {
+      return this.windowHeight - this.reservedHeight
     }
   },
   watch: {
@@ -302,7 +312,10 @@ export default {
       return sort.by && sort.dir
           && [SORT_DIRS.DESC, SORT_DIRS.ASC].includes(sort.dir)
           && this.sortCols.includes(sort.by)
-    }
+    },
+    onResize() {
+      this.windowHeight = window.innerHeight
+    },
   }
 }
 </script>
@@ -310,5 +323,8 @@ export default {
 <style scoped>
 .no-padding {
   padding: 0 20px 0 0 !important;
+}
+.element-full-width {
+  width: 100%;
 }
 </style>

@@ -91,6 +91,7 @@
               :items="signals"
               :columns="tableOrListConfig.columns"
               :buttons="tableOrListConfig.buttons"
+              :reserved-height="reservedHeight"
               :sort-cols="['name', 'description', 'sampleRate']"
               :sort-prop="{by: this.sortBy, dir: this.sortDir}"
               @click="onTableButtonClick"
@@ -281,6 +282,9 @@ export default {
         }],
         buttons
       }
+    },
+    reservedHeight() {
+      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 502 : 326
     },
     selectedSignals() {
       return this.signals.filter(signal => this.selectedIds.includes(signal.id))

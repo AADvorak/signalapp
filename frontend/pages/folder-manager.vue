@@ -12,6 +12,7 @@
               :items="folders"
               :columns="tableOrListConfig.columns"
               :buttons="tableOrListConfig.buttons"
+              :reserved-height="160"
               @click="onTableButtonClick"/>
         </div>
         <fixed-width-wrapper>
