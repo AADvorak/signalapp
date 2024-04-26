@@ -17,6 +17,7 @@ import link.signalapp.mapper.SignalMapper;
 import link.signalapp.model.Signal;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.SignalRepository;
+import link.signalapp.service.utils.FilterUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,18 +43,16 @@ public class SignalService extends ServiceBase {
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
     private final ApplicationProperties applicationProperties;
+    private final FilterUtils filterUtils = new FilterUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
 
     public ResponseWithTotalCounts<SignalDtoResponse> filter(SignalFilterDto filter) {
         int userId = getUserFromContext().getId();
         int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber();
-        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize() > maxUserSignalsNumber
-                || filter.getSize() <= 0
-                ? maxUserSignalsNumber
-                : filter.getSize(), getSort(filter));
-        String search = filter.getSearch() == null || filter.getSearch().isEmpty() ? "" : "%" + filter.getSearch() + "%";
+        Pageable pageable = filterUtils.getPageable(filter, maxUserSignalsNumber);
+        String search = filterUtils.getSearch(filter);
         Page<Signal> signalPage = signalRepository.findByUserIdAndFilter(userId, search,
-                listWithDefaultValue(filter.getSampleRates(), BigDecimal.ZERO),
-                listWithDefaultValue(filter.getFolderIds(), 0), pageable);
+                filterUtils.listWithDefaultValue(filter.getSampleRates(), BigDecimal.ZERO),
+                filterUtils.listWithDefaultValue(filter.getFolderIds(), 0), pageable);
         return new ResponseWithTotalCounts<SignalDtoResponse>()
                 .setData(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList())
                 .setPages(signalPage.getTotalPages())
@@ -115,16 +114,6 @@ public class SignalService extends ServiceBase {
                 .orElseThrow(SignalAppNotFoundException::new);
     }
 
-    private Sort getSort(SignalFilterDto filter) {
-        Sort sort = Sort.by(camelToSnake(getSortByOrDefault(filter.getSortBy())));
-        return "asc".equals(filter.getSortDir()) ? sort : sort.descending();
-    }
-
-    private String getSortByOrDefault(String sortBy) {
-        return sortBy != null && !sortBy.isEmpty() && AVAILABLE_SORT_FIELDS.contains(sortBy)
-                ? sortBy : DEFAULT_SORT_FIELD;
-    }
-
     private void checkStoredByUserSignalsNumber(int userId) {
         int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber();
         if (signalRepository.countByUserId(userId) >= maxUserSignalsNumber) {
@@ -146,28 +135,4 @@ public class SignalService extends ServiceBase {
             throw new SignalAppException(SignalAppErrorCode.WRONG_VAW_FORMAT, null);
         }
     }
-
-    private <T> List<T> listWithDefaultValue(List<T> list, T defaultValue) {
-        return list == null || list.isEmpty() ? List.of(defaultValue) : list;
-    }
-
-    private String camelToSnake(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        StringBuilder result = new StringBuilder();
-        char c = str.charAt(0);
-        result.append(Character.toLowerCase(c));
-        for (int i = 1; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            if (Character.isUpperCase(ch)) {
-                result.append('_');
-                result.append(Character.toLowerCase(ch));
-            } else {
-                result.append(ch);
-            }
-        }
-        return result.toString();
-    }
-
 }

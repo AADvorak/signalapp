@@ -1,3 +1,6 @@
 application:
     data-path: ../signalappdata/
     verify-captcha: false
+spring:
+    jpa:
+        show-sql: true

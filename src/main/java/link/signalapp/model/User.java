@@ -40,4 +40,8 @@ public class User {
     @Column
     private LocalDateTime createTime = LocalDateTime.now();
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    private Role role;
+
 }

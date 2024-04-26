@@ -12,7 +12,14 @@ import java.time.LocalDateTime;
 public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenPK> {
 
     @Query(value = """
-            select user_id, token, last_action_time
+            select *
+            from user_token
+            where user_id = :userId
+            """, nativeQuery = true)
+    UserToken findByUserId(@Param("userId") int userId);
+
+    @Query(value = """
+            select *
             from user_token
             where token = :token
                 and extract(epoch from (:currentTime - last_action_time)) < :userIdleTimeout

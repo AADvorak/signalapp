@@ -8,14 +8,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @Accessors(chain = true)
-public class SignalFilterDto implements FilterDto {
+public class UserFilterDto implements FilterDto {
 
     private String search;
 
@@ -30,7 +27,4 @@ public class SignalFilterDto implements FilterDto {
 
     private String sortDir;
 
-    private List<Integer> folderIds;
-
-    private List<BigDecimal> sampleRates;
 }

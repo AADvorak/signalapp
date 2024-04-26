@@ -3,6 +3,8 @@ package link.signalapp.dto.response;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,5 +22,11 @@ public class UserDtoResponse {
     private String email;
 
     private boolean emailConfirmed;
+
+    private LocalDateTime createTime;
+
+    private LocalDateTime lastActionTime;
+
+    private RoleDtoResponse role;
 
 }

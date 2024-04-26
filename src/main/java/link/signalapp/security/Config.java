@@ -20,6 +20,7 @@ public class Config {
                 .requestMatchers("/api/sessions").permitAll()
                 .requestMatchers("/api/application/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                 .anyRequest().authenticated());
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling

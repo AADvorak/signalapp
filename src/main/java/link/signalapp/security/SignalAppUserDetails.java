@@ -4,11 +4,12 @@ import link.signalapp.model.User;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,7 +18,6 @@ public class SignalAppUserDetails implements UserDetails {
 
     private final User user;
     private String token;
-    private final Set<GrantedAuthority> authorities = Collections.emptySet();
     private final boolean accountNonExpired = true;
     private final boolean accountNonLocked = true;
     private final boolean credentialsNonExpired = true;
@@ -25,6 +25,14 @@ public class SignalAppUserDetails implements UserDetails {
 
     public SignalAppUserDetails(User user) {
         this.user = user;
+    }
+
+    @Override
+    public Collection<SimpleGrantedAuthority> getAuthorities() {
+        if (user.getRole() == null) {
+            return Collections.emptyList();
+        }
+        return List.of(new SimpleGrantedAuthority(user.getRole().getName()));
     }
 
     @Override

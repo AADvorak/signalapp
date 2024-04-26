@@ -1,16 +1,29 @@
 package link.signalapp.repository;
 
 import link.signalapp.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends PagingAndSortingRepository<User, Integer>, JpaRepository<User, Integer> {
 
     User findByEmail(String email);
 
     User findByEmailAndEmailConfirmedTrue(String email);
+
+    @Query(value = """
+            select * from "user"
+            where true
+                and (:search = '' or upper(first_name) like upper(:search)
+                    or upper(last_name) like upper(:search)
+                    or upper(patronymic) like upper(:search)
+                    or upper(email) like upper(:search))
+            """, nativeQuery = true)
+    Page<User> findByFilter(@Param("search") String search, Pageable pageable);
 
     @Modifying
     @Query(value = """
