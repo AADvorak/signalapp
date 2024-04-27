@@ -6,7 +6,7 @@
           <p>
             {{ _t('total', {pages, elements}) }}
           </p>
-          <v-expansion-panels v-model="uiParams.openedPanels">
+          <v-expansion-panels v-model="uiParams.openedPanels" class="mb-1">
             <v-expansion-panel value="loadParams">
               <v-expansion-panel-title>
                 {{ _t('loadParams') }}
@@ -275,7 +275,7 @@ export default {
         icon: mdiDelete,
         color: 'error'
       })
-      return  {
+      return {
         columns: ['description', {
           name: 'sampleRate',
           formatter: value => this.reduceFractionDigitsByValue(value)
@@ -284,7 +284,7 @@ export default {
       }
     },
     reservedHeight() {
-      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 502 : 326
+      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 503 : 327
     },
     selectedSignals() {
       return this.signals.filter(signal => this.selectedIds.includes(signal.id))
