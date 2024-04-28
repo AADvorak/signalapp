@@ -21,7 +21,7 @@ import java.util.List;
 public class AdminUserService {
 
     private static final String DEFAULT_SORT_FIELD = "createTime";
-    private static final List<String> AVAILABLE_SORT_FIELDS = List.of("first_name", "last_name",
+    private static final List<String> AVAILABLE_SORT_FIELDS = List.of("firstName", "lastName",
             "patronymic", "email", "createTime");
 
     private final UserRepository userRepository;
@@ -31,7 +31,8 @@ public class AdminUserService {
     public ResponseWithTotalCounts<UserDtoResponse> filter(UserFilterDto filter) {
         Pageable pageable = filterUtils.getPageable(filter, 25);
         String search = filterUtils.getSearch(filter);
-        Page<User> users = userRepository.findByFilter(search, pageable);
+        Page<User> users = userRepository.findByFilter(search,
+                filterUtils.listWithDefaultValue(filter.getRoleIds(), 0), pageable);
         ResponseWithTotalCounts<UserDtoResponse> responseWithTotalCounts
                 = new ResponseWithTotalCounts<UserDtoResponse>()
                 .setData(users.stream().map(UserMapper.INSTANCE::userToDto).toList())

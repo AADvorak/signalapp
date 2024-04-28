@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,5 +28,7 @@ public class UserFilterDto implements FilterDto {
     private String sortBy;
 
     private String sortDir;
+
+    private List<Integer> roleIds;
 
 }

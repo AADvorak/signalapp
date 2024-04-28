@@ -65,8 +65,16 @@ const pl = {
       lastName: 'Nazwisko',
       patronymic: 'Patronimik',
       search: 'Szukaj',
-      sampleRate: 'Częstotliwość próbkowania'
+      sampleRate: 'Częstotliwość próbkowania',
+      createTime: 'Czas stworzenia',
+      lastActionTime: 'Czas ostatniej akcji',
+      role: 'Rola'
     },
+    pagination: {
+      total: 'Razem: {pages} stron, {elements} wpisów',
+      pageSize: 'Rozmiar strony',
+      loadParams: 'Parametry ładowania'
+    }
   },
   'confirm-dialog': {
     title: 'Potwierdzenie'
@@ -171,8 +179,6 @@ const pl = {
   },
   'signal-manager': {
     name: 'Menadżer sygnałów',
-    total: 'Razem: {pages} stron, {elements} wpisów',
-    pageSize: 'Rozmiar strony',
     sampleRates: 'Częstotliwośći próbkowania',
     folders: 'Foldery',
     youHaveNoStoredSignals: 'Nie masz zapisanych sygnałów',
@@ -186,7 +192,6 @@ const pl = {
     loadSignalsError: 'Błąd podczas ładowania sygnałów',
     confirmDeleteSignal: 'Czy na pewno chcesz usunąć {name}?',
     confirmDeleteSignals: 'Czy na pewno chcesz usunąć wybrane sygnały (liczba: {length})?',
-    loadParams: 'Parametry ładowania'
   },
   'signal-recorder': {
     name: 'Nagrywarka sygnałów',
@@ -228,6 +233,10 @@ const pl = {
     confirmSentCheckEmail: 'Wiadomość potwierdzająca została wysłana, sprawdź swój e-mail {email}',
     confirmEmailMailTitle: 'SignalApp - potwierdzenie e-maila',
     confirmEmailMailMsg: 'Aby potwierdzić e-mail, użyj linku $origin$/api/users/confirm/$code$'
+  },
+  'admin-users': {
+    name: 'Użytkownicy',
+    roles: 'Role'
   },
   processorNames: {
     LinearAmp: 'Wzmacniacz liniowy',

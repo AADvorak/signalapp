@@ -52,6 +52,9 @@ export const dataStore = defineStore('dataStore', {
       this.clearUserInfo()
       this.folders = []
     },
+    checkUserRole(role) {
+      return this.userInfo?.role?.name === role
+    },
     setWaitingForAuthorization(waitingForAuthorization) {
       this.waitingForAuthorization = waitingForAuthorization
     },

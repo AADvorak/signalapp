@@ -65,8 +65,16 @@ const en = {
       lastName: 'Last name',
       patronymic: 'Patronymic',
       search: 'Search',
-      sampleRate: 'Sample rate'
+      sampleRate: 'Sample rate',
+      createTime: 'Create time',
+      lastActionTime: 'Last action time',
+      role: 'Role'
     },
+    pagination: {
+      total: 'Total: {pages} pages, {elements} entries',
+      pageSize: 'Page size',
+      loadParams: 'Load parameters'
+    }
   },
   'confirm-dialog': {
     title: 'Confirmation'
@@ -171,8 +179,6 @@ const en = {
   },
   'signal-manager': {
     name: 'Signal manager',
-    total: 'Total: {pages} pages, {elements} entries',
-    pageSize: 'Page size',
     sampleRates: 'Sample rates',
     folders: 'Folders',
     youHaveNoStoredSignals: 'You have no stored signals',
@@ -186,7 +192,6 @@ const en = {
     loadSignalsError: 'Error while loading signals',
     confirmDeleteSignal: 'Are you sure to delete {name}?',
     confirmDeleteSignals: 'Are you sure to delete selected {length} signals?',
-    loadParams: 'Load parameters'
   },
   'signal-recorder': {
     name: 'Signal recorder',
@@ -228,6 +233,10 @@ const en = {
     confirmSentCheckEmail: 'Confirm message is sent, check your email {email}',
     confirmEmailMailTitle: 'SignalApp - confirm email',
     confirmEmailMailMsg: 'To confirm you email use the link $origin$/api/users/confirm/$code$'
+  },
+  'admin-users': {
+    name: 'Users',
+    roles: 'Roles'
   },
   processorNames: {
     LinearAmp: 'Linear amplifier',

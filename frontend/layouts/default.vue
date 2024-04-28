@@ -51,16 +51,17 @@
                       {{ _t('startPage') }}
                     </v-list-item-title>
                   </v-list-item>
-                  <v-list-item
-                      v-for="module in modulesForMenu"
-                      :key="module.code"
-                      @click="toPage('/' + module.code.toLowerCase())"
-                  >
-                    <v-list-item-title>
-                      <v-icon>{{ getModuleIcon(module) }}</v-icon>
-                      {{ $t(`${module.code}.name`) }}
-                    </v-list-item-title>
-                  </v-list-item>
+                  <template v-for="module in modulesForMenu">
+                    <v-list-item v-if="checkUserRoleForModule(module)"
+                        :key="module.code"
+                        @click="toPage('/' + module.code.toLowerCase())"
+                    >
+                      <v-list-item-title>
+                        <v-icon>{{ getModuleIcon(module) }}</v-icon>
+                        {{ $t(`${module.code}.name`) }}
+                      </v-list-item-title>
+                    </v-list-item>
+                  </template>
                 </v-list>
               </v-card-text>
             </v-card>
@@ -90,7 +91,7 @@
 import {dataStore} from "~/stores/data-store";
 import {moduleStore} from "~/stores/module-store";
 import ApiProvider from "../api/api-provider";
-import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog} from "@mdi/js";
+import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog, mdiAccountMultiple} from "@mdi/js";
 import DeviceUtils from "../utils/device-utils";
 import ComponentBase from "../components/base/component-base.vue";
 import LocaleSelect from "~/components/layout/locale-select.vue";
@@ -107,7 +108,8 @@ export default {
       moduleIcons: {
         microphone: mdiMicrophone,
         sineWave: mdiSineWave,
-        server: mdiServer
+        server: mdiServer,
+        accountMultiple: mdiAccountMultiple
       },
       darkMode: dataStore().darkMode,
       header: '',
@@ -204,6 +206,9 @@ export default {
     },
     getModuleIcon(module) {
       return this.moduleIcons[module.icon] || mdiCog
+    },
+    checkUserRoleForModule(module) {
+      return !module.role || dataStore().checkUserRole(module.role)
     }
   },
 }

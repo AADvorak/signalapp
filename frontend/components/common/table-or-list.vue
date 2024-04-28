@@ -1,5 +1,5 @@
 <template>
-  <v-layout fluid v-resize="onResize">
+  <v-layout fluid>
     <div v-if="isMobile" class="element-full-width">
       <div v-for="item in items">
         <v-card >
@@ -227,11 +227,25 @@ export default {
       return column
     },
     columnValue(column, item) {
-      const value = item[this.columnName(column)]
+      const value = this.extractColumnValue(column, item)
       if (value === undefined || typeof column === 'string' || !column.formatter) {
         return value
       }
       return column.formatter(value)
+    },
+    extractColumnValue(column, item) {
+      if (typeof column === 'string' || !column.valuePath) {
+        return item[this.columnName(column)]
+      }
+      const valuePathArr = column.valuePath.split('.')
+      let obj = item[valuePathArr[0]]
+      for (let i = 1; i < valuePathArr.length; i++) {
+        if (!obj) {
+          return obj
+        }
+        obj = obj[valuePathArr[i]]
+      }
+      return obj
     },
     columnHeader(column) {
       return this._tc('fields.' + this.columnName(column))
@@ -313,6 +327,7 @@ export default {
           && [SORT_DIRS.DESC, SORT_DIRS.ASC].includes(sort.dir)
           && this.sortCols.includes(sort.by)
     },
+    // todo
     onResize() {
       this.windowHeight = window.innerHeight
     },

@@ -4,12 +4,12 @@
       <v-card-text>
         <fixed-width-wrapper>
           <p>
-            {{ _t('total', {pages, elements}) }}
+            {{ _tc('pagination.total', {pages, elements}) }}
           </p>
           <v-expansion-panels v-model="uiParams.openedPanels" class="mb-1">
             <v-expansion-panel value="loadParams">
               <v-expansion-panel-title>
-                {{ _t('loadParams') }}
+                {{ _tc('pagination.loadParams') }}
                 <btn-with-tooltip
                     :disabled="filterIsEmpty"
                     tooltip="clear"
@@ -26,7 +26,7 @@
                     <number-input
                         class="param-input"
                         field="pageSize"
-                        :label="_t('pageSize')"
+                        :label="_tc('pagination.pageSize')"
                         :field-obj="form.pageSize"
                         @update="v => form.pageSize.value = v"/>
                     <text-input

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface UserRepository extends PagingAndSortingRepository<User, Integer>, JpaRepository<User, Integer> {
 
     User findByEmail(String email);
@@ -22,8 +24,13 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
                     or upper(last_name) like upper(:search)
                     or upper(patronymic) like upper(:search)
                     or upper(email) like upper(:search))
+                and (0 in :roleIds or role_id in :roleIds)
             """, nativeQuery = true)
-    Page<User> findByFilter(@Param("search") String search, Pageable pageable);
+    Page<User> findByFilter(
+            @Param("search") String search,
+            @Param("roleIds") List<Integer> roleIds,
+            Pageable pageable
+    );
 
     @Modifying
     @Query(value = """

@@ -65,8 +65,16 @@ const ru = {
       lastName: 'Фамилия',
       patronymic: 'Отчество',
       search: 'Поиск',
-      sampleRate: 'Частота дискретизации'
+      sampleRate: 'Частота дискретизации',
+      createTime: 'Время создания',
+      lastActionTime: 'Время последнего действия',
+      role: 'Роль'
     },
+    pagination: {
+      total: 'Всего: {pages} страниц, {elements} записей',
+      pageSize: 'Размер страницы',
+      loadParams: 'Параметры загрузки'
+    }
   },
   'confirm-dialog': {
     title: 'Подтверждение'
@@ -171,8 +179,6 @@ const ru = {
   },
   'signal-manager': {
     name: 'Менеджер сигналов',
-    total: 'Всего: {pages} страниц, {elements} записей',
-    pageSize: 'Размер страницы',
     sampleRates: 'Частоты дискретизации',
     folders: 'Папки',
     youHaveNoStoredSignals: 'У вас нет сохраненных сигналов',
@@ -186,7 +192,6 @@ const ru = {
     loadSignalsError: 'Ошибка при загрузке сигналов',
     confirmDeleteSignal: 'Удалить {name}?',
     confirmDeleteSignals: 'Удалить выбранные сигналы (количество: {length})?',
-    loadParams: 'Параметры загрузки'
   },
   'signal-recorder': {
     name: 'Запись сигналов',
@@ -228,6 +233,10 @@ const ru = {
     confirmSentCheckEmail: 'Письмо с ссылкой для подтвержения отправлено на {email}',
     confirmEmailMailTitle: 'SignalApp - подтверждение эл. почты',
     confirmEmailMailMsg: 'Чтобы подтвердить электронную почту перейдите по ссылке $origin$/api/users/confirm/$code$'
+  },
+  'admin-users': {
+    name: 'Пользователи',
+    roles: 'Роли'
   },
   processorNames: {
     LinearAmp: 'Линейный усилитель',

@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
 import {ProcessorTypes} from "~/dictionary/processor-types";
+import {Roles} from "~/dictionary/roles";
 
 export const moduleStore = defineStore('moduleStore', {
   state: () => ({
@@ -7,6 +8,7 @@ export const moduleStore = defineStore('moduleStore', {
       {code: 'signal-generator', forMenu: true, icon: 'sineWave'},
       {code: 'signal-recorder', forMenu: true, icon: 'microphone'},
       {code: 'signal-manager', forMenu: true, icon: 'server'},
+      {code: 'admin-users', forMenu: true, icon: 'accountMultiple', role: Roles.ADMIN},
       {code: 'signin', forMenu: false},
       {code: 'signup', forMenu: false},
       {code: 'user-settings', forMenu: false},
