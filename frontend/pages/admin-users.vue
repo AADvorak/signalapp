@@ -91,6 +91,7 @@ import formValidation from "~/mixins/form-validation";
 import formValuesSaving from "~/mixins/form-values-saving";
 import actionWithTimeout from "~/mixins/action-with-timeout";
 import uiParamsSaving from "~/mixins/ui-params-saving";
+import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
 
 const DATE_TIME_FORMATTER = value => new Date(value).toLocaleString()
 
@@ -98,8 +99,16 @@ export default {
   name: 'admin-users',
   components: {TableOrList, BtnWithTooltip, NumberInput, FixedWidthWrapper, TextInput, CardWithLayout},
   extends: PageBase,
-  mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving],
+  mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving, paginationUrlParams],
   data: () => ({
+    additionalPaginationParamsConfig: [
+      {
+        name: 'roleIds',
+        location: PaginationParamLocations.FORM,
+        readFunc: parseInt,
+        isArray: true
+      }
+    ],
     mounted: false,
     form: {
       pageSize: {
@@ -155,7 +164,7 @@ export default {
       return !this.formValues.search && !this.formValues.roleIds.length
     },
     reservedHeight() {
-      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 434 : 254
+      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 410 : 254
     },
   },
   watch: {
@@ -215,64 +224,11 @@ export default {
         }
       })
     },
-    readUrlParams() {
-      const route = useRoute()
-      const page = ref(route.query.page)
-      if (page.value) {
-        this.page = parseInt(page.value)
-      }
-      const size = ref(route.query.size)
-      if (size.value) {
-        this.formValue('pageSize', parseInt(size.value))
-      }
-      const search = ref(route.query.search)
-      if (search.value) {
-        this.formValue('search', search.value)
-      }
-      const roleIds = ref(route.query.roleIds)
-      if (roleIds.value) {
-        this.formValue('roleIds', this.readNumberArrFromUrlParam(roleIds.value, parseInt))
-      }
-      const sortBy = ref(route.query.sortBy)
-      if (sortBy.value) {
-        this.sort.by = sortBy.value
-      }
-      const sortDir = ref(route.query.sortDir)
-      if (sortDir.value) {
-        this.sort.dir = sortDir.value
-      }
-    },
-    readNumberArrFromUrlParam(str, parseFunc) {
-      return str.split(',').map(v => parseFunc(v)).filter(number => !isNaN(number))
-    },
     setUrlParams() {
       if (!this.mounted) {
         return
       }
       useRouter().push(`/admin-users${this.makeUrlParams()}`)
-    },
-    makeUrlParams() {
-      let params = `?page=${this.page}&size=${this.formValue('pageSize')}`
-      if (this.formValues.search) {
-        params += `&search=${this.formValues.search}`
-      }
-      if (this.formValues.roleIds.length) {
-        params += `&roleIds=${this.makeUrlParamFromArr(this.formValues.roleIds)}`
-      }
-      if (this.sort.by) {
-        params += `&sortBy=${this.sort.by}`
-      }
-      if (this.sort.dir) {
-        params += `&sortDir=${this.sort.dir}`
-      }
-      return params
-    },
-    makeUrlParamFromArr(arr) {
-      let str = ''
-      arr.forEach(item => {
-        str += (str ? ',' : '') + item
-      })
-      return str
     },
     makeUserFilter() {
       const filter = {

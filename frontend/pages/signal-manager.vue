@@ -21,7 +21,7 @@
                 </btn-with-tooltip>
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <v-form class="mt-5">
+                <v-form>
                   <div class="d-flex justify-center flex-wrap">
                     <number-input
                         class="param-input"
@@ -93,7 +93,7 @@
               :buttons="tableOrListConfig.buttons"
               :reserved-height="reservedHeight"
               :sort-cols="['name', 'description', 'sampleRate']"
-              :sort-prop="{by: this.sortBy, dir: this.sortDir}"
+              :sort-prop="this.sort"
               @click="onTableButtonClick"
               @change="onTableChange"
               @select="onTableSelect"
@@ -194,6 +194,7 @@ import SelectProcessor from "~/components/processor-selection/select-processor.v
 import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue";
 import DoubleProcessorDialog from "~/components/processor-selection/double-processor-dialog.vue";
 import SingleProcessorDialog from "~/components/processor-selection/single-processor-dialog.vue";
+import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
 
 export default {
   name: "signal-manager",
@@ -203,8 +204,22 @@ export default {
     FixedWidthWrapper, CardWithLayout
   },
   extends: PageBase,
-  mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving],
+  mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving, paginationUrlParams],
   data: () => ({
+    additionalPaginationParamsConfig: [
+      {
+        name: 'folderIds',
+        location: PaginationParamLocations.FORM,
+        readFunc: parseInt,
+        isArray: true
+      },
+      {
+        name: 'sampleRates',
+        location: PaginationParamLocations.FORM,
+        readFunc: parseFloat,
+        isArray: true
+      }
+    ],
     mounted: false,
     viewDialog: false,
     processDialog: false,
@@ -216,8 +231,10 @@ export default {
     elements: 0,
     pages: 0,
     page: 1,
-    sortBy: '',
-    sortDir: '',
+    sort: {
+      by: '',
+      dir: ''
+    },
     playedSignal: null,
     mdi: {
       mdiDelete,
@@ -284,7 +301,7 @@ export default {
       }
     },
     reservedHeight() {
-      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 503 : 327
+      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 486 : 330
     },
     selectedSignals() {
       return this.signals.filter(signal => this.selectedIds.includes(signal.id))
@@ -395,71 +412,11 @@ export default {
       this.formValue('folderIds', this.formValues.folderIds.filter(folderId =>
           loadedFolderIds.includes(folderId)))
     },
-    readUrlParams() {
-      const route = useRoute()
-      const page = ref(route.query.page)
-      if (page.value) {
-        this.page = parseInt(page.value)
-      }
-      const size = ref(route.query.size)
-      if (size.value) {
-        this.formValue('pageSize', parseInt(size.value))
-      }
-      const search = ref(route.query.search)
-      if (search.value) {
-        this.formValue('search', search.value)
-      }
-      const folderIds = ref(route.query.folderIds)
-      if (folderIds.value) {
-        this.formValue('folderIds', this.readNumberArrFromUrlParam(folderIds.value, parseInt))
-      }
-      const sampleRates = ref(route.query.sampleRates)
-      if (sampleRates.value) {
-        this.formValue('sampleRates', this.readNumberArrFromUrlParam(sampleRates.value, parseFloat))
-      }
-      const sortBy = ref(route.query.sortBy)
-      if (sortBy.value) {
-        this.sortBy = sortBy.value
-      }
-      const sortDir = ref(route.query.sortDir)
-      if (sortDir.value) {
-        this.sortDir = sortDir.value
-      }
-    },
-    readNumberArrFromUrlParam(str, parseFunc) {
-      return str.split(',').map(v => parseFunc(v)).filter(number => !isNaN(number))
-    },
     setUrlParams() {
       if (!this.mounted) {
         return
       }
       useRouter().push(`/signal-manager${this.makeUrlParams()}`)
-    },
-    makeUrlParams() {
-      let params = `?page=${this.page}&size=${this.formValue('pageSize')}`
-      if (this.formValues.search) {
-        params += `&search=${this.formValues.search}`
-      }
-      if (this.formValues.folderIds.length) {
-        params += `&folderIds=${this.makeUrlParamFromArr(this.formValues.folderIds)}`
-      }
-      if (this.formValues.sampleRates.length) {
-        params += `&sampleRates=${this.makeUrlParamFromArr(this.formValues.sampleRates)}`
-      }
-      if (this.sortBy) {
-        params += `&sortBy=${this.sortBy}`
-      }
-      if (this.sortDir) {
-        params += `&sortDir=${this.sortDir}`
-      }
-      return params
-    },
-    makeUrlParamFromArr(arr) {
-      let str = ''
-      arr.forEach(item => {
-        str += (str ? ',' : '') + item
-      })
-      return str
     },
     makeSignalFilter() {
       const filter = {
@@ -475,11 +432,11 @@ export default {
       if (this.formValues.sampleRates.length) {
         filter.sampleRates = this.formValues.sampleRates
       }
-      if (this.sortBy) {
-        filter.sortBy = this.sortBy
+      if (this.sort.by) {
+        filter.sortBy = this.sort.by
       }
-      if (this.sortDir) {
-        filter.sortDir = this.sortDir
+      if (this.sort.dir) {
+        filter.sortDir = this.sort.dir
       }
       return filter
     },
@@ -575,8 +532,7 @@ export default {
       this.selectedIds = selectedIds
     },
     onTableSort(sort) {
-      this.sortBy = sort.by
-      this.sortDir = sort.dir
+      this.sort = sort
       this.page = 1
       this.setUrlParams()
       this.loadSignals()
