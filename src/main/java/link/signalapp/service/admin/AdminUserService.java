@@ -3,9 +3,12 @@ package link.signalapp.service.admin;
 import link.signalapp.dto.request.UserFilterDto;
 import link.signalapp.dto.response.ResponseWithTotalCounts;
 import link.signalapp.dto.response.UserDtoResponse;
+import link.signalapp.error.exception.SignalAppNotFoundException;
 import link.signalapp.mapper.UserMapper;
+import link.signalapp.model.Role;
 import link.signalapp.model.User;
 import link.signalapp.model.UserToken;
+import link.signalapp.repository.RoleRepository;
 import link.signalapp.repository.UserRepository;
 import link.signalapp.repository.UserTokenRepository;
 import link.signalapp.service.utils.FilterUtils;
@@ -26,6 +29,7 @@ public class AdminUserService {
 
     private final UserRepository userRepository;
     private final UserTokenRepository userTokenRepository;
+    private final RoleRepository roleRepository;
     private final FilterUtils filterUtils = new FilterUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
 
     public ResponseWithTotalCounts<UserDtoResponse> filter(UserFilterDto filter) {
@@ -40,6 +44,22 @@ public class AdminUserService {
                 .setElements(users.getTotalElements());
         responseWithTotalCounts.getData().forEach(this::setLastActionTime);
         return responseWithTotalCounts;
+    }
+
+    public void setRole(int userId, int roleId) {
+        User user = userRepository.findById(userId).orElseThrow(SignalAppNotFoundException::new);
+        Role role = roleRepository.findById(roleId).orElseThrow(SignalAppNotFoundException::new);
+        user.setRole(role);
+        userRepository.save(user);
+    }
+
+    public void deleteRole(int userId, int roleId) {
+        User user = userRepository.findById(userId).orElseThrow(SignalAppNotFoundException::new);
+        if (user.getRole() == null || user.getRole().getId() != roleId) {
+            throw new SignalAppNotFoundException();
+        }
+        user.setRole(null);
+        userRepository.save(user);
     }
 
     private void setLastActionTime(UserDtoResponse response) {

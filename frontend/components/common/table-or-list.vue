@@ -28,6 +28,10 @@
                     v-if="button.component === 'signal-folders-menu'"
                     :signal-id="item.id"
                     @changed="onSignalFoldersChanged"/>
+                <user-role-menu
+                    v-if="button.component === 'user-role-menu'"
+                    :user="item"
+                    @changed="onUserRoleChanged"/>
               </v-btn>
             </template>
           </v-card-actions>
@@ -84,6 +88,10 @@
                 v-if="button.component === 'signal-folders-menu'"
                 :signal-id="item.id"
                 @changed="onSignalFoldersChanged"/>
+            <user-role-menu
+                v-if="button.component === 'user-role-menu'"
+                :user="item"
+                @changed="onUserRoleChanged"/>
           </btn-with-tooltip>
         </td>
       </tr>
@@ -99,6 +107,7 @@ import StringUtils from "~/utils/string-utils";
 import ComponentBase from "~/components/base/component-base.vue";
 import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
 import SignalFoldersMenu from "~/components/folders/signal-folders-menu.vue";
+import UserRoleMenu from "~/components/admin/user-role-menu.vue";
 
 const SORT_DIRS = {
   DESC: 'desc',
@@ -107,7 +116,7 @@ const SORT_DIRS = {
 
 export default {
   name: "table-or-list",
-  components: {SignalFoldersMenu, BtnWithTooltip},
+  components: {UserRoleMenu, SignalFoldersMenu, BtnWithTooltip},
   extends: ComponentBase,
   props: {
     dataName: {
@@ -255,6 +264,9 @@ export default {
     },
     onSignalFoldersChanged() {
       this.$emit('change', 'signal-folders-menu')
+    },
+    onUserRoleChanged() {
+      this.$emit('change', 'user-role-menu')
     },
     checkCondition(button, item) {
       if (!button.condition) {

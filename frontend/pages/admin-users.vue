@@ -66,7 +66,8 @@
             :reserved-height="reservedHeight"
             :sort-cols="['firstName', 'lastName', 'patronymic', 'createTime', 'email']"
             :sort-prop="sort"
-            @sort="onTableSort"/>
+            @sort="onTableSort"
+            @change="onTableChange"/>
         <fixed-width-wrapper>
           <v-pagination
               v-model="page"
@@ -92,8 +93,11 @@ import formValuesSaving from "~/mixins/form-values-saving";
 import actionWithTimeout from "~/mixins/action-with-timeout";
 import uiParamsSaving from "~/mixins/ui-params-saving";
 import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
+import {roleStore} from "~/stores/role-store";
 
 const DATE_TIME_FORMATTER = value => new Date(value).toLocaleString()
+
+const USER_ROLE_MENU_COMPONENT = 'user-role-menu'
 
 export default {
   name: 'admin-users',
@@ -132,7 +136,8 @@ export default {
         {
           name: 'edit',
           icon: mdiFileEdit,
-          color: 'primary'
+          color: 'primary',
+          component: USER_ROLE_MENU_COMPONENT
         },
         {
           name: 'delete',
@@ -141,7 +146,7 @@ export default {
         }
       ],
     },
-    roles: [],
+    roles: roleStore().roles,
     elements: 0,
     pages: 0,
     page: 1,
@@ -200,7 +205,7 @@ export default {
     async loadRoles() {
       const response = await this.getApiProvider().get('/api/admin/roles')
       if (response.ok) {
-        this.roles = response.data
+        roleStore().roles = response.data
       }
     },
     async loadUsers() {
@@ -258,6 +263,12 @@ export default {
       this.page = 1
       this.setUrlParams()
       this.loadUsers()
+    },
+    onTableChange(component) {
+      if (component === USER_ROLE_MENU_COMPONENT) {
+        this.usersLastLoadFilter = ''
+        this.loadUsers()
+      }
     }
   }
 }
