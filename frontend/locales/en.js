@@ -42,6 +42,8 @@ const en = {
       same: 'Must have the same value'
     },
     messages: {
+      yes: 'Yes',
+      no: 'No',
       fileSaveError: 'Error while saving file',
       processSignalWith: 'Process signal with {processorName}',
       processSignalsWith: 'Process signals with {processorName}',
@@ -58,6 +60,7 @@ const en = {
       description: 'Description',
       type: 'Type',
       email: 'Email',
+      emailConfirmed: 'Is email confirmed',
       password: 'Password',
       passwordRepeat: 'Password repeat',
       oldPassword: 'Old password',
@@ -363,6 +366,9 @@ const en = {
   },
   chart: {
     resetZoom: 'Reset zoom'
+  },
+  userRoles: {
+    'ADMIN': 'Admin'
   }
 }
 

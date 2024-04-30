@@ -42,6 +42,8 @@ const pl = {
       same: 'Musi mieć taką samą wartość'
     },
     messages: {
+      yes: 'Tak',
+      no: 'Nie',
       fileSaveError: 'Błąd podczas zapisywania pliku',
       processSignalWith: 'Przetwórz sygnał {processorName}',
       processSignalsWith: 'Przetwórz sygnały {processorName}',
@@ -58,6 +60,7 @@ const pl = {
       description: 'Opis',
       type: 'Typ',
       email: 'E-mail',
+      emailConfirmed: 'E-mail potwierdzony',
       password: 'Hasło',
       passwordRepeat: 'Powtórz hasło',
       oldPassword: 'Stare hasło',
@@ -363,6 +366,9 @@ const pl = {
   },
   chart: {
     resetZoom: 'Zresetuj zoom'
+  },
+  userRoles: {
+    'ADMIN': 'Admin'
   }
 }
 

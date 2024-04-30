@@ -42,6 +42,8 @@ const ru = {
       same: 'Должны иметь одинаковое значение'
     },
     messages: {
+      yes: 'Да',
+      no: 'Нет',
       fileSaveError: 'Ошибка при сохранении файла',
       processSignalWith: 'Преобразовать сигнал {processorName}',
       processSignalsWith: 'Преобразовать сигналы {processorName}',
@@ -58,6 +60,7 @@ const ru = {
       description: 'Описание',
       type: 'Тип',
       email: 'Email',
+      emailConfirmed: 'Email подтвержден',
       password: 'Пароль',
       passwordRepeat: 'Повтор пароля',
       oldPassword: 'Старый пароль',
@@ -363,6 +366,9 @@ const ru = {
   },
   chart: {
     resetZoom: 'Сбросить увеличение'
+  },
+  userRoles: {
+    'ADMIN': 'Админ'
   }
 }
 

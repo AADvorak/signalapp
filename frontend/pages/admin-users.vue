@@ -128,10 +128,12 @@ export default {
       roleIds: {value: []}
     },
     tableOrListConfig: {
-      columns: ['firstName', 'lastName', 'patronymic',
+      columns: [
+        {name: 'emailConfirmed', localeKeyGetter: value => value ? 'common.messages.yes' : 'common.messages.no'},
+        'firstName', 'lastName', 'patronymic',
         {name: 'createTime', formatter: DATE_TIME_FORMATTER},
         {name: 'lastActionTime', formatter: DATE_TIME_FORMATTER},
-        {name: 'role', valuePath: 'role.name'},
+        {name: 'role', valuePath: 'role.name', localeKeyGetter: value => `userRoles.${value}`},
       ],
       buttons: [
         {

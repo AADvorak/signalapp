@@ -8,7 +8,7 @@
         >
           <template v-slot:label>
             <div @click.stop>
-              {{ role.name }}
+              {{ $t(`userRoles.${role.name}`) }}
             </div>
           </template>
         </v-checkbox>

@@ -237,10 +237,15 @@ export default {
     },
     columnValue(column, item) {
       const value = this.extractColumnValue(column, item)
-      if (value === undefined || typeof column === 'string' || !column.formatter) {
-        return value
+      if (value !== undefined && value !== null && typeof column !== 'string') {
+        if (column.localeKeyGetter) {
+          return this.$t(column.localeKeyGetter(value))
+        }
+        if (column.formatter) {
+          return column.formatter(value)
+        }
       }
-      return column.formatter(value)
+      return value
     },
     extractColumnValue(column, item) {
       if (typeof column === 'string' || !column.valuePath) {
