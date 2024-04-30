@@ -236,7 +236,8 @@ const pl = {
   },
   'admin-users': {
     name: 'Użytkownicy',
-    roles: 'Role'
+    roles: 'Role',
+    confirmDeleteUser: 'Czy na pewno chcesz usunąć użytkownika z e-mailem {email}?'
   },
   processorNames: {
     LinearAmp: 'Wzmacniacz liniowy',

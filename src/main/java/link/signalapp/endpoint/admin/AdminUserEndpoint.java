@@ -28,4 +28,9 @@ public class AdminUserEndpoint {
     public void deleteRole(@PathVariable int userId, @PathVariable int roleId) {
         adminUserService.deleteRole(userId, roleId);
     }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable int userId) {
+        adminUserService.deleteUser(userId);
+    }
 }

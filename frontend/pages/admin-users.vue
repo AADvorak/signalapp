@@ -66,6 +66,7 @@
             :reserved-height="reservedHeight"
             :sort-cols="['firstName', 'lastName', 'patronymic', 'createTime', 'email']"
             :sort-prop="sort"
+            @click="onTableButtonClick"
             @sort="onTableSort"
             @change="onTableChange"/>
         <fixed-width-wrapper>
@@ -260,6 +261,11 @@ export default {
       this.formValue('search', '')
       this.formValue('roleIds', [])
     },
+    onTableButtonClick({button, item}) {
+      if (button === 'delete') {
+        this.askConfirmDeleteUser(item)
+      }
+    },
     onTableSort(sort) {
       this.sort = sort
       this.page = 1
@@ -271,7 +277,22 @@ export default {
         this.usersLastLoadFilter = ''
         this.loadUsers()
       }
-    }
+    },
+    askConfirmDeleteUser(user) {
+      this.askConfirm({
+        text: this._t('confirmDeleteUser', {email: user.email}),
+        ok: () => {
+          this.deleteUser(user)
+        }
+      })
+    },
+    async deleteUser(user) {
+      let response = await this.getApiProvider().del(`/api/admin/users/${user.id}`)
+      if (response.ok) {
+        this.usersLastLoadFilter = ''
+        await this.loadUsers()
+      }
+    },
   }
 }
 </script>

@@ -4,6 +4,7 @@ import link.signalapp.dto.request.UserFilterDto;
 import link.signalapp.dto.response.ResponseWithTotalCounts;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.error.exception.SignalAppNotFoundException;
+import link.signalapp.file.FileManager;
 import link.signalapp.mapper.UserMapper;
 import link.signalapp.model.Role;
 import link.signalapp.model.User;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,6 +32,7 @@ public class AdminUserService {
     private final UserRepository userRepository;
     private final UserTokenRepository userTokenRepository;
     private final RoleRepository roleRepository;
+    private final FileManager fileManager;
     private final FilterUtils filterUtils = new FilterUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
 
     public ResponseWithTotalCounts<UserDtoResponse> filter(UserFilterDto filter) {
@@ -60,6 +63,13 @@ public class AdminUserService {
         }
         user.setRole(null);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(int userId) {
+        User user = userRepository.findById(userId).orElseThrow(SignalAppNotFoundException::new);
+        userRepository.delete(user);
+        fileManager.deleteAllUserData(userId);
     }
 
     private void setLastActionTime(UserDtoResponse response) {

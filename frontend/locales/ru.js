@@ -236,7 +236,8 @@ const ru = {
   },
   'admin-users': {
     name: 'Пользователи',
-    roles: 'Роли'
+    roles: 'Роли',
+    confirmDeleteUser: 'Удалить пользователя с email {email}?'
   },
   processorNames: {
     LinearAmp: 'Линейный усилитель',

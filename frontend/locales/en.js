@@ -236,7 +236,8 @@ const en = {
   },
   'admin-users': {
     name: 'Users',
-    roles: 'Roles'
+    roles: 'Roles',
+    confirmDeleteUser: 'Are you sure to delete user with email {email}?'
   },
   processorNames: {
     LinearAmp: 'Linear amplifier',
