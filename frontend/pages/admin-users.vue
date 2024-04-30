@@ -146,7 +146,6 @@ export default {
         }
       ],
     },
-    roles: roleStore().roles,
     elements: 0,
     pages: 0,
     page: 1,
@@ -171,6 +170,9 @@ export default {
     reservedHeight() {
       return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 410 : 254
     },
+    roles() {
+      return roleStore().roles
+    }
   },
   watch: {
     page() {
