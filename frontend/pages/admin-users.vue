@@ -95,6 +95,7 @@ import actionWithTimeout from "~/mixins/action-with-timeout";
 import uiParamsSaving from "~/mixins/ui-params-saving";
 import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
 import {roleStore} from "~/stores/role-store";
+import {dataStore} from "~/stores/data-store";
 
 const DATE_TIME_FORMATTER = value => new Date(value).toLocaleString()
 
@@ -140,12 +141,14 @@ export default {
           name: 'edit',
           icon: mdiFileEdit,
           color: 'primary',
-          component: USER_ROLE_MENU_COMPONENT
+          component: USER_ROLE_MENU_COMPONENT,
+          condition: user => user.id !== dataStore().userInfo.id
         },
         {
           name: 'delete',
           icon: mdiDelete,
-          color: 'error'
+          color: 'error',
+          condition: user => user.id !== dataStore().userInfo.id
         }
       ],
     },
