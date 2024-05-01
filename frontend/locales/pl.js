@@ -71,7 +71,8 @@ const pl = {
       sampleRate: 'Częstotliwość próbkowania',
       createTime: 'Czas stworzenia',
       lastActionTime: 'Czas ostatniej akcji',
-      role: 'Rola'
+      role: 'Rola',
+      storedSignalsNumber: 'Liczba przechowywanych sygnałów'
     },
     pagination: {
       total: 'Razem: {pages} stron, {elements} wpisów',

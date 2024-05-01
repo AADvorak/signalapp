@@ -134,6 +134,7 @@ export default {
         'firstName', 'lastName', 'patronymic',
         {name: 'createTime', formatter: DATE_TIME_FORMATTER},
         {name: 'lastActionTime', formatter: DATE_TIME_FORMATTER},
+        'storedSignalsNumber',
         {name: 'role', valuePath: 'role.name', localeKeyGetter: value => `userRoles.${value}`},
       ],
       buttons: [

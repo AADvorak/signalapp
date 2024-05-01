@@ -10,6 +10,7 @@ import link.signalapp.model.Role;
 import link.signalapp.model.User;
 import link.signalapp.model.UserToken;
 import link.signalapp.repository.RoleRepository;
+import link.signalapp.repository.SignalRepository;
 import link.signalapp.repository.UserRepository;
 import link.signalapp.repository.UserTokenRepository;
 import link.signalapp.service.utils.FilterUtils;
@@ -32,6 +33,7 @@ public class AdminUserService {
     private final UserRepository userRepository;
     private final UserTokenRepository userTokenRepository;
     private final RoleRepository roleRepository;
+    private final SignalRepository signalRepository;
     private final FileManager fileManager;
     private final FilterUtils filterUtils = new FilterUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
 
@@ -46,6 +48,7 @@ public class AdminUserService {
                 .setPages(users.getTotalPages())
                 .setElements(users.getTotalElements());
         responseWithTotalCounts.getData().forEach(this::setLastActionTime);
+        responseWithTotalCounts.getData().forEach(this::setStoredSignalsNumber);
         return responseWithTotalCounts;
     }
 
@@ -77,5 +80,9 @@ public class AdminUserService {
         if (userToken != null) {
             response.setLastActionTime(userToken.getLastActionTime());
         }
+    }
+
+    private void setStoredSignalsNumber(UserDtoResponse response) {
+        response.setStoredSignalsNumber(signalRepository.countByUserId(response.getId()));
     }
 }

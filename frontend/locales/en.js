@@ -71,7 +71,8 @@ const en = {
       sampleRate: 'Sample rate',
       createTime: 'Create time',
       lastActionTime: 'Last action time',
-      role: 'Role'
+      role: 'Role',
+      storedSignalsNumber: 'Number of stored signals'
     },
     pagination: {
       total: 'Total: {pages} pages, {elements} entries',

@@ -29,4 +29,6 @@ public class UserDtoResponse {
 
     private RoleDtoResponse role;
 
+    private int storedSignalsNumber;
+
 }

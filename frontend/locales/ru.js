@@ -71,7 +71,8 @@ const ru = {
       sampleRate: 'Частота дискретизации',
       createTime: 'Время создания',
       lastActionTime: 'Время последнего действия',
-      role: 'Роль'
+      role: 'Роль',
+      storedSignalsNumber: 'Количество сохраненных сигналов'
     },
     pagination: {
       total: 'Всего: {pages} страниц, {elements} записей',
