@@ -188,9 +188,9 @@ export default {
     },
     formValues() {
       this.actionWithTimeout(() => {
-        // if (!this.validatePageSize()) {
-        //   return
-        // }
+        if (!this.validatePageSize()) {
+          return
+        }
         this.page = 1
         this.saveFormValues()
         this.setUrlParams()
@@ -211,6 +211,14 @@ export default {
     this.mounted = false
   },
   methods: {
+    validatePageSize() {
+      this.clearValidation()
+      const validationMsg = this.getNumberValidationMsg('pageSize')
+      if (validationMsg) {
+        this.pushValidationMsg('pageSize', validationMsg)
+      }
+      return !validationMsg
+    },
     async loadRoles() {
       const response = await this.getApiProvider().get('/api/admin/roles')
       if (response.ok) {
@@ -222,7 +230,7 @@ export default {
       const filterJson = JSON.stringify(filter)
       if (!this.mounted || this.loadingOverlay
           || this.usersLastLoadFilter === filterJson
-          /*|| !this.validatePageSize()*/) {
+          || !this.validatePageSize()) {
         return
       }
       await this.loadWithOverlay(async () => {
