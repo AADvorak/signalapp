@@ -25,7 +25,7 @@ public class ApplicationEndpoint {
     @GetMapping(path = "/version", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getAppVersion() {
         // todo keep this value in one place
-        return "1.6.0-beta1";
+        return "1.6.0-beta2";
     }
 
     @GetMapping(path = "/timezone-offset")
