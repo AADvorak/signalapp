@@ -37,7 +37,7 @@
                     <v-select
                         class="param-input"
                         v-model="form.roleIds.value"
-                        item-title="name"
+                        item-title="localeName"
                         item-value="id"
                         :items="roles"
                         :label="_t('roles')"
@@ -178,7 +178,7 @@ export default {
       return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 410 : 254
     },
     roles() {
-      return roleStore().roles
+      return roleStore().roles.map(role => ({...role, localeName: this.$t(`userRoles.${role.name}`)}))
     }
   },
   watch: {
