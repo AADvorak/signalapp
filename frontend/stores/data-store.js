@@ -5,6 +5,7 @@ export const dataStore = defineStore('dataStore', {
     return {
       userInfo: undefined,
       settings: undefined,
+      serverTimezoneOffset: undefined,
       folders: [],
       waitingForAuthorization: null,
       recordedAudio: null,

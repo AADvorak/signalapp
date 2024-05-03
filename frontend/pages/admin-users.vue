@@ -96,8 +96,7 @@ import uiParamsSaving from "~/mixins/ui-params-saving";
 import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
 import {roleStore} from "~/stores/role-store";
 import {dataStore} from "~/stores/data-store";
-
-const DATE_TIME_FORMATTER = value => new Date(value).toLocaleString()
+import {DateTimeUtils} from "~/utils/date-time-utils";
 
 const USER_ROLE_MENU_COMPONENT = 'user-role-menu'
 
@@ -132,8 +131,8 @@ export default {
       columns: [
         {name: 'emailConfirmed', localeKeyGetter: value => value ? 'common.messages.yes' : 'common.messages.no'},
         'firstName', 'lastName', 'patronymic',
-        {name: 'createTime', formatter: DATE_TIME_FORMATTER},
-        {name: 'lastActionTime', formatter: DATE_TIME_FORMATTER},
+        {name: 'createTime', formatter: DateTimeUtils.getLocalDateLocaleString},
+        {name: 'lastActionTime', formatter: DateTimeUtils.getLocalDateLocaleString},
         'storedSignalsNumber',
         {name: 'role', valuePath: 'role.name', localeKeyGetter: value => `userRoles.${value}`},
       ],

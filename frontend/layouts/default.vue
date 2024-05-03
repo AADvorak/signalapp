@@ -159,6 +159,7 @@ export default {
     this.setHeaderByRoute()
     this.loadUserInfo()
     this.loadSettings()
+    this.loadServerTimezoneOffset()
     useLocaleUtils(this.$i18n).detectLocale()
   },
   methods: {
@@ -180,6 +181,13 @@ export default {
       }
       const response = await ApiProvider.get('/api/application/settings', true)
       dataStore().setSettings(response.ok ? response.data : null)
+    },
+    async loadServerTimezoneOffset() {
+      if (dataStore().serverTimezoneOffset !== undefined) {
+        return
+      }
+      const response = await ApiProvider.get('/api/application/timezone-offset', true)
+      dataStore().serverTimezoneOffset = response.ok ? parseInt(response.data) : null
     },
     toMainPage() {
       this.toPage('/')

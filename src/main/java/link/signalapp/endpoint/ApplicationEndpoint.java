@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZonedDateTime;
+
 @RestController
 @RequestMapping("/api/application")
 @RequiredArgsConstructor
@@ -16,7 +18,7 @@ public class ApplicationEndpoint {
     private final ApplicationProperties applicationProperties;
 
     @GetMapping(path = "/settings", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SettingsDtoResponse get() {
+    public SettingsDtoResponse getSettings() {
         return new SettingsDtoResponse().setVerifyCaptcha(applicationProperties.isVerifyCaptcha());
     }
 
@@ -26,4 +28,8 @@ public class ApplicationEndpoint {
         return "1.6.0-beta1";
     }
 
+    @GetMapping(path = "/timezone-offset")
+    public int getTimezoneOffset() {
+        return ZonedDateTime.now().getOffset().getTotalSeconds();
+    }
 }
