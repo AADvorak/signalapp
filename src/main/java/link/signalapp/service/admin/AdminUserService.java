@@ -76,7 +76,7 @@ public class AdminUserService {
     }
 
     private void setLastActionTime(UserDtoResponse response) {
-        UserToken userToken = userTokenRepository.findByUserId(response.getId());
+        UserToken userToken = userTokenRepository.findLastByUserId(response.getId());
         if (userToken != null) {
             response.setLastActionTime(userToken.getLastActionTime());
         }

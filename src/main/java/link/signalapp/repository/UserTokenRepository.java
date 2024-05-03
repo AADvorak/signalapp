@@ -15,8 +15,10 @@ public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenP
             select *
             from user_token
             where user_id = :userId
+            order by last_action_time desc
+            limit 1
             """, nativeQuery = true)
-    UserToken findByUserId(@Param("userId") int userId);
+    UserToken findLastByUserId(@Param("userId") int userId);
 
     @Query(value = """
             select *
