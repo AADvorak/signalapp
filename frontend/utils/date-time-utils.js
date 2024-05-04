@@ -6,7 +6,7 @@ export const DateTimeUtils = {
     const date = new Date(dateStr)
     const clientOffset = date.getTimezoneOffset() * 60
     const serverOffset = dataStore().serverTimezoneOffset || 0
-    date.setTime(date.getTime() - serverOffset - clientOffset)
+    date.setTime(date.getTime() - (serverOffset + clientOffset) * 1000)
     return date.toLocaleString()
   }
 }
