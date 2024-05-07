@@ -17,8 +17,6 @@ public class UserConfirmEndpoint {
 
     @GetMapping(path = "/confirm/{code}")
     public RedirectView getMailConfirm(@PathVariable String code) {
-        String result = userService.confirmEmail(code);
-        return new RedirectView("/" + (result.equals(UserService.EMAIL_CONFIRM_ERROR)
-                ? result : "user-settings"));
+        return new RedirectView("/" + userService.confirmEmail(code));
     }
 }

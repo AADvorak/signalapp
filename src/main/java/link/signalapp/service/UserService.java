@@ -36,8 +36,8 @@ public class UserService extends ServiceBase {
 
     public static final int MAX_PASSWORD_LENGTH = 72;
 
-    public static final String EMAIL_CONFIRM_OK = "email-confirm-ok";
-    public static final String EMAIL_CONFIRM_ERROR = "email-confirm-error";
+    private static final String EMAIL_CONFIRM_OK_REDIRECT = "user-settings";
+    private static final String EMAIL_CONFIRM_ERROR_REDIRECT = "email-confirm-error";
 
     private final UserRepository userRepository;
     private final UserConfirmRepository userConfirmRepository;
@@ -149,10 +149,10 @@ public class UserService extends ServiceBase {
         UserConfirm userConfirm = userConfirmRepository.findByCode(code);
         if (userConfirm == null
                 || userRepository.updateSetEmailConfirmedTrue(userConfirm.getId().getUser().getId()) == 0) {
-            return EMAIL_CONFIRM_ERROR;
+            return EMAIL_CONFIRM_ERROR_REDIRECT;
         }
         userConfirmRepository.delete(userConfirm);
-        return EMAIL_CONFIRM_OK;
+        return EMAIL_CONFIRM_OK_REDIRECT;
     }
 
     @Transactional(rollbackFor = MessagingException.class)
