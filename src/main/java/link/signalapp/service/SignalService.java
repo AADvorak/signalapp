@@ -45,8 +45,7 @@ public class SignalService extends ServiceBase {
 
     public ResponseWithTotalCounts<SignalDtoResponse> filter(SignalFilterDto filter) {
         int userId = getUserFromContext().getId();
-        int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber();
-        Pageable pageable = filterUtils.getPageable(filter, maxUserSignalsNumber);
+        Pageable pageable = filterUtils.getPageable(filter, applicationProperties.getMaxPageSize());
         String search = filterUtils.getSearch(filter);
         Page<Signal> signalPage = signalRepository.findByUserIdAndFilter(userId, search,
                 filterUtils.listWithDefaultValue(filter.getSampleRates(), BigDecimal.ZERO),

@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
 @Accessors(chain = true)
 public class ApplicationProperties {
 
+    private int maxPageSize;
+
     private int maxNameLength;
 
     private int minPasswordLength;
 
     private int userIdleTimeout;
-
-    private boolean debug;
 
     private boolean verifyCaptcha;
 

@@ -9,6 +9,7 @@ import link.signalapp.mapper.UserMapper;
 import link.signalapp.model.Role;
 import link.signalapp.model.User;
 import link.signalapp.model.UserToken;
+import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.RoleRepository;
 import link.signalapp.repository.SignalRepository;
 import link.signalapp.repository.UserRepository;
@@ -35,10 +36,11 @@ public class AdminUserService {
     private final RoleRepository roleRepository;
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
+    private final ApplicationProperties applicationProperties;
     private final FilterUtils filterUtils = new FilterUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
 
     public ResponseWithTotalCounts<UserDtoResponse> filter(UserFilterDto filter) {
-        Pageable pageable = filterUtils.getPageable(filter, 25);
+        Pageable pageable = filterUtils.getPageable(filter, applicationProperties.getMaxPageSize());
         String search = filterUtils.getSearch(filter);
         Page<User> users = userRepository.findByFilter(search,
                 filterUtils.listWithDefaultValue(filter.getRoleIds(), 0), pageable);

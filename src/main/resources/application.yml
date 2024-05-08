@@ -1,6 +1,6 @@
 application:
     data_path: signalappdata/
-    debug: false
+    max-page-size: 25
     max-name-length: 100
     min-password-length: 5
     user-idle-timeout: 3600
