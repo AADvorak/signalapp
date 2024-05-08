@@ -20,8 +20,8 @@
 <script>
 
 import ComponentBase from "~/components/base/component-base.vue";
-import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
+import {userStore} from "~/stores/user-store";
 
 export default {
   name: "signal-folders-menu",
@@ -52,7 +52,7 @@ export default {
     async loadSignalFolderIds() {
       const signalFolderIds = await FolderRequests.loadSignalFolderIds(this.signalId)
       if (signalFolderIds) {
-        this.folders = dataStore().folders.map(folder => ({...folder, includes: signalFolderIds.includes(folder.id)}))
+        this.folders = userStore().folders.map(folder => ({...folder, includes: signalFolderIds.includes(folder.id)}))
       }
     },
     async checkBoxStateChanged(folder) {

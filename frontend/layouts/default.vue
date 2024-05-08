@@ -97,6 +97,7 @@ import ComponentBase from "../components/base/component-base.vue";
 import LocaleSelect from "~/components/layout/locale-select.vue";
 import SelectsSettings from "~/components/layout/selects-settings.vue";
 import NumberInputTypeSelect from "~/components/layout/number-input-type-select.vue";
+import {userStore} from "~/stores/user-store";
 
 export default {
   name: 'default',
@@ -125,10 +126,10 @@ export default {
       return this._t(this.darkMode ? 'on' : 'off')
     },
     userButtonText() {
-      return dataStore().userRepresentingString
+      return userStore().userDescription
     },
     isSignedIn() {
-      return dataStore().isSignedIn
+      return userStore().isSignedIn
     },
     modulesForMenu() {
       return moduleStore().modulesForMenu
@@ -165,15 +166,15 @@ export default {
   methods: {
     async signOut() {
       await ApiProvider.del('/api/sessions')
-      dataStore().clearPersonalData()
+      userStore().clearPersonalData()
       this.toMainPage()
     },
     async loadUserInfo() {
-      if (dataStore().userInfo !== undefined) {
+      if (userStore().userInfo !== undefined) {
         return
       }
       const response = await ApiProvider.get('/api/users/me', true)
-      dataStore().setUserInfo(response.ok ? response.data : null)
+      userStore().setUserInfo(response.ok ? response.data : null)
     },
     async loadSettings() {
       if (dataStore().settings !== undefined) {
@@ -216,7 +217,7 @@ export default {
       return this.moduleIcons[module.icon] || mdiCog
     },
     checkUserRoleForModule(module) {
-      return !module.role || dataStore().checkUserRole(module.role)
+      return !module.role || userStore().checkUserRole(module.role)
     }
   },
 }

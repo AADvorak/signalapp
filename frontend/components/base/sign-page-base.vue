@@ -37,6 +37,7 @@ import {dataStore} from "~/stores/data-store";
 import ApiProvider from "~/api/api-provider";
 import CardWithLayout from "~/components/common/card-with-layout.vue";
 import TextInput from "~/components/common/text-input.vue";
+import {userStore} from "~/stores/user-store";
 
 export default {
   name: 'sign-page-base',
@@ -55,7 +56,7 @@ export default {
       return dataStore().waitingForAuthorization
     },
     isSignedIn() {
-      return dataStore().isSignedIn
+      return userStore().isSignedIn
     }
   },
   watch: {
@@ -73,7 +74,7 @@ export default {
         const response = await ApiProvider.postJson(url, {...this.formValues, token})
         if (response.ok) {
           this.requestSuccess = true
-          dataStore().setUserInfo(response.data)
+          userStore().setUserInfo(response.data)
           await useRouter().push(this.waitingForAuthorization ? this.waitingForAuthorization : '/')
         } else {
           this.parseValidation(response.errors)

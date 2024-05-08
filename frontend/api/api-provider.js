@@ -1,4 +1,5 @@
 import {dataStore} from "~/stores/data-store";
+import {userStore} from "~/stores/user-store";
 
 const ApiProvider = {
 
@@ -84,7 +85,7 @@ const ApiProvider = {
       return {...result, data}
     }
     if (response.status === 401 && !noHandleUnauthorized) {
-      dataStore().clearPersonalData()
+      userStore().clearPersonalData()
       this.route && dataStore().setWaitingForAuthorization(this.route.fullPath)
       this.router && this.router.push('/signin')
     }

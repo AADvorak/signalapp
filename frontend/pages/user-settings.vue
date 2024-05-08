@@ -38,11 +38,11 @@
 import {mdiDelete} from "@mdi/js";
 import PageBase from "../components/base/page-base.vue";
 import formValidation from "../mixins/form-validation";
-import {dataStore} from "~/stores/data-store";
 import formValues from "../mixins/form-values";
 import filterPatronymicField from "../mixins/filter-patronymic-field";
 import CardWithLayout from "~/components/common/card-with-layout.vue";
 import TextInput from "~/components/common/text-input.vue";
+import {userStore} from "~/stores/user-store";
 
 const ME_URL = '/api/users/me'
 
@@ -66,7 +66,7 @@ export default {
   }),
   mounted() {
     this.reloadUserInfo()
-    dataStore().$subscribe((mutation, state) => {
+    userStore().$subscribe((mutation, state) => {
       this.parseUserInfo(state.userInfo)
     })
     this.focusFirstFormField()
@@ -76,7 +76,7 @@ export default {
       await this.loadWithOverlay(async () => {
         const response = await this.getApiProvider().get(ME_URL)
         if (response.ok) {
-          dataStore().setUserInfo(response.data)
+          userStore().setUserInfo(response.data)
         } else {
           this.showErrorsFromResponse(response)
         }
@@ -96,7 +96,7 @@ export default {
       await this.loadWithFlag(async () => {
         const response = await this.getApiProvider().putJson(ME_URL, this.formValues)
         if (response.ok) {
-          dataStore().setUserInfo(response.data)
+          userStore().setUserInfo(response.data)
           this.showMessage({
             text: this._t('saveSuccess')
           })
@@ -117,7 +117,7 @@ export default {
     async deleteAccount() {
       const response = await this.getApiProvider().del(ME_URL)
       if (response.ok) {
-        dataStore().clearUserInfo()
+        userStore().clearPersonalData()
         await useRouter().push('/')
       } else {
         this.showErrorsFromResponse(response, this._t('deleteError'))
@@ -133,7 +133,7 @@ export default {
         if (response.ok) {
           this.confirmEmailSent = true
           this.showMessage({
-            text: this._t('confirmSentCheckEmail', {email: dataStore().userInfo.email})
+            text: this._t('confirmSentCheckEmail', {email: userStore().userInfo.email})
           })
         } else {
           this.showErrorsFromResponse(response, this._t('sendEmailError'))

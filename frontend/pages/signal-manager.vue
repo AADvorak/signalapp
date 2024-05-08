@@ -179,7 +179,6 @@ import formValidation from "../mixins/form-validation";
 import actionWithTimeout from "../mixins/action-with-timeout";
 import formValuesSaving from "../mixins/form-values-saving";
 import DeviceUtils from "../utils/device-utils";
-import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
 import NumberUtils from "~/utils/number-utils";
 import uiParamsSaving from "~/mixins/ui-params-saving";
@@ -195,6 +194,7 @@ import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue"
 import DoubleProcessorDialog from "~/components/processor-selection/double-processor-dialog.vue";
 import SingleProcessorDialog from "~/components/processor-selection/single-processor-dialog.vue";
 import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
+import {userStore} from "~/stores/user-store";
 
 export default {
   name: "signal-manager",
@@ -318,7 +318,7 @@ export default {
       return this.selectedSignals.length === this.selectedSignals.filter(signal => signal.data).length
     },
     folders() {
-      return dataStore().folders
+      return userStore().folders
     },
     filterIsEmpty() {
       return !this.formValues.search && !this.formValues.sampleRates.length && !this.formValues.folderIds.length

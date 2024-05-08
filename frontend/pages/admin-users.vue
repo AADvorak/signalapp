@@ -95,10 +95,12 @@ import actionWithTimeout from "~/mixins/action-with-timeout";
 import uiParamsSaving from "~/mixins/ui-params-saving";
 import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
 import {roleStore} from "~/stores/role-store";
-import {dataStore} from "~/stores/data-store";
+import {userStore} from "~/stores/user-store";
 import {DateTimeUtils} from "~/utils/date-time-utils";
 
 const USER_ROLE_MENU_COMPONENT = 'user-role-menu'
+
+const isNotCurrentUser = user => user.id !== userStore().userInfo.id
 
 export default {
   name: 'admin-users',
@@ -142,13 +144,13 @@ export default {
           icon: mdiFileEdit,
           color: 'primary',
           component: USER_ROLE_MENU_COMPONENT,
-          condition: user => user.id !== dataStore().userInfo.id
+          condition: isNotCurrentUser
         },
         {
           name: 'delete',
           icon: mdiDelete,
           color: 'error',
-          condition: user => user.id !== dataStore().userInfo.id
+          condition: isNotCurrentUser
         }
       ],
     },

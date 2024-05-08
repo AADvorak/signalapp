@@ -1,5 +1,5 @@
 import ApiProvider from "~/api/api-provider";
-import {dataStore} from "~/stores/data-store";
+import {userStore} from "~/stores/user-store";
 
 const FolderRequests = {
   apiProvider: ApiProvider,
@@ -7,12 +7,12 @@ const FolderRequests = {
     this.apiProvider = apiProvider
   },
   async loadFolders(force = false, noHandleUnauthorized = true) {
-    if (dataStore().folders.length && !force) {
+    if (userStore().folders.length && !force) {
       return
     }
     const response = await this.apiProvider.get('/api/folders', noHandleUnauthorized)
     if (response.ok) {
-      dataStore().folders = response.data
+      userStore().folders = response.data
     } else {
       throw response
     }

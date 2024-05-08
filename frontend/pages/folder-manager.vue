@@ -43,12 +43,12 @@
 <script>
 import {mdiDelete, mdiFileEdit} from "@mdi/js";
 import PageBase from "~/components/base/page-base.vue";
-import {dataStore} from "~/stores/data-store";
 import FolderRequests from "~/api/folder-requests";
 import CardWithLayout from "~/components/common/card-with-layout.vue";
 import FixedWidthWrapper from "~/components/common/fixed-width-wrapper.vue";
 import TableOrList from "~/components/common/table-or-list.vue";
 import FolderEditor from "~/components/folders/folder-editor.vue";
+import {userStore} from "~/stores/user-store";
 
 export default {
   name: "folder-manager",
@@ -79,7 +79,7 @@ export default {
   }),
   computed: {
     folders() {
-      return dataStore().folders
+      return userStore().folders
     }
   },
   mounted() {

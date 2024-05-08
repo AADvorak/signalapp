@@ -3,10 +3,8 @@ import {defineStore} from 'pinia'
 export const dataStore = defineStore('dataStore', {
   state: () => {
     return {
-      userInfo: undefined,
       settings: undefined,
       serverTimezoneOffset: undefined,
-      folders: [],
       waitingForAuthorization: null,
       recordedAudio: null,
       darkMode: localStorage.getItem('darkMode') === 'true',
@@ -17,44 +15,9 @@ export const dataStore = defineStore('dataStore', {
       numberInputTypes: ['text', 'slider']
     }
   },
-  getters: {
-    userRepresentingString: state => {
-      const userInfo = state.userInfo
-      if (!userInfo) {
-        return ''
-      }
-      if (userInfo.firstName && userInfo.lastName && userInfo.patronymic) {
-        return userInfo.firstName.substring(0, 1) + '.' + userInfo.patronymic.substring(0, 1) + '. ' + userInfo.lastName
-      }
-      if (userInfo.firstName && userInfo.lastName) {
-        return userInfo.firstName.substring(0, 1) + '. ' + userInfo.lastName
-      }
-      if (userInfo.firstName) {
-        return userInfo.firstName
-      }
-      if (userInfo.lastName) {
-        return userInfo.lastName
-      }
-      return userInfo.email
-    },
-    isSignedIn: state => !!state.userInfo?.id,
-  },
   actions: {
-    setUserInfo(userInfo) {
-      this.userInfo = userInfo
-    },
     setSettings(settings) {
       this.settings = settings
-    },
-    clearUserInfo() {
-      this.userInfo = undefined
-    },
-    clearPersonalData() {
-      this.clearUserInfo()
-      this.folders = []
-    },
-    checkUserRole(role) {
-      return this.userInfo?.role?.name === role
     },
     setWaitingForAuthorization(waitingForAuthorization) {
       this.waitingForAuthorization = waitingForAuthorization
