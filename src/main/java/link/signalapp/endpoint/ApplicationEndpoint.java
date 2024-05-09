@@ -19,7 +19,9 @@ public class ApplicationEndpoint {
 
     @GetMapping(path = "/settings", produces = MediaType.APPLICATION_JSON_VALUE)
     public SettingsDtoResponse getSettings() {
-        return new SettingsDtoResponse().setVerifyCaptcha(applicationProperties.isVerifyCaptcha());
+        return new SettingsDtoResponse()
+                .setVerifyCaptcha(applicationProperties.isVerifyCaptcha())
+                .setMaxPageSize(applicationProperties.getMaxPageSize());
     }
 
     @GetMapping(path = "/version", produces = MediaType.TEXT_PLAIN_VALUE)

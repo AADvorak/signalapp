@@ -97,6 +97,7 @@ import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination
 import {roleStore} from "~/stores/role-store";
 import {userStore} from "~/stores/user-store";
 import {DateTimeUtils} from "~/utils/date-time-utils";
+import maxPageSizeLoading from "~/mixins/max-page-size-loading";
 
 const USER_ROLE_MENU_COMPONENT = 'user-role-menu'
 
@@ -106,7 +107,10 @@ export default {
   name: 'admin-users',
   components: {TableOrList, BtnWithTooltip, NumberInput, FixedWidthWrapper, TextInput, CardWithLayout},
   extends: PageBase,
-  mixins: [formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving, paginationUrlParams],
+  mixins: [
+    formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving,
+    paginationUrlParams, maxPageSizeLoading
+  ],
   data: () => ({
     additionalPaginationParamsConfig: [
       {
@@ -122,7 +126,6 @@ export default {
         value: 10,
         params: {
           min: 5,
-          max: 25,
           step: 1
         }
       },
@@ -205,6 +208,7 @@ export default {
     this.restoreUiParams()
     this.readUrlParams()
     this.setUrlParams()
+    this.setMaxPageSize()
     this.loadRoles()
     this.actionWithTimeout(this.loadUsers)
   },

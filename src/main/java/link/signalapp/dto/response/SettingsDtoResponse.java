@@ -13,4 +13,6 @@ public class SettingsDtoResponse {
 
     private boolean verifyCaptcha;
 
+    private int maxPageSize;
+
 }

@@ -3,7 +3,6 @@ import {defineStore} from 'pinia'
 export const dataStore = defineStore('dataStore', {
   state: () => {
     return {
-      settings: undefined,
       serverTimezoneOffset: undefined,
       waitingForAuthorization: null,
       recordedAudio: null,
@@ -16,9 +15,6 @@ export const dataStore = defineStore('dataStore', {
     }
   },
   actions: {
-    setSettings(settings) {
-      this.settings = settings
-    },
     setWaitingForAuthorization(waitingForAuthorization) {
       this.waitingForAuthorization = waitingForAuthorization
     },

@@ -1,5 +1,5 @@
 import { useReCaptcha } from 'vue-recaptcha-v3';
-import {dataStore} from "~/stores/data-store";
+import {appSettingsStore} from "~/stores/app-settings-store";
 
 export default {
   data: () => ({
@@ -7,7 +7,7 @@ export default {
   }),
   methods: {
     async recaptcha() {
-      if (!dataStore().settings?.verifyCaptcha) {
+      if (!appSettingsStore().settings?.verifyCaptcha) {
         return null
       }
       await this.recaptchaInstance?.recaptchaLoaded()

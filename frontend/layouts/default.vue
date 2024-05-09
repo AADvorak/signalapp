@@ -98,6 +98,7 @@ import LocaleSelect from "~/components/layout/locale-select.vue";
 import SelectsSettings from "~/components/layout/selects-settings.vue";
 import NumberInputTypeSelect from "~/components/layout/number-input-type-select.vue";
 import {userStore} from "~/stores/user-store";
+import {appSettingsStore} from "~/stores/app-settings-store";
 
 export default {
   name: 'default',
@@ -177,11 +178,11 @@ export default {
       userStore().setUserInfo(response.ok ? response.data : null)
     },
     async loadSettings() {
-      if (dataStore().settings !== undefined) {
+      if (appSettingsStore().settings !== undefined) {
         return
       }
       const response = await ApiProvider.get('/api/application/settings', true)
-      dataStore().setSettings(response.ok ? response.data : null)
+      appSettingsStore().settings = response.ok ? response.data : null
     },
     async loadServerTimezoneOffset() {
       if (dataStore().serverTimezoneOffset !== undefined) {
