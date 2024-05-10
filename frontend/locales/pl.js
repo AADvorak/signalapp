@@ -53,7 +53,8 @@ const pl = {
       wrongSignalSamplesNumber: 'Liczba próbek importowanego sygnału nie może być większa niż {maxSamplesNumber}. W wybranym pliku wynosi {samplesNumber}',
       noFolders: 'Nie masz folderów',
       noData: 'Nie ma danych',
-      alreadySignedIn: 'Już jesteś zalogowany(a)'
+      alreadySignedIn: 'Już jesteś zalogowany(a)',
+      requiredRole: 'Potrzebna rola'
     },
     fields: {
       name: 'Nazwa',

@@ -195,7 +195,7 @@ import DoubleProcessorDialog from "~/components/processor-selection/double-proce
 import SingleProcessorDialog from "~/components/processor-selection/single-processor-dialog.vue";
 import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
 import {userStore} from "~/stores/user-store";
-import maxPageSizeLoading from "~/mixins/max-page-size-loading";
+import {appSettingsStore} from "~/stores/app-settings-store";
 
 export default {
   name: "signal-manager",
@@ -207,7 +207,7 @@ export default {
   extends: PageBase,
   mixins: [
     formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving,
-    paginationUrlParams, maxPageSizeLoading
+    paginationUrlParams
   ],
   data: () => ({
     additionalPaginationParamsConfig: [
@@ -255,6 +255,7 @@ export default {
         value: 10,
         params: {
           min: 5,
+          max: appSettingsStore().settings?.maxPageSize,
           step: 1
         }
       },
@@ -351,7 +352,6 @@ export default {
     this.restoreUiParams()
     this.readUrlParams()
     this.setUrlParams()
-    this.setMaxPageSize()
     this.loadSampleRates()
     this.loadFolders()
     this.actionWithTimeout(() => this.loadSignals())

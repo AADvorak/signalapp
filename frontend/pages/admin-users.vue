@@ -1,5 +1,5 @@
 <template>
-  <card-with-layout full-width :confirm="confirm" :loading-overlay="loadingOverlay">
+  <card-with-layout full-width :message="message" :confirm="confirm" :loading-overlay="loadingOverlay">
     <template #default>
       <v-card-text>
         <fixed-width-wrapper>
@@ -59,7 +59,6 @@
         <table-or-list v-else
             data-name="users"
             caption="email"
-            :select="true"
             :items="users"
             :columns="tableOrListConfig.columns"
             :buttons="tableOrListConfig.buttons"
@@ -97,11 +96,13 @@ import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination
 import {roleStore} from "~/stores/role-store";
 import {userStore} from "~/stores/user-store";
 import {DateTimeUtils} from "~/utils/date-time-utils";
-import maxPageSizeLoading from "~/mixins/max-page-size-loading";
+import {Roles} from "~/dictionary/roles";
+import requiredRoleMsg from "~/mixins/required-role-msg";
+import {appSettingsStore} from "~/stores/app-settings-store";
 
 const USER_ROLE_MENU_COMPONENT = 'user-role-menu'
 
-const isNotCurrentUser = user => user.id !== userStore().userInfo.id
+const isNotCurrentUser = user => user.id !== userStore().userInfo?.id
 
 export default {
   name: 'admin-users',
@@ -109,7 +110,7 @@ export default {
   extends: PageBase,
   mixins: [
     formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving,
-    paginationUrlParams, maxPageSizeLoading
+    paginationUrlParams, requiredRoleMsg
   ],
   data: () => ({
     additionalPaginationParamsConfig: [
@@ -126,6 +127,7 @@ export default {
         value: 10,
         params: {
           min: 5,
+          max: appSettingsStore().settings?.maxPageSize,
           step: 1
         }
       },
@@ -208,9 +210,11 @@ export default {
     this.restoreUiParams()
     this.readUrlParams()
     this.setUrlParams()
-    this.setMaxPageSize()
     this.loadRoles()
-    this.actionWithTimeout(this.loadUsers)
+    this.actionWithTimeout(() => {
+      this.requiredRoleMsg(Roles.ADMIN)
+      this.loadUsers()
+    })
   },
   beforeUnmount() {
     this.mounted = false
@@ -225,6 +229,9 @@ export default {
       return !validationMsg
     },
     async loadRoles() {
+      if (!userStore().checkUserRole(Roles.ADMIN)) {
+        return
+      }
       const response = await this.getApiProvider().get('/api/admin/roles')
       if (response.ok) {
         roleStore().roles = response.data
@@ -235,7 +242,8 @@ export default {
       const filterJson = JSON.stringify(filter)
       if (!this.mounted || this.loadingOverlay
           || this.usersLastLoadFilter === filterJson
-          || !this.validatePageSize()) {
+          || !this.validatePageSize()
+          || !userStore().checkUserRole(Roles.ADMIN)) {
         return
       }
       await this.loadWithOverlay(async () => {

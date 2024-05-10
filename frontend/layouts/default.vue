@@ -98,7 +98,6 @@ import LocaleSelect from "~/components/layout/locale-select.vue";
 import SelectsSettings from "~/components/layout/selects-settings.vue";
 import NumberInputTypeSelect from "~/components/layout/number-input-type-select.vue";
 import {userStore} from "~/stores/user-store";
-import {appSettingsStore} from "~/stores/app-settings-store";
 
 export default {
   name: 'default',
@@ -159,9 +158,6 @@ export default {
   mounted() {
     window.history.scrollRestoration = 'manual'
     this.setHeaderByRoute()
-    this.loadUserInfo()
-    this.loadSettings()
-    this.loadServerTimezoneOffset()
     useLocaleUtils(this.$i18n).detectLocale()
   },
   methods: {
@@ -169,27 +165,6 @@ export default {
       await ApiProvider.del('/api/sessions')
       userStore().clearPersonalData()
       this.toMainPage()
-    },
-    async loadUserInfo() {
-      if (userStore().userInfo !== undefined) {
-        return
-      }
-      const response = await ApiProvider.get('/api/users/me', true)
-      userStore().setUserInfo(response.ok ? response.data : null)
-    },
-    async loadSettings() {
-      if (appSettingsStore().settings !== undefined) {
-        return
-      }
-      const response = await ApiProvider.get('/api/application/settings', true)
-      appSettingsStore().settings = response.ok ? response.data : null
-    },
-    async loadServerTimezoneOffset() {
-      if (dataStore().serverTimezoneOffset !== undefined) {
-        return
-      }
-      const response = await ApiProvider.get('/api/application/timezone-offset', true)
-      dataStore().serverTimezoneOffset = response.ok ? parseInt(response.data) : null
     },
     toMainPage() {
       this.toPage('/')

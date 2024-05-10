@@ -53,7 +53,8 @@ const ru = {
       wrongSignalSamplesNumber: 'Количество отсчетов импортируемого сигнала должно быть не более {maxSamplesNumber}. В выбранном файле оно равно {samplesNumber}',
       noFolders: 'У вас нет папок',
       noData: 'Нет данных',
-      alreadySignedIn: 'Вход уже выполнен'
+      alreadySignedIn: 'Вход уже выполнен',
+      requiredRole: 'Требуется роль'
     },
     fields: {
       name: 'Имя',

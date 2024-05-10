@@ -53,7 +53,8 @@ const en = {
       wrongSignalSamplesNumber: 'Number of imported signal samples must be not greater than {maxSamplesNumber}. In selected file it is {samplesNumber}',
       noFolders: 'You have no folders',
       noData: 'No data',
-      alreadySignedIn: 'Already signed in'
+      alreadySignedIn: 'Already signed in',
+      requiredRole: 'Required role'
     },
     fields: {
       name: 'Name',
