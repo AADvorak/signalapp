@@ -1,7 +1,6 @@
 package link.signalapp.service;
 
 import link.signalapp.properties.ApplicationProperties;
-import link.signalapp.model.User;
 import link.signalapp.model.UserToken;
 import link.signalapp.repository.UserTokenRepository;
 import lombok.RequiredArgsConstructor;
