@@ -34,8 +34,6 @@ export default {
   },
   mounted() {
     this.localeUtils = useLocaleUtils(this.$i18n)
-    this.localeUtils.detectLocale()
-    this.localeUtils.makeChartLang()
   }
 }
 </script>

@@ -158,7 +158,9 @@ export default {
   mounted() {
     window.history.scrollRestoration = 'manual'
     this.setHeaderByRoute()
-    useLocaleUtils(this.$i18n).detectLocale()
+    const localeUtils = useLocaleUtils(this.$i18n)
+    localeUtils.detectLocale()
+    localeUtils.makeChartLang()
   },
   methods: {
     async signOut() {
