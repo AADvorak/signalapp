@@ -13,10 +13,6 @@ public class ServiceBase {
         return getUserDetailsFromContext().getUser();
     }
 
-    protected String getTokenFromContext() {
-        return getUserDetailsFromContext().getToken();
-    }
-
     protected SignalAppUserDetails getUserDetailsFromContext() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!(principal instanceof SignalAppUserDetails)) {

@@ -1,5 +1,6 @@
 package link.signalapp.service;
 
+import link.signalapp.model.UserTokenPK;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.captcha.RecaptchaVerifier;
 import link.signalapp.dto.request.*;
@@ -30,6 +31,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.mail.MessagingException;
+
+import java.time.LocalDateTime;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -189,7 +192,6 @@ public class UserServiceTest {
     public void logoutOk() {
         String token = createToken();
         fillSecurityContextHolder(data.user(), token);
-        when(userTokenRepository.deleteByToken(token)).thenReturn(1);
         assertDoesNotThrow(() -> userService.logout());
     }
 
@@ -383,7 +385,10 @@ public class UserServiceTest {
     }
 
     private void fillSecurityContextHolder(User user, String token) {
-        UserDetails userDetails = new SignalAppUserDetails(user).setToken(token);
+        UserToken userToken = new UserToken()
+                .setLastActionTime(LocalDateTime.now())
+                .setId(new UserTokenPK().setUser(user).setToken(token));
+        UserDetails userDetails = new SignalAppUserDetails(userToken);
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());

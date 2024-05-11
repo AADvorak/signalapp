@@ -36,7 +36,7 @@ public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenP
     @Query(value = """
             delete from user_token
             where user_id = :userId
-                and extract(epoch from (:currentTime - last_action_time)) > :userIdleTimeout
+                and (extract(epoch from (:currentTime - last_action_time)) > :userIdleTimeout or token = '')
             """, nativeQuery = true)
     int deleteOldTokens(
             @Param("userId") int userId,
@@ -46,9 +46,10 @@ public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenP
 
     @Modifying
     @Query(value = """
-            delete from user_token
+            update user_token
+            set token = ''
             where token = :token
             """, nativeQuery = true)
-    int deleteByToken(@Param("token") String token);
+    int clearByToken(@Param("token") String token);
 
 }

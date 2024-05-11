@@ -82,9 +82,7 @@ public class UserService extends ServiceBase {
 
     @Transactional
     public void logout() {
-        if (userTokenRepository.deleteByToken(getTokenFromContext()) == 0) {
-            throw new SignalAppUnauthorizedException();
-        }
+        userTokenRepository.clearByToken(getUserDetailsFromContext().getToken());
         SecurityContextHolder.clearContext();
     }
 

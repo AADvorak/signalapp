@@ -16,7 +16,7 @@ public class UserTokenService {
     private final UserTokenRepository userTokenRepository;
     private final ApplicationProperties applicationProperties;
 
-    public User getUserByToken(String token) {
+    public UserToken getActiveTokenAndRefreshLastActionTime(String token) {
         UserToken userToken = userTokenRepository.findActiveToken(token, LocalDateTime.now(),
                 applicationProperties.getUserIdleTimeout());
         if (userToken == null) {
@@ -25,6 +25,6 @@ public class UserTokenService {
             userToken.setLastActionTime(LocalDateTime.now());
             userTokenRepository.save(userToken);
         }
-        return userToken.getId().getUser();
+        return userToken;
     }
 }

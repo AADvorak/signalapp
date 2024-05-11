@@ -1,7 +1,7 @@
 package link.signalapp.security;
 
 import jakarta.servlet.http.Cookie;
-import link.signalapp.model.User;
+import link.signalapp.model.UserToken;
 import link.signalapp.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,9 +37,9 @@ public class TokenRequestFilter extends OncePerRequestFilter {
     }
 
     private void authorizeUser(String token) {
-        User user = userTokenService.getUserByToken(token);
-        if (user != null) {
-            UserDetails userDetails = new SignalAppUserDetails(user).setToken(token);
+        UserToken userToken = userTokenService.getActiveTokenAndRefreshLastActionTime(token);
+        if (userToken != null) {
+            UserDetails userDetails = new SignalAppUserDetails(userToken);
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                     new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());

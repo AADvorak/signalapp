@@ -1,6 +1,8 @@
 package link.signalapp.security;
 
+import link.signalapp.model.Role;
 import link.signalapp.model.User;
+import link.signalapp.model.UserToken;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -16,32 +18,40 @@ import java.util.List;
 @Accessors(chain = true)
 public class SignalAppUserDetails implements UserDetails {
 
-    private final User user;
-    private String token;
+    private final UserToken userToken;
     private final boolean accountNonExpired = true;
     private final boolean accountNonLocked = true;
     private final boolean credentialsNonExpired = true;
     private final boolean enabled = true;
 
-    public SignalAppUserDetails(User user) {
-        this.user = user;
+    public SignalAppUserDetails(UserToken userToken) {
+        this.userToken = userToken;
     }
 
     @Override
     public Collection<SimpleGrantedAuthority> getAuthorities() {
-        if (user.getRole() == null) {
+        Role role = userToken.getId().getUser().getRole();
+        if (role == null) {
             return Collections.emptyList();
         }
-        return List.of(new SimpleGrantedAuthority(user.getRole().getName()));
+        return List.of(new SimpleGrantedAuthority(role.getName()));
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return userToken.getId().getUser().getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return userToken.getId().getUser().getEmail();
+    }
+
+    public User getUser() {
+        return userToken.getId().getUser();
+    }
+
+    public String getToken() {
+        return userToken.getId().getToken();
     }
 }
