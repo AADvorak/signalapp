@@ -193,7 +193,7 @@ import SelectProcessor from "~/components/processor-selection/select-processor.v
 import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue";
 import DoubleProcessorDialog from "~/components/processor-selection/double-processor-dialog.vue";
 import SingleProcessorDialog from "~/components/processor-selection/single-processor-dialog.vue";
-import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
+import pagination, {PaginationParamLocations} from "~/mixins/pagination";
 import {userStore} from "~/stores/user-store";
 import {appSettingsStore} from "~/stores/app-settings-store";
 
@@ -206,8 +206,7 @@ export default {
   },
   extends: PageBase,
   mixins: [
-    formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving,
-    paginationUrlParams
+    formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving, pagination
   ],
   data: () => ({
     additionalPaginationParamsConfig: [
@@ -215,13 +214,15 @@ export default {
         name: 'folderIds',
         location: PaginationParamLocations.FORM,
         readFunc: parseInt,
-        isArray: true
+        isArray: true,
+        emptyValue: []
       },
       {
         name: 'sampleRates',
         location: PaginationParamLocations.FORM,
         readFunc: parseFloat,
-        isArray: true
+        isArray: true,
+        emptyValue: []
       }
     ],
     mounted: false,
@@ -230,15 +231,7 @@ export default {
     sampleRates: [],
     signals: [],
     selectedIds: [],
-    signalsLastLoadFilter: '',
     signalsEmpty: false,
-    elements: 0,
-    pages: 0,
-    page: 1,
-    sort: {
-      by: '',
-      dir: ''
-    },
     playedSignal: null,
     mdi: {
       mdiDelete,
@@ -323,27 +316,7 @@ export default {
     },
     folders() {
       return userStore().folders
-    },
-    filterIsEmpty() {
-      return !this.formValues.search && !this.formValues.sampleRates.length && !this.formValues.folderIds.length
     }
-  },
-  watch: {
-    page() {
-      this.setUrlParams()
-      this.loadSignals()
-    },
-    formValues() {
-      this.actionWithTimeout(() => {
-        if (!this.validatePageSize()) {
-          return
-        }
-        this.page = 1
-        this.saveFormValues()
-        this.setUrlParams()
-        this.loadSignals()
-      })
-    },
   },
   mounted() {
     this.mounted = true
@@ -354,40 +327,14 @@ export default {
     this.setUrlParams()
     this.loadSampleRates()
     this.loadFolders()
-    this.actionWithTimeout(() => this.loadSignals())
+    this.actionWithTimeout(this.loadDataPage)
   },
   beforeUnmount() {
     this.mounted = false
   },
   methods: {
-    validatePageSize() {
-      this.clearValidation()
-      const validationMsg = this.getNumberValidationMsg('pageSize')
-      if (validationMsg) {
-        this.pushValidationMsg('pageSize', validationMsg)
-      }
-      return !validationMsg
-    },
-    async loadSignals() {
-      const filter = this.makeSignalFilter()
-      const filterJson = JSON.stringify(filter)
-      if (!this.mounted || this.loadingOverlay
-          || this.signalsLastLoadFilter === filterJson
-          || !this.validatePageSize()) {
-        return
-      }
-      await this.loadWithOverlay(async () => {
-        const response = await this.getApiProvider().postJson('/api/signals/filter', filter)
-        if (response.ok) {
-          this.signals = response.data.data
-          this.elements = response.data.elements
-          this.pages = response.data.pages
-          this.signalsEmpty = this.elements === 0
-          this.signalsLastLoadFilter = filterJson
-        } else {
-          this.showErrorsFromResponse(response, this._t('loadSignalsError'))
-        }
-      })
+    async loadDataPage() {
+      await this.loadDataPageBase('signals', '/api/signals/filter')
     },
     async loadSignalData(signal) {
       if (signal.data) {
@@ -421,33 +368,6 @@ export default {
         return
       }
       useRouter().push(`/signal-manager${this.makeUrlParams()}`)
-    },
-    makeSignalFilter() {
-      const filter = {
-        page: this.page - 1,
-        size: this.formValue('pageSize')
-      }
-      if (this.formValues.search) {
-        filter.search = this.formValues.search
-      }
-      if (this.formValues.folderIds.length) {
-        filter.folderIds = this.formValues.folderIds
-      }
-      if (this.formValues.sampleRates.length) {
-        filter.sampleRates = this.formValues.sampleRates
-      }
-      if (this.sort.by) {
-        filter.sortBy = this.sort.by
-      }
-      if (this.sort.dir) {
-        filter.sortDir = this.sort.dir
-      }
-      return filter
-    },
-    clearFilter() {
-      this.formValue('search', '')
-      this.formValue('folderIds', [])
-      this.formValue('sampleRates', [])
     },
     openSignal(signal) {
       signalStore().clearHistoryForSignal(signal.id)
@@ -483,8 +403,8 @@ export default {
     async deleteSignal(signal) {
       let response = await this.deleteSignalRequest(signal)
       if (response.ok) {
-        this.signalsLastLoadFilter = ''
-        await this.loadSignals()
+        this.dataPageLastLoadFilter = ''
+        await this.loadDataPage()
       }
     },
     askConfirmDeleteSelectedSignals() {
@@ -499,8 +419,8 @@ export default {
       let promiseArr = []
       this.selectedSignals.forEach(signal => promiseArr.push(this.deleteSignalRequest(signal)))
       await Promise.all(promiseArr)
-      this.signalsLastLoadFilter = ''
-      await this.loadSignals()
+      this.dataPageLastLoadFilter = ''
+      await this.loadDataPage()
     },
     deleteSignalRequest(signal) {
       return this.getApiProvider().del('/api/signals/' + signal.id)
@@ -514,8 +434,8 @@ export default {
     },
     onSignalFoldersChanged() {
       if (this.formValues.folderIds.length) {
-        this.signalsLastLoadFilter = ''
-        this.loadSignals()
+        this.dataPageLastLoadFilter = ''
+        this.loadDataPage()
       }
     },
     onTableButtonClick({button, item}) {
@@ -534,12 +454,6 @@ export default {
     },
     onTableSelect(selectedIds) {
       this.selectedIds = selectedIds
-    },
-    onTableSort(sort) {
-      this.sort = sort
-      this.page = 1
-      this.setUrlParams()
-      this.loadSignals()
     },
     reduceFractionDigitsByValue(value) {
       return NumberUtils.reduceFractionDigitsByValue(value)

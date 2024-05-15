@@ -92,7 +92,7 @@ import formValidation from "~/mixins/form-validation";
 import formValuesSaving from "~/mixins/form-values-saving";
 import actionWithTimeout from "~/mixins/action-with-timeout";
 import uiParamsSaving from "~/mixins/ui-params-saving";
-import paginationUrlParams, {PaginationParamLocations} from "~/mixins/pagination-url-params";
+import pagination, {PaginationParamLocations} from "~/mixins/pagination";
 import {roleStore} from "~/stores/role-store";
 import {userStore} from "~/stores/user-store";
 import {DateTimeUtils} from "~/utils/date-time-utils";
@@ -110,7 +110,7 @@ export default {
   extends: PageBase,
   mixins: [
     formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving,
-    paginationUrlParams, requiredRoleMsg
+    pagination, requiredRoleMsg
   ],
   data: () => ({
     additionalPaginationParamsConfig: [
@@ -118,7 +118,8 @@ export default {
         name: 'roleIds',
         location: PaginationParamLocations.FORM,
         readFunc: parseInt,
-        isArray: true
+        isArray: true,
+        emptyValue: []
       }
     ],
     mounted: false,
@@ -159,16 +160,8 @@ export default {
         }
       ],
     },
-    elements: 0,
-    pages: 0,
-    page: 1,
     users: [],
     usersEmpty: false,
-    usersLastLoadFilter: '',
-    sort: {
-      by: '',
-      dir: ''
-    },
     uiParams: {
       openedPanels: []
     },
@@ -177,32 +170,12 @@ export default {
     }
   }),
   computed: {
-    filterIsEmpty() {
-      return !this.formValues.search && !this.formValues.roleIds.length
-    },
     reservedHeight() {
       return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 410 : 254
     },
     roles() {
       return roleStore().roles.map(role => ({...role, localeName: this.$t(`userRoles.${role.name}`)}))
     }
-  },
-  watch: {
-    page() {
-      this.setUrlParams()
-      this.loadUsers()
-    },
-    formValues() {
-      this.actionWithTimeout(() => {
-        if (!this.validatePageSize()) {
-          return
-        }
-        this.page = 1
-        this.saveFormValues()
-        this.setUrlParams()
-        this.loadUsers()
-      })
-    },
   },
   mounted() {
     this.mounted = true
@@ -213,21 +186,13 @@ export default {
     this.loadRoles()
     this.actionWithTimeout(() => {
       this.requiredRoleMsg(Roles.ADMIN)
-      this.loadUsers()
+      this.loadDataPage()
     })
   },
   beforeUnmount() {
     this.mounted = false
   },
   methods: {
-    validatePageSize() {
-      this.clearValidation()
-      const validationMsg = this.getNumberValidationMsg('pageSize')
-      if (validationMsg) {
-        this.pushValidationMsg('pageSize', validationMsg)
-      }
-      return !validationMsg
-    },
     async loadRoles() {
       if (!userStore().checkUserRole(Roles.ADMIN)) {
         return
@@ -237,27 +202,8 @@ export default {
         roleStore().roles = response.data
       }
     },
-    async loadUsers() {
-      const filter = this.makeUserFilter()
-      const filterJson = JSON.stringify(filter)
-      if (!this.mounted || this.loadingOverlay
-          || this.usersLastLoadFilter === filterJson
-          || !this.validatePageSize()
-          || !userStore().checkUserRole(Roles.ADMIN)) {
-        return
-      }
-      await this.loadWithOverlay(async () => {
-        const response = await this.getApiProvider().postJson('/api/admin/users/filter', filter)
-        if (response.ok) {
-          this.users = response.data.data
-          this.elements = response.data.elements
-          this.pages = response.data.pages
-          this.usersEmpty = this.elements === 0
-          this.usersLastLoadFilter = filterJson
-        } else {
-          this.showErrorsFromResponse(response)
-        }
-      })
+    async loadDataPage() {
+      await this.loadDataPageBase('users', '/api/admin/users/filter', Roles.ADMIN)
     },
     setUrlParams() {
       if (!this.mounted) {
@@ -265,44 +211,15 @@ export default {
       }
       useRouter().push(`/admin-users${this.makeUrlParams()}`)
     },
-    makeUserFilter() {
-      const filter = {
-        page: this.page - 1,
-        size: this.formValue('pageSize')
-      }
-      if (this.formValues.search) {
-        filter.search = this.formValues.search
-      }
-      if (this.formValues.roleIds.length) {
-        filter.roleIds = this.formValues.roleIds
-      }
-      if (this.sort.by) {
-        filter.sortBy = this.sort.by
-      }
-      if (this.sort.dir) {
-        filter.sortDir = this.sort.dir
-      }
-      return filter
-    },
-    clearFilter() {
-      this.formValue('search', '')
-      this.formValue('roleIds', [])
-    },
     onTableButtonClick({button, item}) {
       if (button === 'delete') {
         this.askConfirmDeleteUser(item)
       }
     },
-    onTableSort(sort) {
-      this.sort = sort
-      this.page = 1
-      this.setUrlParams()
-      this.loadUsers()
-    },
     onTableChange(component) {
       if (component === USER_ROLE_MENU_COMPONENT) {
-        this.usersLastLoadFilter = ''
-        this.loadUsers()
+        this.dataPageLastLoadFilter = ''
+        this.loadDataPage()
       }
     },
     askConfirmDeleteUser(user) {
@@ -316,8 +233,8 @@ export default {
     async deleteUser(user) {
       let response = await this.getApiProvider().del(`/api/admin/users/${user.id}`)
       if (response.ok) {
-        this.usersLastLoadFilter = ''
-        await this.loadUsers()
+        this.dataPageLastLoadFilter = ''
+        await this.loadDataPage()
       }
     },
   }
