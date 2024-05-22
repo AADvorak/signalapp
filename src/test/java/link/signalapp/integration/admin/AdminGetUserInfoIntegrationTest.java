@@ -1,6 +1,7 @@
 package link.signalapp.integration.admin;
 
 import link.signalapp.dto.response.UserDtoResponse;
+import link.signalapp.model.Role;
 import link.signalapp.model.Signal;
 import link.signalapp.model.User;
 import link.signalapp.model.UserToken;
@@ -46,7 +47,7 @@ public class AdminGetUserInfoIntegrationTest extends AdminIntegrationTestBase {
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody()).getData().get(0);
         User user = userRepository.findByEmail(email1);
         UserToken userToken = userTokenRepository.findLastByUserId(user.getId());
-        assertNotNull(user.getRole());
+        assertNotNull(user.getRoles());
         assertAll(
                 () -> assertEquals(user.getId(), userDtoResponse.getId()),
                 () -> assertEquals(user.getEmail(), userDtoResponse.getEmail()),
@@ -57,7 +58,7 @@ public class AdminGetUserInfoIntegrationTest extends AdminIntegrationTestBase {
                 () -> assertEquals(0, userDtoResponse.getStoredSignalsNumber()),
                 () -> assertEquals(user.getCreateTime(), userDtoResponse.getCreateTime()),
                 () -> assertEquals(userToken.getLastActionTime(), userDtoResponse.getLastActionTime()),
-                () -> assertEquals(getAdminRole().getId(), userDtoResponse.getRole().getId())
+                () -> assertTrue(userHasRole(getAdminRole(), userDtoResponse))
         );
     }
 
@@ -78,7 +79,7 @@ public class AdminGetUserInfoIntegrationTest extends AdminIntegrationTestBase {
                 () -> assertEquals(SECOND_USER_SIGNALS_NUMBER, userDtoResponse.getStoredSignalsNumber()),
                 () -> assertEquals(user.getCreateTime(), userDtoResponse.getCreateTime()),
                 () -> assertEquals(userToken.getLastActionTime(), userDtoResponse.getLastActionTime()),
-                () -> assertNull(user.getRole())
+                () -> assertFalse(userHasRole(getAdminRole(), userDtoResponse))
         );
     }
 
@@ -93,5 +94,9 @@ public class AdminGetUserInfoIntegrationTest extends AdminIntegrationTestBase {
                     .setMaxAbsY(BigDecimal.ONE)
                     .setUserId(userId));
         }
+    }
+
+    private boolean userHasRole(Role role, UserDtoResponse user) {
+        return user.getRoles().stream().anyMatch(roleDtoResponse -> roleDtoResponse.getId() == role.getId());
     }
 }

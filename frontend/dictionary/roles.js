@@ -1,3 +1,4 @@
 export const Roles = {
-  ADMIN: 'ADMIN'
+  ADMIN: 'ADMIN',
+  EXTENDED_STORAGE: 'EXTENDED_STORAGE'
 }

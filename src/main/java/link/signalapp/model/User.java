@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -40,8 +41,12 @@ public class User {
     @Column
     private LocalDateTime createTime = LocalDateTime.now();
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_in_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
 
 }

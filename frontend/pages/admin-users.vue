@@ -142,7 +142,7 @@ export default {
         {name: 'createTime', formatter: DateTimeUtils.getLocalDateLocaleString},
         {name: 'lastActionTime', formatter: DateTimeUtils.getLocalDateLocaleString},
         'storedSignalsNumber',
-        {name: 'role', valuePath: 'role.name', localeKeyGetter: value => `userRoles.${value}`},
+        {name: 'roles', valuePath: 'name', localeKeyGetter: value => `userRoles.${value}`, isArray: true},
       ],
       buttons: [
         {

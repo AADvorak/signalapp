@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,7 +28,7 @@ public class UserDtoResponse {
 
     private LocalDateTime lastActionTime;
 
-    private RoleDtoResponse role;
+    private Set<RoleDtoResponse> roles;
 
     private int storedSignalsNumber;
 

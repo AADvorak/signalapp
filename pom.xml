@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.4</version>
+        <version>3.1.11</version>
         <relativePath/>
     </parent>
     <groupId>link.signalapp</groupId>
@@ -18,7 +18,7 @@
         <java.version>17</java.version>
         <org.projectlombok.version>1.18.20</org.projectlombok.version>
         <org.mapstruct.version>1.5.1.Final</org.mapstruct.version>
-        <spring-boot-starter.version>3.1.4</spring-boot-starter.version>
+        <spring-boot-starter.version>3.1.11</spring-boot-starter.version>
     </properties>
 
     <dependencies>

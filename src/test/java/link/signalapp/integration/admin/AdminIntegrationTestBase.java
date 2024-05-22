@@ -9,6 +9,8 @@ import link.signalapp.model.User;
 import link.signalapp.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Set;
+
 public class AdminIntegrationTestBase extends IntegrationTestBase {
 
     protected static final String FILTER_USERS_URL = "/api/admin/users/filter";
@@ -19,9 +21,12 @@ public class AdminIntegrationTestBase extends IntegrationTestBase {
     protected RoleRepository roleRepository;
 
     protected void giveAdminRoleToUser(String email) {
+        giveRoleToUser(email, getAdminRole());
+    }
+
+    protected void giveRoleToUser(String email, Role role) {
         User user = userRepository.findByEmail(email);
-        Role adminRole = getAdminRole();
-        user.setRole(adminRole);
+        user.setRoles(Set.of(role));
         userRepository.save(user);
     }
 

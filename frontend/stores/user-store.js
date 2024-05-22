@@ -37,8 +37,8 @@ export const userStore = defineStore('userStore', {
       this.userInfo = undefined
       this.folders = []
     },
-    checkUserRole(role) {
-      return this.userInfo?.role?.name === role
+    checkUserRole(roleName) {
+      return this.userInfo?.roles?.map(role => role.name).includes(roleName)
     }
   },
 })

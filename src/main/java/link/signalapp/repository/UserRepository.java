@@ -17,14 +17,22 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 
     User findByEmailAndEmailConfirmedTrue(String email);
 
+    /**
+     * This method doesn't work, select count query is generated incorrectly
+     * It is replaced by JDBC implementation
+     */
     @Query(value = """
-            select * from "user"
+            select u.*
+            from "user" u
             where true
-                and (:search = '' or upper(first_name) like upper(:search)
-                    or upper(last_name) like upper(:search)
-                    or upper(patronymic) like upper(:search)
-                    or upper(email) like upper(:search))
-                and (0 in :roleIds or role_id in :roleIds)
+                and (:search = '' or upper(u.first_name) like upper(:search)
+                    or upper(u.last_name) like upper(:search)
+                    or upper(u.patronymic) like upper(:search)
+                    or upper(u.email) like upper(:search))
+                and (0 in :roleIds or exists(
+                    select 1
+                    from user_in_role uir
+                    where uir.user_id = u.id and uir.role_id in :roleIds))
             """, nativeQuery = true)
     Page<User> findByFilter(
             @Param("search") String search,

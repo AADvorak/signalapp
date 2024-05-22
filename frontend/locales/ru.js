@@ -72,7 +72,7 @@ const ru = {
       sampleRate: 'Частота дискретизации',
       createTime: 'Время создания',
       lastActionTime: 'Время последнего действия',
-      role: 'Роль',
+      roles: 'Роли',
       storedSignalsNumber: 'Количество сохраненных сигналов'
     },
     pagination: {
@@ -370,7 +370,8 @@ const ru = {
     resetZoom: 'Сбросить увеличение'
   },
   userRoles: {
-    'ADMIN': 'Админ'
+    'ADMIN': 'Админ',
+    'EXTENDED_STORAGE': 'Расширенное хранилище'
   }
 }
 

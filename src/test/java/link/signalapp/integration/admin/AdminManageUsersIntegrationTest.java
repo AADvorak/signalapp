@@ -45,7 +45,7 @@ public class AdminManageUsersIntegrationTest extends AdminIntegrationTestBase {
         giveAdminRoleToUser(email2);
         ResponseEntity<Void> response = template.exchange(fullUrl(userRolePath(secondUserId(), getAdminRole().getId())),
                 HttpMethod.DELETE, new HttpEntity<>(login(email1)), Void.class);
-        Role deletedRole = userRepository.findByEmail(email2).getRole();
+        Role deletedRole = findUserRoleByRoleId(userRepository.findByEmail(email2), getAdminRole().getId());
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertNull(deletedRole)
@@ -69,7 +69,7 @@ public class AdminManageUsersIntegrationTest extends AdminIntegrationTestBase {
         int roleId = getAdminRole().getId();
         ResponseEntity<Void> response = template.exchange(fullUrl(userRolePath(secondUserId(), roleId)),
                 HttpMethod.PUT, new HttpEntity<>(login(email1)), Void.class);
-        Role userRole = userRepository.findByEmail(email2).getRole();
+        Role userRole = findUserRoleByRoleId(userRepository.findByEmail(email2), roleId);
         assertNotNull(userRole);
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
@@ -105,6 +105,10 @@ public class AdminManageUsersIntegrationTest extends AdminIntegrationTestBase {
                 .map(Role::getId)
                 .max(Comparator.naturalOrder())
                 .orElse(0) + 1;
+    }
+
+    private Role findUserRoleByRoleId(User user, int roleId) {
+        return user.getRoles().stream().filter(role -> role.getId() == roleId).findFirst().orElse(null);
     }
 
     private String userRolePath(int userId, int roleId) {

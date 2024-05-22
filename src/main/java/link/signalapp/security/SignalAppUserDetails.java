@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -30,11 +30,11 @@ public class SignalAppUserDetails implements UserDetails {
 
     @Override
     public Collection<SimpleGrantedAuthority> getAuthorities() {
-        Role role = userToken.getId().getUser().getRole();
-        if (role == null) {
+        Set<Role> roles = userToken.getId().getUser().getRoles();
+        if (roles == null) {
             return Collections.emptyList();
         }
-        return List.of(new SimpleGrantedAuthority(role.getName()));
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList();
     }
 
     @Override

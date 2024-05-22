@@ -72,7 +72,7 @@ const pl = {
       sampleRate: 'Częstotliwość próbkowania',
       createTime: 'Czas stworzenia',
       lastActionTime: 'Czas ostatniej akcji',
-      role: 'Rola',
+      roles: 'Roli',
       storedSignalsNumber: 'Liczba przechowywanych sygnałów'
     },
     pagination: {
@@ -370,7 +370,8 @@ const pl = {
     resetZoom: 'Zresetuj zoom'
   },
   userRoles: {
-    'ADMIN': 'Admin'
+    'ADMIN': 'Admin',
+    'EXTENDED_STORAGE': 'Rozszerzone przechowywanie'
   }
 }
 

@@ -236,6 +236,17 @@ export default {
       return column
     },
     columnValue(column, item) {
+      if (column.isArray) {
+        let allValues = ''
+        for (const arrayItem of item[this.columnName(column)]) {
+          const value = this.getValueFromObject(column, arrayItem)
+          allValues += (allValues ? ', ' : '') + value
+        }
+        return allValues
+      }
+      return this.getValueFromObject(column, item)
+    },
+    getValueFromObject(column, item) {
       const value = this.extractColumnValue(column, item)
       if (value !== undefined && value !== null && typeof column !== 'string') {
         if (column.localeKeyGetter) {
