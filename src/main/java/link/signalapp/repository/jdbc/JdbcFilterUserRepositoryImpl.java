@@ -64,9 +64,7 @@ public class JdbcFilterUserRepositoryImpl implements FilterUserRepository {
 
     public JdbcFilterUserRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        queryExecutor = new JdbcFilteringQueryExecutor<>(
-                USER_ROW_MAPPER, jdbcTemplate
-        );
+        queryExecutor = new JdbcFilteringQueryExecutor<>(USER_ROW_MAPPER, jdbcTemplate);
         queryBuilder = new JdbcFilteringQueryBuilder(USERS_QUERY, Map.of(
                 "search", USERS_QUERY_SEARCH_CONDITION,
                 "roleIds", USERS_QUERY_ROLE_IDS_CONDITION

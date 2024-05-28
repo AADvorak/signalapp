@@ -16,6 +16,7 @@ import link.signalapp.file.FileManager;
 import link.signalapp.mapper.SignalMapper;
 import link.signalapp.model.Signal;
 import link.signalapp.properties.ApplicationProperties;
+import link.signalapp.repository.FilterSignalRepository;
 import link.signalapp.repository.SignalRepository;
 import link.signalapp.service.utils.FilterUtils;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class SignalService extends ServiceBase {
     private static final List<String> AVAILABLE_SORT_FIELDS = List.of("name", "description", "sampleRate");
 
     private final SignalRepository signalRepository;
+    private final FilterSignalRepository filterSignalRepository;
     private final FileManager fileManager;
     private final ApplicationProperties applicationProperties;
     private final FilterUtils filterUtils = new FilterUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
@@ -47,9 +49,8 @@ public class SignalService extends ServiceBase {
         int userId = getUserFromContext().getId();
         Pageable pageable = filterUtils.getPageable(filter, applicationProperties.getMaxPageSize());
         String search = filterUtils.getSearch(filter);
-        Page<Signal> signalPage = signalRepository.findByUserIdAndFilter(userId, search,
-                filterUtils.listWithDefaultValue(filter.getSampleRates(), BigDecimal.ZERO),
-                filterUtils.listWithDefaultValue(filter.getFolderIds(), 0), pageable);
+        Page<Signal> signalPage = filterSignalRepository.findByUserIdAndFilter(userId, search,
+                filter.getSampleRates(), filter.getFolderIds(), pageable);
         return new ResponseWithTotalCounts<SignalDtoResponse>()
                 .setData(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList())
                 .setPages(signalPage.getTotalPages())

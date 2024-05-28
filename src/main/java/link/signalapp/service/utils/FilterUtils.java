@@ -25,10 +25,6 @@ public class FilterUtils {
         return filter.getSearch() == null || filter.getSearch().isEmpty() ? "" : "%" + filter.getSearch() + "%";
     }
 
-    public <T> List<T> listWithDefaultValue(List<T> list, T defaultValue) {
-        return list == null || list.isEmpty() ? List.of(defaultValue) : list;
-    }
-
     private Sort getSort(FilterDto filter) {
         Sort sort = Sort.by(camelToSnake(getSortByOrDefault(filter.getSortBy())));
         return "asc".equals(filter.getSortDir()) ? sort : sort.descending();

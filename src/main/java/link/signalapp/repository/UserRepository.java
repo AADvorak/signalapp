@@ -21,6 +21,7 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
      * This method doesn't work, select count query is generated incorrectly
      * It is replaced by JDBC implementation
      */
+    @Deprecated
     @Query(value = """
             select u.*
             from "user" u

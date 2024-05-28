@@ -37,6 +37,10 @@ public interface SignalRepository extends PagingAndSortingRepository<Signal, Int
             """, nativeQuery = true)
     List<BigDecimal> sampleRatesByUserId(@Param("userId") int userId);
 
+    /**
+     * replaced by JDBC implementation
+     */
+    @Deprecated
     @Query(value = """
             select s.*
             from signal s
