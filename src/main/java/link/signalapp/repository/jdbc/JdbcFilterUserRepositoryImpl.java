@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,14 +21,18 @@ public class JdbcFilterUserRepositoryImpl implements FilterUserRepository {
             select {}
             from "user" u
             where true
-                and (:search = '' or upper(u.first_name) like upper(:search)
+            """;
+    private static final String USERS_QUERY_SEARCH_CONDITION = """
+                and (upper(u.first_name) like upper(:search)
                     or upper(u.last_name) like upper(:search)
                     or upper(u.patronymic) like upper(:search)
                     or upper(u.email) like upper(:search))
-                and (0 in (:roleIds) or exists(
+            """;
+    private static final String USERS_QUERY_ROLE_IDS_CONDITION = """
+                and exists(
                     select 1
                     from user_in_role uir
-                    where uir.user_id = u.id and uir.role_id in (:roleIds)))
+                    where uir.user_id = u.id and uir.role_id in (:roleIds))
             """;
 
     private static final String ROLES_QUERY = """
@@ -54,22 +59,25 @@ public class JdbcFilterUserRepositoryImpl implements FilterUserRepository {
                     .setName(rs.getString("name"));
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final JdbcFilteringQueryExecutor<User> filteringQueryExecutor;
+    private final JdbcFilteringQueryExecutor<User> queryExecutor;
+    private final JdbcFilteringQueryBuilder queryBuilder;
 
     public JdbcFilterUserRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        filteringQueryExecutor = new JdbcFilteringQueryExecutor<>(
-                USERS_QUERY, USER_ROW_MAPPER, jdbcTemplate
+        queryExecutor = new JdbcFilteringQueryExecutor<>(
+                USER_ROW_MAPPER, jdbcTemplate
         );
+        queryBuilder = new JdbcFilteringQueryBuilder(USERS_QUERY, Map.of(
+                "search", USERS_QUERY_SEARCH_CONDITION,
+                "roleIds", USERS_QUERY_ROLE_IDS_CONDITION
+        ));
     }
 
     @Override
     public Page<User> findByFilter(String search, List<Integer> roleIds, Pageable pageable) {
-        Map<String, Object> params = Map.of(
-                "search", search,
-                "roleIds", roleIds
-        );
-        Page<User> userPage = filteringQueryExecutor.execute(params, pageable);
+        Map<String, Object> params = makeParams(search, roleIds);
+        String query = queryBuilder.build(params);
+        Page<User> userPage = queryExecutor.execute(query, params, pageable);
         userPage.stream().forEach(this::fetchRoles);
         return userPage;
     }
@@ -77,5 +85,12 @@ public class JdbcFilterUserRepositoryImpl implements FilterUserRepository {
     private void fetchRoles(User user) {
         Map<String, Object> params = Map.of("userId", user.getId());
         user.setRoles(new HashSet<>(jdbcTemplate.query(ROLES_QUERY, params, ROLE_ROW_MAPPER)));
+    }
+
+    private Map<String, Object> makeParams(String search, List<Integer> roleIds) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("search", search);
+        params.put("roleIds", roleIds);
+        return params;
     }
 }

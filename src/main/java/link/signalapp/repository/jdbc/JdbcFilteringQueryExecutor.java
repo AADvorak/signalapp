@@ -13,28 +13,27 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JdbcFilteringQueryExecutor<T> {
 
-    private final String queryTemplate;
     private final RowMapper<T> rowMapper;
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public Page<T> execute(Map<String, Object> parameters, Pageable pageable) {
-        List<T> result = jdbcTemplate.query(makeResultQuery(pageable), parameters, rowMapper);
+    public Page<T> execute(String queryTemplate, Map<String, Object> parameters, Pageable pageable) {
+        List<T> result = jdbcTemplate.query(makeResultQuery(queryTemplate, pageable), parameters, rowMapper);
         if (result.isEmpty()) {
             return Page.empty(pageable);
         }
         if (pageable.getPageNumber() == 0 && pageable.getPageSize() > result.size()) {
             return new PageImpl<>(result);
         }
-        Long total = jdbcTemplate.queryForObject(makeCountQuery(), parameters, Long.class);
+        Long total = jdbcTemplate.queryForObject(makeCountQuery(queryTemplate), parameters, Long.class);
         return new PageImpl<>(result, pageable, total != null ? total : 0L);
     }
 
-    private String makeResultQuery(Pageable pageable) {
+    private String makeResultQuery(String queryTemplate, Pageable pageable) {
         return queryTemplate.replace("{}", "*")
                 + makeOrderByQuery(pageable) + makeLimitQuery(pageable);
     }
 
-    private String makeCountQuery() {
+    private String makeCountQuery(String queryTemplate) {
         return queryTemplate.replace("{}", "count(1)");
     }
 

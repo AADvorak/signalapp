@@ -42,8 +42,7 @@ public class AdminUserService {
     public ResponseWithTotalCounts<UserDtoResponse> filter(UserFilterDto filter) {
         Pageable pageable = filterUtils.getPageable(filter, applicationProperties.getMaxPageSize());
         String search = filterUtils.getSearch(filter);
-        Page<User> users = filterUserRepository.findByFilter(search,
-                filterUtils.listWithDefaultValue(filter.getRoleIds(), 0), pageable);
+        Page<User> users = filterUserRepository.findByFilter(search, filter.getRoleIds(), pageable);
         ResponseWithTotalCounts<UserDtoResponse> responseWithTotalCounts
                 = new ResponseWithTotalCounts<UserDtoResponse>()
                 .setData(users.stream().map(UserMapper.INSTANCE::userToDto).toList())
