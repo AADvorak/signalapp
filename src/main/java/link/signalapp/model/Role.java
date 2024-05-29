@@ -13,6 +13,9 @@ import lombok.experimental.Accessors;
 @Entity
 public class Role {
 
+    public static final String ADMIN = "ADMIN";
+    public static final String EXTENDED_STORAGE = "EXTENDED_STORAGE";
+
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)

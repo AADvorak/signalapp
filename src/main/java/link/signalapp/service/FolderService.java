@@ -11,6 +11,7 @@ import link.signalapp.error.params.MaxNumberExceptionParams;
 import link.signalapp.file.FileManager;
 import link.signalapp.mapper.FolderMapper;
 import link.signalapp.model.Folder;
+import link.signalapp.model.Role;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.FolderRepository;
 import link.signalapp.repository.SignalRepository;
@@ -37,7 +38,7 @@ public class FolderService extends ServiceBase {
 
     public FolderDtoResponse add(FolderDtoRequest request) {
         int userId = getUserFromContext().getId();
-        int maxUserFoldersNumber = applicationProperties.getLimits().getMaxUserFoldersNumber();
+        int maxUserFoldersNumber = getMaxUserFoldersNumber();
         if (folderRepository.countByUserId(userId) >= maxUserFoldersNumber) {
             throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_FOLDERS_CREATED,
                     new MaxNumberExceptionParams(maxUserFoldersNumber));
@@ -75,5 +76,12 @@ public class FolderService extends ServiceBase {
             signalRepository.deleteByIdAndUserId(signalId, userId);
             fileManager.deleteSignalData(userId, signalId);
         } catch (Exception ignore) {}
+    }
+
+    private int getMaxUserFoldersNumber() {
+        int maxUserFoldersNumber = applicationProperties.getLimits().getMaxUserFoldersNumber();
+        return checkUserHasRole(Role.EXTENDED_STORAGE)
+                ? maxUserFoldersNumber * applicationProperties.getLimits().getExtendedStorageMultiplier()
+                : maxUserFoldersNumber;
     }
 }

@@ -10,6 +10,7 @@ application:
         max-signal-length: 1024000
         max-user-signals-number: 50
         max-user-folders-number: 10
+        extended-storage-multiplier: 5
 mailing:
     password: ${MAILING_PASSWORD}
     smtp-port: ${MAILING_SMTP_PORT}

@@ -14,6 +14,7 @@ import link.signalapp.error.params.MaxNumberExceptionParams;
 import link.signalapp.error.params.MaxSizeExceptionParams;
 import link.signalapp.file.FileManager;
 import link.signalapp.mapper.SignalMapper;
+import link.signalapp.model.Role;
 import link.signalapp.model.Signal;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.FilterSignalRepository;
@@ -113,11 +114,18 @@ public class SignalService extends ServiceBase {
     }
 
     private void checkStoredByUserSignalsNumber(int userId) {
-        int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber();
+        int maxUserSignalsNumber = getMaxUserSignalsNumber();
         if (signalRepository.countByUserId(userId) >= maxUserSignalsNumber) {
             throw new SignalAppConflictException(SignalAppErrorCode.TOO_MANY_SIGNALS_STORED,
                     new MaxNumberExceptionParams(maxUserSignalsNumber));
         }
+    }
+
+    private int getMaxUserSignalsNumber() {
+        int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber();
+        return checkUserHasRole(Role.EXTENDED_STORAGE)
+                ? maxUserSignalsNumber * applicationProperties.getLimits().getExtendedStorageMultiplier()
+                : maxUserSignalsNumber;
     }
 
     private void checkAudioData(byte[] data) throws UnsupportedAudioFileException, IOException {

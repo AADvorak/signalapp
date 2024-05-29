@@ -15,4 +15,6 @@ public class ApplicationLimits {
 
     private int maxUserFoldersNumber;
 
+    private int extendedStorageMultiplier;
+
 }
