@@ -1,10 +1,13 @@
 package link.signalapp.integration;
 
+import link.signalapp.model.Role;
+import link.signalapp.model.User;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.dto.request.LoginDtoRequest;
 import link.signalapp.dto.request.UserDtoRequest;
 import link.signalapp.dto.response.ErrorDtoResponse;
 import link.signalapp.dto.response.FieldErrorDtoResponse;
+import link.signalapp.repository.RoleRepository;
 import link.signalapp.repository.UserRepository;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,6 +34,8 @@ public class IntegrationTestBase {
 
     @Autowired
     protected UserRepository userRepository;
+    @Autowired
+    protected RoleRepository roleRepository;
 
     protected static final String BASE_URL = "http://localhost:";
     protected static final String SESSIONS_URL = "/api/sessions";
@@ -65,6 +71,18 @@ public class IntegrationTestBase {
                 .setLastName("Last")
                 .setPatronymic("Patronymic")
                 .setPassword(password);
+    }
+
+    protected void giveRoleToUser(String email, Role role) {
+        User user = userRepository.findByEmail(email);
+        user.setRoles(Set.of(role));
+        userRepository.save(user);
+    }
+
+    protected Role getRoleByName(String name) {
+        return roleRepository.findAll().stream()
+                .filter(role -> name.equals(role.getName()))
+                .findAny().orElseThrow();
     }
 
     protected void checkBadRequestFieldError(Executable executable, String expectedErrorCode, String expectedErrorField) {

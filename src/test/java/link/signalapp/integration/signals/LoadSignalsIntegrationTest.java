@@ -5,9 +5,9 @@ import link.signalapp.dto.response.IdDtoResponse;
 import link.signalapp.dto.response.SignalDtoResponse;
 import link.signalapp.file.FileManager;
 import link.signalapp.integration.IntegrationTestBase;
+import link.signalapp.model.Role;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.SignalRepository;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -36,12 +36,15 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     private FileManager fileManager;
 
     private int userId;
+    private int extendedStorageUserId;
 
     @BeforeAll
     public void beforeAll() {
         userRepository.deleteAll();
         registerUsers();
+        giveRoleToUser(email2, getRoleByName(Role.EXTENDED_STORAGE));
         userId = userRepository.findByEmail(email1).getId();
+        extendedStorageUserId = userRepository.findByEmail(email2).getId();
     }
 
     @AfterAll
@@ -200,6 +203,33 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    public void uploadSignalWithExtendedStorageOk() throws IOException {
+        int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber();
+        for (int i = 0; i < maxUserSignalsNumber; i++) {
+            signalRepository.save(createRandomSignal(extendedStorageUserId));
+        }
+        HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(email2,
+                createSignalDtoRequest(), getTestWav());
+        ResponseEntity<IdDtoResponse> response = template.exchange(fullUrl(SIGNALS_URL),
+                HttpMethod.POST, entity, IdDtoResponse.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void uploadSignalWithExtendedStorageMaxUserStoredNumber() throws IOException {
+        int maxUserSignalsNumber = applicationProperties.getLimits().getMaxUserSignalsNumber()
+                * applicationProperties.getLimits().getExtendedStorageMultiplier();
+        for (int i = 0; i < maxUserSignalsNumber; i++) {
+            signalRepository.save(createRandomSignal(extendedStorageUserId));
+        }
+        HttpEntity<MultiValueMap<String, Object>> entity = createHttpEntity(email2,
+                createSignalDtoRequest(), getTestWav());
+        checkConflictError(
+                () -> template.exchange(fullUrl(SIGNALS_URL), HttpMethod.POST, entity, IdDtoResponse.class),
+                "TOO_MANY_SIGNALS_STORED");
+    }
+
+    @Test
     public void updateSignalOk() throws IOException {
         SignalDtoRequest signalDtoRequest = createSignalDtoRequest();
         ResponseEntity<IdDtoResponse> response = template.exchange(fullUrl(SIGNALS_URL),
@@ -337,11 +367,17 @@ public class LoadSignalsIntegrationTest extends IntegrationTestBase {
         return SignalsTestUtils.generateWav(length, channels, SAMPLE_RATE);
     }
 
-    private HttpEntity<MultiValueMap<String, Object>> createHttpEntity(SignalDtoRequest signalDtoRequest, byte[] testWav) {
+    private HttpEntity<MultiValueMap<String, Object>> createHttpEntity(
+            SignalDtoRequest signalDtoRequest, byte[] testWav) {
+        return createHttpEntity(email1, signalDtoRequest, testWav);
+    }
+
+    private HttpEntity<MultiValueMap<String, Object>> createHttpEntity(
+            String email, SignalDtoRequest signalDtoRequest, byte[] testWav) {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("json", signalDtoRequest);
         body.add("data", testWav);
-        HttpHeaders headers = login(email1);
+        HttpHeaders headers = login(email);
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         return new HttpEntity<>(body, headers);
     }
