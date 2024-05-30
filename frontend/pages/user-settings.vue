@@ -10,6 +10,9 @@
       <div v-if="emailConfirmed" class="mb-5">
         <p style="color: #4CAF50">{{ _t('emailConfirmed') }}</p>
       </div>
+      <div v-if="rolesLocalizedStr" class="mb-5">
+        {{ _tc('fields.roles') }}: {{ rolesLocalizedStr }}
+      </div>
       <v-form @submit.prevent>
         <text-input
             v-for="field in filteredFormFields"
@@ -64,6 +67,19 @@ export default {
     confirmEmailRequestSent: false,
     saveRequestSent: false
   }),
+  computed: {
+    rolesLocalizedStr() {
+      const roles = userStore().userInfo?.roles
+      if (!roles?.length) {
+        return ''
+      }
+      let output = ''
+      for (const role of roles) {
+        output += (output ? ', ' : '') + this.$t(`userRoles.${role.name}`)
+      }
+      return output
+    }
+  },
   mounted() {
     this.reloadUserInfo()
     userStore().$subscribe((mutation, state) => {
