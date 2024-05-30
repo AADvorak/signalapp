@@ -5,6 +5,7 @@ import link.signalapp.model.UserToken;
 import link.signalapp.repository.UserTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -15,15 +16,14 @@ public class UserTokenService {
     private final UserTokenRepository userTokenRepository;
     private final ApplicationProperties applicationProperties;
 
+    @Transactional
     public UserToken getActiveTokenAndRefreshLastActionTime(String token) {
         UserToken userToken = userTokenRepository.findActiveToken(token, LocalDateTime.now(),
                 applicationProperties.getUserIdleTimeout());
         if (userToken == null) {
             return null;
-        } else {
-            userToken.setLastActionTime(LocalDateTime.now());
-            userTokenRepository.save(userToken);
         }
+        userTokenRepository.updateLastActionTimeByToken(LocalDateTime.now(), token);
         return userToken;
     }
 }

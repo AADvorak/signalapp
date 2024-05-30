@@ -23,7 +23,7 @@ public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenP
     @Query(value = """
             select *
             from user_token
-            where token = :token
+            where token = :token and token != ''
                 and extract(epoch from (:currentTime - last_action_time)) < :userIdleTimeout
             """, nativeQuery = true)
     UserToken findActiveToken(
@@ -51,5 +51,16 @@ public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenP
             where token = :token
             """, nativeQuery = true)
     int clearByToken(@Param("token") String token);
+
+    @Modifying
+    @Query(value = """
+            update user_token
+            set last_action_time = :lastActionTime
+            where token = :token
+            """, nativeQuery = true)
+    int updateLastActionTimeByToken(
+            @Param("lastActionTime") LocalDateTime lastActionTime,
+            @Param("token") String token
+    );
 
 }
