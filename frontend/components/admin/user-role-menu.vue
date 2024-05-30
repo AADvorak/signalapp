@@ -1,7 +1,7 @@
 <template>
   <v-menu v-model="model" activator="parent" width="200px">
     <v-list>
-      <v-list-item v-for="role in userRoles" height="40px">
+      <v-list-item v-for="role in roles" height="40px">
         <v-checkbox
             v-model="role.selected"
             @click.stop="checkBoxStateChanged(role)"
@@ -34,20 +34,28 @@ export default {
   emits: ['changed'],
   data: () => ({
     model: false,
-    userRoles: []
+    roles: []
   }),
   mounted() {
-    this.userRoles = roleStore().roles.map(role => ({...role, selected: this.user.role?.id === role.id}))
+    this.roles = roleStore().roles.map(role => ({...role, selected: this.checkUserHasRole(role.id)}))
   },
   methods: {
     async checkBoxStateChanged(role) {
-      let response = role.selected
+      const response = role.selected
           ? await ApiProvider.del(`api/admin/users/${this.user.id}/roles/${role.id}`)
           : await ApiProvider.putJson(`api/admin/users/${this.user.id}/roles/${role.id}`)
       if (response.ok) {
         this.$emit('changed')
         this.model = false
       }
+    },
+    checkUserHasRole(roleId) {
+      for (const role of this.user.roles) {
+        if (role.id === roleId) {
+          return true
+        }
+      }
+      return false
     }
   }
 }
