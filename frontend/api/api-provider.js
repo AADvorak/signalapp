@@ -37,7 +37,7 @@ const ApiProvider = {
   },
 
   putJson(url, data, noHandleUnauthorized) {
-    return this.request(url, 'PUT', data, 'application/json', noHandleUnauthorized)
+    return this.request(url, 'PUT', JSON.stringify(data), 'application/json', noHandleUnauthorized)
   },
 
   putMultipart(url, object, data, noHandleUnauthorized) {
