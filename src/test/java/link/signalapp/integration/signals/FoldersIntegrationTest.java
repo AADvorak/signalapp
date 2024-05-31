@@ -5,6 +5,7 @@ import link.signalapp.dto.response.FolderDtoResponse;
 import link.signalapp.file.FileManager;
 import link.signalapp.integration.IntegrationTestBase;
 import link.signalapp.model.Folder;
+import link.signalapp.model.Role;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.FolderRepository;
 import link.signalapp.repository.SignalRepository;
@@ -40,12 +41,15 @@ public class FoldersIntegrationTest extends IntegrationTestBase {
     private FileManager fileManager;
 
     private int userId;
+    private int extendedStorageUserId;
 
     @BeforeAll
     public void beforeAll() {
         userRepository.deleteAll();
         registerUsers();
+        giveRoleToUser(email2, getRoleByName(Role.EXTENDED_STORAGE));
         userId = userRepository.findByEmail(email1).getId();
+        extendedStorageUserId = userRepository.findByEmail(email2).getId();
     }
 
     @AfterAll
@@ -125,6 +129,23 @@ public class FoldersIntegrationTest extends IntegrationTestBase {
         createFoldersInDB(applicationProperties.getLimits().getMaxUserFoldersNumber());
         checkConflictError(() -> template.exchange(fullUrl(FOLDERS_URL), HttpMethod.POST,
                         new HttpEntity<>(createFolderDtoRequest(), login(email1)), FolderDtoResponse.class),
+                "TOO_MANY_FOLDERS_CREATED");
+    }
+
+    @Test
+    public void addWithExtendedStorageOk() {
+        createFoldersInDB(extendedStorageUserId, applicationProperties.getLimits().getMaxUserFoldersNumber());
+        ResponseEntity<FolderDtoResponse> response = template.exchange(fullUrl(FOLDERS_URL), HttpMethod.POST,
+                new HttpEntity<>(createFolderDtoRequest(), login(email2)), FolderDtoResponse.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void addWithExtendedStorageToManyFolders() {
+        createFoldersInDB(extendedStorageUserId, applicationProperties.getLimits().getMaxUserFoldersNumber()
+                * applicationProperties.getLimits().getExtendedStorageMultiplier());
+        checkConflictError(() -> template.exchange(fullUrl(FOLDERS_URL), HttpMethod.POST,
+                        new HttpEntity<>(createFolderDtoRequest(), login(email2)), FolderDtoResponse.class),
                 "TOO_MANY_FOLDERS_CREATED");
     }
 
@@ -221,6 +242,10 @@ public class FoldersIntegrationTest extends IntegrationTestBase {
     }
 
     private Map<Integer, Folder> createFoldersInDB(int number) {
+        return createFoldersInDB(userId, number);
+    }
+
+    private Map<Integer, Folder> createFoldersInDB(int userId, int number) {
         Map<Integer, Folder> folders = new HashMap<>();
         for (int i = 1; i <= number; i++) {
             Folder folder = folderRepository.save(new Folder()
