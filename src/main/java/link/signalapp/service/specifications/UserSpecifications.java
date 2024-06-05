@@ -1,4 +1,4 @@
-package link.signalapp.repository.specifications;
+package link.signalapp.service.specifications;
 
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;

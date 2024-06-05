@@ -17,12 +17,13 @@ import link.signalapp.mapper.SignalMapper;
 import link.signalapp.model.Role;
 import link.signalapp.model.Signal;
 import link.signalapp.properties.ApplicationProperties;
-import link.signalapp.repository.FilterSignalRepository;
 import link.signalapp.repository.SignalRepository;
+import link.signalapp.service.specifications.SignalSpecifications;
 import link.signalapp.service.utils.FilterUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,6 @@ public class SignalService extends ServiceBase {
     private static final List<String> AVAILABLE_SORT_FIELDS = List.of("name", "description", "sampleRate");
 
     private final SignalRepository signalRepository;
-    private final FilterSignalRepository filterSignalRepository;
     private final FileManager fileManager;
     private final ApplicationProperties applicationProperties;
     private final FilterUtils filterUtils = new FilterUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
@@ -49,9 +49,9 @@ public class SignalService extends ServiceBase {
     public ResponseWithTotalCounts<SignalDtoResponse> filter(SignalFilterDto filter) {
         int userId = getUserFromContext().getId();
         Pageable pageable = filterUtils.getPageable(filter, applicationProperties.getMaxPageSize());
-        String search = filterUtils.getSearch(filter);
-        Page<Signal> signalPage = filterSignalRepository.findByUserIdAndFilter(userId, search,
-                filter.getSampleRates(), filter.getFolderIds(), pageable);
+        Specification<Signal> specification = makeSignalSpecification(userId, filterUtils.getSearch(filter),
+                filter.getSampleRates(), filter.getFolderIds());
+        Page<Signal> signalPage = signalRepository.findAll(specification, pageable);
         return new ResponseWithTotalCounts<SignalDtoResponse>()
                 .setData(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList())
                 .setPages(signalPage.getTotalPages())
@@ -140,5 +140,15 @@ public class SignalService extends ServiceBase {
         if (format.getChannels() > 1) {
             throw new SignalAppException(SignalAppErrorCode.WRONG_VAW_FORMAT, null);
         }
+    }
+
+    private Specification<Signal> makeSignalSpecification(
+            int userId, String search,
+            List<BigDecimal> sampleRates, List<Integer> folderIds
+    ) {
+        return Specification.where(SignalSpecifications.userIdEqual(userId))
+                .and(search == null ? null : SignalSpecifications.nameOrDescriptionLike(search))
+                .and(sampleRates == null ? null : SignalSpecifications.sampleRateIn(sampleRates))
+                .and(folderIds == null ? null : SignalSpecifications.existsFolderWithIdIn(folderIds));
     }
 }

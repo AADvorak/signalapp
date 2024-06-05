@@ -1,4 +1,4 @@
-package link.signalapp.repository.specifications;
+package link.signalapp.service.specifications;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;

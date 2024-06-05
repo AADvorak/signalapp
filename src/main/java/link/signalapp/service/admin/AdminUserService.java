@@ -11,7 +11,7 @@ import link.signalapp.model.User;
 import link.signalapp.model.UserToken;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.*;
-import link.signalapp.repository.specifications.UserSpecifications;
+import link.signalapp.service.specifications.UserSpecifications;
 import link.signalapp.service.utils.FilterUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,7 +42,8 @@ public class AdminUserService {
 
     public ResponseWithTotalCounts<UserDtoResponse> filter(UserFilterDto filter) {
         Pageable pageable = filterUtils.getPageable(filter, applicationProperties.getMaxPageSize());
-        Specification<User> userSpecification = makeUserSpecification(filter);
+        Specification<User> userSpecification = makeUserSpecification(filterUtils.getSearch(filter),
+                filter.getRoleIds());
         Page<User> users = userRepository.findAll(userSpecification, pageable);
         ResponseWithTotalCounts<UserDtoResponse> responseWithTotalCounts
                 = new ResponseWithTotalCounts<UserDtoResponse>()
@@ -97,9 +98,8 @@ public class AdminUserService {
         return roles.stream().anyMatch(role -> role.getId() == roleId);
     }
 
-    private Specification<User> makeUserSpecification(UserFilterDto filter) {
-        String search = filterUtils.getSearch(filter);
+    private Specification<User> makeUserSpecification(String search, List<Integer> roleIds) {
         return Specification.where(search == null ? null : UserSpecifications.nameOrEmailLike(search))
-                .and(filter.getRoleIds() == null ? null : UserSpecifications.existsRoleWithIdIn(filter.getRoleIds()));
+                .and(roleIds == null ? null : UserSpecifications.existsRoleWithIdIn(roleIds));
     }
 }
