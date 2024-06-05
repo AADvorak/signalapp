@@ -11,10 +11,12 @@ import link.signalapp.model.User;
 import link.signalapp.model.UserToken;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.*;
+import link.signalapp.repository.specifications.UserSpecifications;
 import link.signalapp.service.utils.FilterUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +33,6 @@ public class AdminUserService {
             "patronymic", "email", "createTime");
 
     private final UserRepository userRepository;
-    private final FilterUserRepository filterUserRepository;
     private final UserTokenRepository userTokenRepository;
     private final RoleRepository roleRepository;
     private final SignalRepository signalRepository;
@@ -41,8 +42,8 @@ public class AdminUserService {
 
     public ResponseWithTotalCounts<UserDtoResponse> filter(UserFilterDto filter) {
         Pageable pageable = filterUtils.getPageable(filter, applicationProperties.getMaxPageSize());
-        String search = filterUtils.getSearch(filter);
-        Page<User> users = filterUserRepository.findByFilter(search, filter.getRoleIds(), pageable);
+        Specification<User> userSpecification = makeUserSpecification(filter);
+        Page<User> users = userRepository.findAll(userSpecification, pageable);
         ResponseWithTotalCounts<UserDtoResponse> responseWithTotalCounts
                 = new ResponseWithTotalCounts<UserDtoResponse>()
                 .setData(users.stream().map(UserMapper.INSTANCE::userToDto).toList())
@@ -94,5 +95,11 @@ public class AdminUserService {
 
     private boolean checkRolesContainsRoleWithId(int roleId, Set<Role> roles) {
         return roles.stream().anyMatch(role -> role.getId() == roleId);
+    }
+
+    private Specification<User> makeUserSpecification(UserFilterDto filter) {
+        String search = filterUtils.getSearch(filter);
+        return Specification.where(search == null ? null : UserSpecifications.nameOrEmailLike(search))
+                .and(filter.getRoleIds() == null ? null : UserSpecifications.existsRoleWithIdIn(filter.getRoleIds()));
     }
 }

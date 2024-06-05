@@ -15,15 +15,9 @@ public class JdbcFilteringQueryBuilder {
         for (String key : parameters.keySet()) {
             Object parameter = parameters.get(key);
             String condition = conditions.get(key);
-            if (condition == null || parameter == null) {
-                continue;
+            if (condition != null && parameter != null) {
+                queryBuilder.append(condition);
             }
-            if (parameter instanceof String stringParameter) {
-                if (stringParameter.isEmpty()) {
-                    continue;
-                }
-            }
-            queryBuilder.append(condition);
         }
         return queryBuilder.toString();
     }

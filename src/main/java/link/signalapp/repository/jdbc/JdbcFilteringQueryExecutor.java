@@ -39,7 +39,7 @@ public class JdbcFilteringQueryExecutor<T> {
 
     private String makeOrderByQuery(Pageable pageable) {
         var order = pageable.getSort().stream().findFirst().orElseThrow();
-        return " order by " + order.getProperty() + " " + order.getDirection();
+        return " order by " + camelToSnake(order.getProperty()) + " " + order.getDirection();
     }
 
     private String makeLimitQuery(Pageable pageable) {
@@ -50,5 +50,24 @@ public class JdbcFilteringQueryExecutor<T> {
             return limit + " offset " + page;
         }
         return limit;
+    }
+
+    private String camelToSnake(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        StringBuilder result = new StringBuilder();
+        char c = str.charAt(0);
+        result.append(Character.toLowerCase(c));
+        for (int i = 1; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            if (Character.isUpperCase(ch)) {
+                result.append('_');
+                result.append(Character.toLowerCase(ch));
+            } else {
+                result.append(ch);
+            }
+        }
+        return result.toString();
     }
 }
