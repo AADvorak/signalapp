@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @EqualsAndHashCode
 @Embeddable
-public class UserTokenPK implements Serializable {
+public class UserTokenId implements Serializable {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)

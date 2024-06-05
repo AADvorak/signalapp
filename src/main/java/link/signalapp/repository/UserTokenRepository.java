@@ -1,6 +1,6 @@
 package link.signalapp.repository;
 
-import link.signalapp.model.UserTokenPK;
+import link.signalapp.model.UserTokenId;
 import link.signalapp.model.UserToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 
-public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenPK> {
+public interface UserTokenRepository extends JpaRepository<UserToken, UserTokenId> {
 
     @Query(value = """
             select *

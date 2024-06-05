@@ -1,6 +1,6 @@
 package link.signalapp.service;
 
-import link.signalapp.model.UserTokenPK;
+import link.signalapp.model.UserTokenId;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.captcha.RecaptchaVerifier;
 import link.signalapp.dto.request.*;
@@ -387,7 +387,7 @@ public class UserServiceTest {
     private void fillSecurityContextHolder(User user, String token) {
         UserToken userToken = new UserToken()
                 .setLastActionTime(LocalDateTime.now())
-                .setId(new UserTokenPK().setUser(user).setToken(token));
+                .setId(new UserTokenId().setUser(user).setToken(token));
         UserDetails userDetails = new SignalAppUserDetails(userToken);
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(

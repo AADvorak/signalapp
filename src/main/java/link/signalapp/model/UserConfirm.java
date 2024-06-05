@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class UserConfirm {
 
     @EmbeddedId
-    private UserConfirmPK id;
+    private UserConfirmId id;
 
     @Column
     private String code;

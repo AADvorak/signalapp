@@ -18,7 +18,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @EqualsAndHashCode
 @Embeddable
-public class UserConfirmPK implements Serializable {
+public class UserConfirmId implements Serializable {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)

@@ -133,7 +133,7 @@ public class UserService extends ServiceBase {
             throw new SignalAppDataException(SignalAppDataErrorCode.EMAIL_ALREADY_CONFIRMED);
         }
         UserConfirm userConfirm = new UserConfirm()
-                .setId(new UserConfirmPK().setUser(user))
+                .setId(new UserConfirmId().setUser(user))
                 .setCode(String.valueOf(randomUUID()))
                 .setCreateTime(LocalDateTime.now());
         userConfirmRepository.save(userConfirm);
@@ -169,7 +169,7 @@ public class UserService extends ServiceBase {
     private String generateAndSaveToken(User user) {
         String token = String.valueOf(randomUUID());
         userTokenRepository.save(new UserToken()
-                .setId(new UserTokenPK().setUser(user).setToken(token))
+                .setId(new UserTokenId().setUser(user).setToken(token))
                 .setLastActionTime(LocalDateTime.now()));
         return token;
     }
