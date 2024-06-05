@@ -2,6 +2,7 @@ package link.signalapp.integration.admin;
 
 import link.signalapp.dto.request.UserFilterDto;
 import link.signalapp.dto.response.UserDtoResponse;
+import link.signalapp.model.Role;
 import link.signalapp.model.User;
 import link.signalapp.security.PasswordEncoder;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,6 +35,7 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
         createUsersForFilterTestsInDB();
         giveAdminRoleToUser(email1);
         giveAdminRoleToUser(email2);
+        giveRoleToUser(email2, getRoleByName(Role.EXTENDED_STORAGE));
     }
 
     @Test
@@ -71,9 +73,23 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
     }
 
     @Test
-    public void filterRoleIds() {
+    public void filterRoleIdsVariant1() {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setRoleIds(List.of(getAdminRole().getId()));
+        filterAndCheckCounts(userFilterDto, 2, 1, 2);
+    }
+
+    @Test
+    public void filterRoleIdsVariant2() {
+        UserFilterDto userFilterDto = createUserFilterDto()
+                .setRoleIds(List.of(getRoleByName(Role.EXTENDED_STORAGE).getId()));
+        filterAndCheckCounts(userFilterDto, 1, 1, 1);
+    }
+
+    @Test
+    public void filterRoleIdsVariant3() {
+        UserFilterDto userFilterDto = createUserFilterDto()
+                .setRoleIds(List.of(getAdminRole().getId(), getRoleByName(Role.EXTENDED_STORAGE).getId()));
         filterAndCheckCounts(userFilterDto, 2, 1, 2);
     }
 

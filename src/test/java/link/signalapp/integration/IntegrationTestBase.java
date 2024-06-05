@@ -18,6 +18,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -75,7 +76,11 @@ public class IntegrationTestBase {
 
     protected void giveRoleToUser(String email, Role role) {
         User user = userRepository.findByEmail(email);
-        user.setRoles(Set.of(role));
+        Set<Role> roles = user.getRoles();
+        if (roles == null) {
+            roles = new HashSet<>();
+        }
+        roles.add(role);
         userRepository.save(user);
     }
 
