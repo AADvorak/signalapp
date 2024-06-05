@@ -36,10 +36,18 @@ export default {
     model: false,
     roles: []
   }),
+  watch: {
+    user() {
+      this.initRoles()
+    }
+  },
   mounted() {
-    this.roles = roleStore().roles.map(role => ({...role, selected: this.checkUserHasRole(role.id)}))
+    this.initRoles()
   },
   methods: {
+    initRoles() {
+      this.roles = roleStore().roles.map(role => ({...role, selected: this.checkUserHasRole(role.id)}))
+    },
     async checkBoxStateChanged(role) {
       const response = role.selected
           ? await ApiProvider.del(`api/admin/users/${this.user.id}/roles/${role.id}`)
