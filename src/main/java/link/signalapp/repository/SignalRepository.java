@@ -6,8 +6,6 @@
 package link.signalapp.repository;
 
 import link.signalapp.model.Signal;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -38,31 +36,6 @@ public interface SignalRepository extends PagingAndSortingRepository<Signal, Int
             where user_id = :userId
             """, nativeQuery = true)
     List<BigDecimal> sampleRatesByUserId(@Param("userId") int userId);
-
-    /**
-     * replaced by JDBC implementation
-     */
-    @Deprecated
-    @Query(value = """
-            select s.*
-            from signal s
-            where user_id = :userId
-                and (:filter = '' or upper(name) like upper(:filter)
-                    or upper(description) like upper(:filter))
-                and (0 in :sampleRates or sample_rate in :sampleRates)
-                and (0 in :folderIds or exists(
-                    select 1
-                    from signal_in_folder sif
-                    where sif.signal_id = s.id and sif.folder_id in :folderIds
-                ))
-            """, nativeQuery = true)
-    Page<Signal> findByUserIdAndFilter(
-            @Param("userId") int userId,
-            @Param("filter") String filter,
-            @Param("sampleRates") List<BigDecimal> sampleRates,
-            @Param("folderIds") List<Integer> folderIds,
-            Pageable pageable
-    );
 
     Optional<Signal> findByIdAndUserId(int id, int userId);
 
