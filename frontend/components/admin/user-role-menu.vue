@@ -34,15 +34,18 @@ export default {
   emits: ['changed'],
   data: () => ({
     model: false,
-    roles: []
+    roles: [],
+    changed: false
   }),
   watch: {
-    user() {
-      this.initRoles()
+    model(newValue) {
+      if (newValue) {
+        this.changed = false
+        this.initRoles()
+      } else {
+        this.changed && this.$emit('changed')
+      }
     }
-  },
-  mounted() {
-    this.initRoles()
   },
   methods: {
     initRoles() {
@@ -53,8 +56,7 @@ export default {
           ? await ApiProvider.del(`api/admin/users/${this.user.id}/roles/${role.id}`)
           : await ApiProvider.putJson(`api/admin/users/${this.user.id}/roles/${role.id}`)
       if (response.ok) {
-        this.$emit('changed')
-        this.model = false
+        this.changed = true
       }
     },
     checkUserHasRole(roleId) {
