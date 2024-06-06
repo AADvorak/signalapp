@@ -47,15 +47,13 @@ public class JdbcFilterSignalRepositoryImpl implements FilterSignalRepository {
                     .setXMin(rs.getBigDecimal("x_min"));
 
     private final JdbcFilteringQueryExecutor<Signal> queryExecutor;
-    private final JdbcFilteringQueryBuilder queryBuilder;
 
     public JdbcFilterSignalRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate) {
-        queryExecutor = new JdbcFilteringQueryExecutor<>(ROW_MAPPER, jdbcTemplate);
-        queryBuilder = new JdbcFilteringQueryBuilder(QUERY_BASE, Map.of(
+        queryExecutor = new JdbcFilteringQueryExecutor<>(QUERY_BASE, Map.of(
                 "search", QUERY_SEARCH_CONDITION,
                 "sampleRates", QUERY_SAMPLE_RATES_CONDITION,
                 "folderIds", QUERY_FOLDER_IDS_CONDITION
-        ));
+        ), ROW_MAPPER, jdbcTemplate);
     }
 
     @Override
@@ -67,8 +65,7 @@ public class JdbcFilterSignalRepositoryImpl implements FilterSignalRepository {
             Pageable pageable
     ) {
         Map<String, Object> params = makeParams(userId, search, sampleRates, folderIds);
-        String query = queryBuilder.build(params);
-        return queryExecutor.execute(query, params, pageable);
+        return queryExecutor.execute(params, pageable);
     }
 
     Map<String, Object> makeParams(int userId, String search, List<BigDecimal> sampleRates, List<Integer> folderIds) {

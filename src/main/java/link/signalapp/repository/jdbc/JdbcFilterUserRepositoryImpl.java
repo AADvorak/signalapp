@@ -60,22 +60,19 @@ public class JdbcFilterUserRepositoryImpl implements FilterUserRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final JdbcFilteringQueryExecutor<User> queryExecutor;
-    private final JdbcFilteringQueryBuilder queryBuilder;
 
     public JdbcFilterUserRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        queryExecutor = new JdbcFilteringQueryExecutor<>(USER_ROW_MAPPER, jdbcTemplate);
-        queryBuilder = new JdbcFilteringQueryBuilder(USERS_QUERY, Map.of(
+        queryExecutor = new JdbcFilteringQueryExecutor<>(USERS_QUERY, Map.of(
                 "search", USERS_QUERY_SEARCH_CONDITION,
                 "roleIds", USERS_QUERY_ROLE_IDS_CONDITION
-        ));
+        ), USER_ROW_MAPPER, jdbcTemplate);
     }
 
     @Override
     public Page<User> findByFilter(String search, List<Integer> roleIds, Pageable pageable) {
         Map<String, Object> params = makeParams(search, roleIds);
-        String query = queryBuilder.build(params);
-        Page<User> userPage = queryExecutor.execute(query, params, pageable);
+        Page<User> userPage = queryExecutor.execute(params, pageable);
         userPage.stream().forEach(this::fetchRoles);
         return userPage;
     }
