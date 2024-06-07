@@ -2,9 +2,11 @@ package link.signalapp.service.admin;
 
 import link.signalapp.dto.request.UserFilterDto;
 import link.signalapp.dto.response.ResponseWithTotalCounts;
+import link.signalapp.dto.response.RoleDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.error.exception.SignalAppNotFoundException;
 import link.signalapp.file.FileManager;
+import link.signalapp.mapper.RoleMapper;
 import link.signalapp.mapper.UserMapper;
 import link.signalapp.model.Role;
 import link.signalapp.model.User;
@@ -55,25 +57,25 @@ public class AdminUserService {
         return responseWithTotalCounts;
     }
 
-    public void setRole(int userId, int roleId) {
-        User user = userRepository.findById(userId).orElseThrow(SignalAppNotFoundException::new);
-        Set<Role> roles = user.getRoles();
-        if (checkRolesContainsRoleWithId(roleId, roles)) {
-            return;
-        }
-        Role role = roleRepository.findById(roleId).orElseThrow(SignalAppNotFoundException::new);
-        roles.add(role);
-        userRepository.save(user);
-    }
-
-    public void deleteRole(int userId, int roleId) {
+    public List<RoleDtoResponse> setRole(int userId, int roleId) {
         User user = userRepository.findById(userId).orElseThrow(SignalAppNotFoundException::new);
         Set<Role> roles = user.getRoles();
         if (!checkRolesContainsRoleWithId(roleId, roles)) {
-            throw new SignalAppNotFoundException();
+            Role role = roleRepository.findById(roleId).orElseThrow(SignalAppNotFoundException::new);
+            roles.add(role);
+            userRepository.save(user);
         }
-        user.setRoles(roles.stream().filter(role -> role.getId() != roleId).collect(Collectors.toSet()));
-        userRepository.save(user);
+        return roles.stream().map(RoleMapper.INSTANCE::roleToDto).toList();
+    }
+
+    public List<RoleDtoResponse> deleteRole(int userId, int roleId) {
+        User user = userRepository.findById(userId).orElseThrow(SignalAppNotFoundException::new);
+        Set<Role> roles = user.getRoles();
+        if (checkRolesContainsRoleWithId(roleId, roles)) {
+            user.setRoles(roles.stream().filter(role -> role.getId() != roleId).collect(Collectors.toSet()));
+            userRepository.save(user);
+        }
+        return user.getRoles().stream().map(RoleMapper.INSTANCE::roleToDto).toList();
     }
 
     @Transactional

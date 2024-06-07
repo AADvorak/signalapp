@@ -1,5 +1,6 @@
 package link.signalapp.integration.admin;
 
+import link.signalapp.dto.response.RoleDtoResponse;
 import link.signalapp.model.Role;
 import link.signalapp.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,11 +45,12 @@ public class AdminManageUsersIntegrationTest extends AdminIntegrationTestBase {
     @Test
     public void deleteUserRoleOk() {
         giveAdminRoleToUser(email2);
-        ResponseEntity<Void> response = template.exchange(fullUrl(userRolePath(secondUserId(), getAdminRole().getId())),
-                HttpMethod.DELETE, new HttpEntity<>(login(email1)), Void.class);
+        ResponseEntity<RoleDtoResponse[]> response = template.exchange(fullUrl(userRolePath(secondUserId(),
+                getAdminRole().getId())), HttpMethod.DELETE, new HttpEntity<>(login(email1)), RoleDtoResponse[].class);
         Role deletedRole = findUserRoleByRoleId(userRepository.findByEmail(email2), getAdminRole().getId());
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertEquals(0, Objects.requireNonNull(response.getBody()).length),
                 () -> assertNull(deletedRole)
         );
     }
@@ -60,20 +63,24 @@ public class AdminManageUsersIntegrationTest extends AdminIntegrationTestBase {
 
     @Test
     public void deleteUserRoleNotFoundRole() {
-        checkNotFoundError(() -> template.exchange(fullUrl(userRolePath(secondUserId(), getAdminRole().getId())),
-                HttpMethod.DELETE, new HttpEntity<>(login(email1)), Void.class));
+        ResponseEntity<RoleDtoResponse[]> response = template.exchange(fullUrl(userRolePath(secondUserId(),
+                getAdminRole().getId())), HttpMethod.DELETE, new HttpEntity<>(login(email1)), RoleDtoResponse[].class);
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertEquals(0, Objects.requireNonNull(response.getBody()).length)
+        );
     }
 
     @Test
     public void setUserRoleOk() {
         int roleId = getAdminRole().getId();
-        ResponseEntity<Void> response = template.exchange(fullUrl(userRolePath(secondUserId(), roleId)),
-                HttpMethod.PUT, new HttpEntity<>(login(email1)), Void.class);
+        ResponseEntity<RoleDtoResponse[]> response = template.exchange(fullUrl(userRolePath(secondUserId(), roleId)),
+                HttpMethod.PUT, new HttpEntity<>(login(email1)), RoleDtoResponse[].class);
         Role userRole = findUserRoleByRoleId(userRepository.findByEmail(email2), roleId);
-        assertNotNull(userRole);
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
-                () -> assertEquals(roleId, userRole.getId())
+                () -> assertEquals(1, Objects.requireNonNull(response.getBody()).length),
+                () -> assertEquals(roleId, Objects.requireNonNull(userRole).getId())
         );
     }
 
