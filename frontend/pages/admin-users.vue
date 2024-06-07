@@ -65,6 +65,7 @@
             :reserved-height="reservedHeight"
             :sort-cols="['firstName', 'lastName', 'patronymic', 'createTime', 'email']"
             :sort-prop="sort"
+            :bus="bus"
             @click="onTableButtonClick"
             @sort="onTableSort"
             @change="onTableChange"/>
@@ -99,6 +100,7 @@ import {DateTimeUtils} from "~/utils/date-time-utils";
 import {Roles} from "~/dictionary/roles";
 import requiredRoleMsg from "~/mixins/required-role-msg";
 import {appSettingsStore} from "~/stores/app-settings-store";
+import mitt from "mitt";
 
 const USER_ROLE_MENU_COMPONENT = 'user-role-menu'
 
@@ -167,7 +169,8 @@ export default {
     },
     mdi: {
       mdiFilterOff
-    }
+    },
+    bus: new mitt(),
   }),
   computed: {
     reservedHeight() {
@@ -188,9 +191,11 @@ export default {
       this.requiredRoleMsg(Roles.ADMIN)
       this.loadDataPage()
     })
+    this.bus.on('newUserRoles', this.onNewUserRoles)
   },
   beforeUnmount() {
     this.mounted = false
+    this.bus.off('newUserRoles')
   },
   methods: {
     async loadRoles() {
@@ -220,6 +225,12 @@ export default {
       if (component === USER_ROLE_MENU_COMPONENT) {
         this.dataPageLastLoadFilter = ''
         this.loadDataPage()
+      }
+    },
+    onNewUserRoles(event) {
+      const user = this.users.filter(user => user.id === event.userId)[0]
+      if (user) {
+        user.roles = event.roles
       }
     },
     askConfirmDeleteUser(user) {

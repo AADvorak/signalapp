@@ -91,6 +91,7 @@
             <user-role-menu
                 v-if="button.component === 'user-role-menu'"
                 :user="item"
+                :bus="bus"
                 @changed="onUserRoleChanged"/>
           </btn-with-tooltip>
         </td>
@@ -154,6 +155,10 @@ export default {
     reservedHeight: {
       type: Number,
       default: 0
+    },
+    bus: {
+      type: Object,
+      default: null
     }
   },
   emits: ['click', 'change', 'select', 'sort'],

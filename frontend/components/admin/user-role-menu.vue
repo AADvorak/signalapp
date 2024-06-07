@@ -29,6 +29,10 @@ export default {
     user: {
       type: Object,
       required: true
+    },
+    bus: {
+      type: Object,
+      default: null
     }
   },
   emits: ['changed'],
@@ -57,6 +61,7 @@ export default {
           : await ApiProvider.putJson(`api/admin/users/${this.user.id}/roles/${role.id}`)
       if (response.ok) {
         this.changed = true
+        this.bus && this.bus.emit('newUserRoles', {userId: this.user.id, roles: response.data})
       }
     },
     checkUserHasRole(roleId) {
