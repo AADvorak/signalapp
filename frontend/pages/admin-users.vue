@@ -67,8 +67,7 @@
             :sort-prop="sort"
             :bus="bus"
             @click="onTableButtonClick"
-            @sort="onTableSort"
-            @change="onTableChange"/>
+            @sort="onTableSort"/>
         <fixed-width-wrapper>
           <v-pagination
               v-model="page"
@@ -101,8 +100,6 @@ import {Roles} from "~/dictionary/roles";
 import requiredRoleMsg from "~/mixins/required-role-msg";
 import {appSettingsStore} from "~/stores/app-settings-store";
 import mitt from "mitt";
-
-const USER_ROLE_MENU_COMPONENT = 'user-role-menu'
 
 const isNotCurrentUser = user => user.id !== userStore().userInfo?.id
 
@@ -151,7 +148,7 @@ export default {
           name: 'edit',
           icon: mdiFileEdit,
           color: 'primary',
-          component: USER_ROLE_MENU_COMPONENT,
+          component: 'user-roles-menu',
           condition: isNotCurrentUser
         },
         {
@@ -192,10 +189,12 @@ export default {
       this.loadDataPage()
     })
     this.bus.on('newUserRoles', this.onNewUserRoles)
+    this.bus.on('userRolesMenuClosedRolesChanged', this.onUserRolesMenuClosedRolesChanged)
   },
   beforeUnmount() {
     this.mounted = false
     this.bus.off('newUserRoles')
+    this.bus.off('userRolesMenuClosedRolesChanged')
   },
   methods: {
     async loadRoles() {
@@ -221,11 +220,9 @@ export default {
         this.askConfirmDeleteUser(item)
       }
     },
-    onTableChange(component) {
-      if (component === USER_ROLE_MENU_COMPONENT) {
-        this.dataPageLastLoadFilter = ''
-        this.loadDataPage()
-      }
+    onUserRolesMenuClosedRolesChanged() {
+      this.dataPageLastLoadFilter = ''
+      this.loadDataPage()
     },
     onNewUserRoles(event) {
       const user = this.users.filter(user => user.id === event.userId)[0]

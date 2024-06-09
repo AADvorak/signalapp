@@ -23,7 +23,7 @@ import {roleStore} from "~/stores/role-store";
 import ApiProvider from "~/api/api-provider";
 
 export default {
-  name: 'user-role-menu',
+  name: 'user-roles-menu',
   extends: ComponentBase,
   props: {
     user: {
@@ -35,7 +35,6 @@ export default {
       default: null
     }
   },
-  emits: ['changed'],
   data: () => ({
     model: false,
     roles: [],
@@ -47,7 +46,7 @@ export default {
         this.changed = false
         this.initRoles()
       } else {
-        this.changed && this.$emit('changed')
+        this.changed && this.bus && this.bus.emit('userRolesMenuClosedRolesChanged')
       }
     }
   },

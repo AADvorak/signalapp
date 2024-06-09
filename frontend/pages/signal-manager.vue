@@ -94,8 +94,8 @@
               :reserved-height="reservedHeight"
               :sort-cols="['name', 'description', 'sampleRate']"
               :sort-prop="this.sort"
+              :bus="bus"
               @click="onTableButtonClick"
-              @change="onTableChange"
               @select="onTableSelect"
               @sort="onTableSort"/>
         </div>
@@ -328,9 +328,11 @@ export default {
     this.loadSampleRates()
     this.loadFolders()
     this.actionWithTimeout(this.loadDataPage)
+    this.bus.on('signalFoldersMenuClosedFoldersChanged', this.onSignalFoldersMenuClosedFoldersChanged)
   },
   beforeUnmount() {
     this.mounted = false
+    this.bus.off('signalFoldersMenuClosedFoldersChanged')
   },
   methods: {
     async loadDataPage() {
@@ -432,7 +434,7 @@ export default {
         await Promise.all(promiseArr)
       })
     },
-    onSignalFoldersChanged() {
+    onSignalFoldersMenuClosedFoldersChanged() {
       if (this.formValues.folderIds.length) {
         this.dataPageLastLoadFilter = ''
         this.loadDataPage()
@@ -445,11 +447,6 @@ export default {
         this.playOrStopSignal(item)
       } else if (button === 'delete') {
         this.askConfirmDeleteSignal(item)
-      }
-    },
-    onTableChange(component) {
-      if (component === 'signal-folders-menu') {
-        this.onSignalFoldersChanged()
       }
     },
     onTableSelect(selectedIds) {

@@ -30,9 +30,12 @@ export default {
     signalId: {
       type: Number,
       required: true
+    },
+    bus: {
+      type: Object,
+      default: null
     }
   },
-  emits: ['changed'],
   data: () => ({
     model: false,
     folders: [],
@@ -44,7 +47,7 @@ export default {
         this.changed = false
         this.loadSignalFolderIds()
       } else {
-        this.changed && this.$emit('changed')
+        this.changed && this.bus && this.bus.emit('signalFoldersMenuClosedFoldersChanged')
       }
     }
   },

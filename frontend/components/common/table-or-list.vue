@@ -27,11 +27,11 @@
                 <signal-folders-menu
                     v-if="button.component === 'signal-folders-menu'"
                     :signal-id="item.id"
-                    @changed="onSignalFoldersChanged"/>
-                <user-role-menu
-                    v-if="button.component === 'user-role-menu'"
+                    :bus="bus"/>
+                <user-roles-menu
+                    v-if="button.component === 'user-roles-menu'"
                     :user="item"
-                    @changed="onUserRoleChanged"/>
+                    :bus="bus"/>
               </v-btn>
             </template>
           </v-card-actions>
@@ -87,12 +87,11 @@
             <signal-folders-menu
                 v-if="button.component === 'signal-folders-menu'"
                 :signal-id="item.id"
-                @changed="onSignalFoldersChanged"/>
-            <user-role-menu
-                v-if="button.component === 'user-role-menu'"
+                :bus="bus"/>
+            <user-roles-menu
+                v-if="button.component === 'user-roles-menu'"
                 :user="item"
-                :bus="bus"
-                @changed="onUserRoleChanged"/>
+                :bus="bus"/>
           </btn-with-tooltip>
         </td>
       </tr>
@@ -108,7 +107,7 @@ import StringUtils from "~/utils/string-utils";
 import ComponentBase from "~/components/base/component-base.vue";
 import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
 import SignalFoldersMenu from "~/components/folders/signal-folders-menu.vue";
-import UserRoleMenu from "~/components/admin/user-role-menu.vue";
+import UserRolesMenu from "~/components/admin/user-roles-menu.vue";
 
 const SORT_DIRS = {
   DESC: 'desc',
@@ -117,7 +116,7 @@ const SORT_DIRS = {
 
 export default {
   name: "table-or-list",
-  components: {UserRoleMenu, SignalFoldersMenu, BtnWithTooltip},
+  components: {UserRolesMenu, SignalFoldersMenu, BtnWithTooltip},
   extends: ComponentBase,
   props: {
     dataName: {
@@ -161,7 +160,7 @@ export default {
       default: null
     }
   },
-  emits: ['click', 'change', 'select', 'sort'],
+  emits: ['click', 'select', 'sort'],
   data: () => ({
     selectAllItems: false,
     selectedIds: [],
@@ -282,12 +281,6 @@ export default {
     },
     buttonClick(button, item) {
       this.$emit('click', {button, item})
-    },
-    onSignalFoldersChanged() {
-      this.$emit('change', 'signal-folders-menu')
-    },
-    onUserRoleChanged() {
-      this.$emit('change', 'user-role-menu')
     },
     checkCondition(button, item) {
       if (!button.condition) {
