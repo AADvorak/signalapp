@@ -22,6 +22,7 @@
 import ComponentBase from "~/components/base/component-base.vue";
 import FolderRequests from "~/api/folder-requests";
 import {userStore} from "~/stores/user-store";
+import {TableOrListEvents} from "~/dictionary/table-or-list-events";
 
 export default {
   name: "signal-folders-menu",
@@ -47,7 +48,7 @@ export default {
         this.changed = false
         this.loadSignalFolderIds()
       } else {
-        this.changed && this.bus && this.bus.emit('signalFoldersMenuClosedFoldersChanged')
+        this.changed && this.bus && this.bus.emit(TableOrListEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED)
       }
     }
   },

@@ -100,6 +100,7 @@ import {Roles} from "~/dictionary/roles";
 import requiredRoleMsg from "~/mixins/required-role-msg";
 import {appSettingsStore} from "~/stores/app-settings-store";
 import mitt from "mitt";
+import {TableOrListEvents} from "~/dictionary/table-or-list-events";
 
 const isNotCurrentUser = user => user.id !== userStore().userInfo?.id
 
@@ -188,13 +189,13 @@ export default {
       this.requiredRoleMsg(Roles.ADMIN)
       this.loadDataPage()
     })
-    this.bus.on('newUserRoles', this.onNewUserRoles)
-    this.bus.on('userRolesMenuClosedRolesChanged', this.onUserRolesMenuClosedRolesChanged)
+    this.bus.on(TableOrListEvents.NEW_USER_ROLES, this.onNewUserRoles)
+    this.bus.on(TableOrListEvents.USER_ROLES_MENU_CLOSED_ROLES_CHANGED, this.onUserRolesMenuClosedRolesChanged)
   },
   beforeUnmount() {
     this.mounted = false
-    this.bus.off('newUserRoles')
-    this.bus.off('userRolesMenuClosedRolesChanged')
+    this.bus.off(TableOrListEvents.NEW_USER_ROLES)
+    this.bus.off(TableOrListEvents.USER_ROLES_MENU_CLOSED_ROLES_CHANGED)
   },
   methods: {
     async loadRoles() {

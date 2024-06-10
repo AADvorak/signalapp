@@ -21,6 +21,7 @@
 import ComponentBase from "~/components/base/component-base.vue";
 import {roleStore} from "~/stores/role-store";
 import ApiProvider from "~/api/api-provider";
+import {TableOrListEvents} from "~/dictionary/table-or-list-events";
 
 export default {
   name: 'user-roles-menu',
@@ -46,7 +47,7 @@ export default {
         this.changed = false
         this.initRoles()
       } else {
-        this.changed && this.bus && this.bus.emit('userRolesMenuClosedRolesChanged')
+        this.changed && this.bus && this.bus.emit(TableOrListEvents.USER_ROLES_MENU_CLOSED_ROLES_CHANGED)
       }
     }
   },
@@ -60,7 +61,7 @@ export default {
           : await ApiProvider.putJson(`api/admin/users/${this.user.id}/roles/${role.id}`)
       if (response.ok) {
         this.changed = true
-        this.bus && this.bus.emit('newUserRoles', {userId: this.user.id, roles: response.data})
+        this.bus && this.bus.emit(TableOrListEvents.NEW_USER_ROLES, {userId: this.user.id, roles: response.data})
       }
     },
     checkUserHasRole(roleId) {

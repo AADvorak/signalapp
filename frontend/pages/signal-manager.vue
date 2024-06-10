@@ -196,6 +196,7 @@ import SingleProcessorDialog from "~/components/processor-selection/single-proce
 import pagination, {PaginationParamLocations} from "~/mixins/pagination";
 import {userStore} from "~/stores/user-store";
 import {appSettingsStore} from "~/stores/app-settings-store";
+import {TableOrListEvents} from "~/dictionary/table-or-list-events";
 
 export default {
   name: "signal-manager",
@@ -328,11 +329,12 @@ export default {
     this.loadSampleRates()
     this.loadFolders()
     this.actionWithTimeout(this.loadDataPage)
-    this.bus.on('signalFoldersMenuClosedFoldersChanged', this.onSignalFoldersMenuClosedFoldersChanged)
+    this.bus.on(TableOrListEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED,
+        this.onSignalFoldersMenuClosedFoldersChanged)
   },
   beforeUnmount() {
     this.mounted = false
-    this.bus.off('signalFoldersMenuClosedFoldersChanged')
+    this.bus.off(TableOrListEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED)
   },
   methods: {
     async loadDataPage() {
