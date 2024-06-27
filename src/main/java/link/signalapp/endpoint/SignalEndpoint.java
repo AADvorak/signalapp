@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import link.signalapp.dto.request.SignalDtoRequest;
-import link.signalapp.dto.request.SignalsPageDtoRequest;
+import link.signalapp.dto.request.paging.SignalsPageDtoRequest;
 import link.signalapp.dto.response.IdDtoResponse;
 import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.SignalDtoResponse;
@@ -26,22 +26,6 @@ import jakarta.validation.Valid;
 public class SignalEndpoint extends EndpointBase {
 
     private final SignalService signalService;
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public PageDtoResponse<SignalDtoResponse> get(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "0") int size,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String sortDir
-    ) {
-        return signalService.getPage(new SignalsPageDtoRequest()
-                .setSearch(search)
-                .setPage(page)
-                .setSize(size)
-                .setSortBy(sortBy)
-                .setSortDir(sortDir));
-    }
 
     @PostMapping(path = "/filter", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)

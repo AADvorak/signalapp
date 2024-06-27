@@ -1,6 +1,7 @@
 package link.signalapp.service.admin;
 
-import link.signalapp.dto.request.UsersPageDtoRequest;
+import link.signalapp.dto.request.paging.UserFiltersDto;
+import link.signalapp.dto.request.paging.UsersPageDtoRequest;
 import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.RoleDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;
@@ -44,8 +45,7 @@ public class AdminUserService {
 
     public PageDtoResponse<UserDtoResponse> getPage(UsersPageDtoRequest request) {
         Pageable pageable = pagingUtils.getPageable(request, applicationProperties.getMaxPageSize());
-        Specification<User> userSpecification = makeUserSpecification(pagingUtils.getSearch(request),
-                request.getRoleIds());
+        Specification<User> userSpecification = makeUserSpecification(request.getFilters());
         Page<User> users = userRepository.findAll(userSpecification, pageable);
         PageDtoResponse<UserDtoResponse> pageDtoResponse
                 = new PageDtoResponse<UserDtoResponse>()
@@ -100,7 +100,9 @@ public class AdminUserService {
         return roles.stream().anyMatch(role -> role.getId() == roleId);
     }
 
-    private Specification<User> makeUserSpecification(String search, List<Integer> roleIds) {
+    private Specification<User> makeUserSpecification(UserFiltersDto filters) {
+        String search = filters.getSearchFormatted();
+        var roleIds = filters.getRoleIds();
         return Specification.where(search == null ? null : UserSpecifications.nameOrEmailLike(search))
                 .and(roleIds == null ? null : UserSpecifications.existsRoleWithIdIn(roleIds));
     }

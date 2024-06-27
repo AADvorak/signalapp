@@ -1,22 +1,22 @@
-package link.signalapp.dto.request;
+package link.signalapp.dto.request.paging;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.util.List;
-
 @Getter
 @Setter
-@NoArgsConstructor
 @Accessors(chain = true)
-public class UsersPageDtoRequest implements PageDtoRequest {
+public class PageDtoRequest<Filters extends FiltersDto> {
 
-    private String search;
+    public PageDtoRequest() {
+        this.page = 0;
+        this.size = 10;
+        this.sort = new SortDto();
+    }
 
     @PositiveOrZero
     private int page;
@@ -25,10 +25,7 @@ public class UsersPageDtoRequest implements PageDtoRequest {
     @Max(25)
     private int size;
 
-    private String sortBy;
+    private SortDto sort;
 
-    private String sortDir;
-
-    private List<Integer> roleIds;
-
+    private Filters filters;
 }

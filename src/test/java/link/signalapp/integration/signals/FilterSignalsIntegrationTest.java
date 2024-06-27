@@ -1,6 +1,6 @@
 package link.signalapp.integration.signals;
 
-import link.signalapp.dto.request.SignalsPageDtoRequest;
+import link.signalapp.dto.request.paging.SignalsPageDtoRequest;
 import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.SignalDtoResponse;
 import link.signalapp.integration.IntegrationTestBase;
@@ -367,7 +367,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     private SignalsPageDtoRequest createRequest() {
-        return new SignalsPageDtoRequest().setPage(0).setSize(10);
+        return new SignalsPageDtoRequest();
     }
 
     private List<BigDecimal> toBigDecimalList(Stream<Integer> stream) {

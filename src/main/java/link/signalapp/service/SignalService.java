@@ -2,7 +2,8 @@ package link.signalapp.service;
 
 import link.signalapp.audio.AudioSampleReader;
 import link.signalapp.dto.request.SignalDtoRequest;
-import link.signalapp.dto.request.SignalsPageDtoRequest;
+import link.signalapp.dto.request.paging.SignalFiltersDto;
+import link.signalapp.dto.request.paging.SignalsPageDtoRequest;
 import link.signalapp.dto.response.IdDtoResponse;
 import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.SignalDtoResponse;
@@ -49,8 +50,7 @@ public class SignalService extends ServiceBase {
     public PageDtoResponse<SignalDtoResponse> getPage(SignalsPageDtoRequest request) {
         int userId = getUserFromContext().getId();
         Pageable pageable = pagingUtils.getPageable(request, applicationProperties.getMaxPageSize());
-        Specification<Signal> specification = makeSignalSpecification(userId, pagingUtils.getSearch(request),
-                request.getSampleRates(), request.getFolderIds());
+        Specification<Signal> specification = makeSignalSpecification(userId, request.getFilters());
         Page<Signal> signalPage = signalRepository.findAll(specification, pageable);
         return new PageDtoResponse<SignalDtoResponse>()
                 .setData(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList())
@@ -142,10 +142,10 @@ public class SignalService extends ServiceBase {
         }
     }
 
-    private Specification<Signal> makeSignalSpecification(
-            int userId, String search,
-            List<BigDecimal> sampleRates, List<Integer> folderIds
-    ) {
+    private Specification<Signal> makeSignalSpecification(int userId, SignalFiltersDto filters) {
+        String search = filters.getSearchFormatted();
+        var sampleRates = filters.getSampleRates();
+        var folderIds = filters.getFolderIds();
         return Specification.where(SignalSpecifications.userIdEqual(userId))
                 .and(search == null ? null : SignalSpecifications.nameOrDescriptionLike(search))
                 .and(sampleRates == null ? null : SignalSpecifications.sampleRateIn(sampleRates))

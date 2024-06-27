@@ -1,6 +1,8 @@
 package link.signalapp.service.utils;
 
-import link.signalapp.dto.request.PageDtoRequest;
+import link.signalapp.dto.request.paging.FiltersDto;
+import link.signalapp.dto.request.paging.PageDtoRequest;
+import link.signalapp.dto.request.paging.SortDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,20 +16,18 @@ public class PagingUtils {
     private final List<String> availableSortFields;
     private final String defaultSortField;
 
-    public Pageable getPageable(PageDtoRequest request, int maxPageSize) {
+    public Pageable getPageable(PageDtoRequest<? extends FiltersDto> request, int maxPageSize) {
         return PageRequest.of(request.getPage(), request.getSize() > maxPageSize
                 || request.getSize() <= 0
                 ? maxPageSize
-                : request.getSize(), getSort(request));
+                : request.getSize(), getSort(request.getSort()));
     }
 
-    public String getSearch(PageDtoRequest request) {
-        return request.getSearch() == null || request.getSearch().isEmpty() ? null : "%" + request.getSearch() + "%";
-    }
-
-    private Sort getSort(PageDtoRequest request) {
-        Sort sort = Sort.by(getSortByOrDefault(request.getSortBy()));
-        return "asc".equals(request.getSortDir()) ? sort : sort.descending();
+    private Sort getSort(SortDto sortDto) {
+        var sortBy = sortDto == null ? "" : sortDto.getBy();
+        var sortDir = sortDto == null ? "" : sortDto.getDir();
+        var sort = Sort.by(getSortByOrDefault(sortBy));
+        return "asc".equals(sortDir) ? sort : sort.descending();
     }
 
     private String getSortByOrDefault(String sortBy) {

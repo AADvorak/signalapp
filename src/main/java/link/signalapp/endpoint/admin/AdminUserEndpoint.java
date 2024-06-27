@@ -1,6 +1,6 @@
 package link.signalapp.endpoint.admin;
 
-import link.signalapp.dto.request.UsersPageDtoRequest;
+import link.signalapp.dto.request.paging.UsersPageDtoRequest;
 import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.RoleDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;

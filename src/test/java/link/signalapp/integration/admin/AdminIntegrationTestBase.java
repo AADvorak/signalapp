@@ -1,6 +1,6 @@
 package link.signalapp.integration.admin;
 
-import link.signalapp.dto.request.UsersPageDtoRequest;
+import link.signalapp.dto.request.paging.UsersPageDtoRequest;
 import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.integration.IntegrationTestBase;
@@ -19,7 +19,7 @@ public class AdminIntegrationTestBase extends IntegrationTestBase {
     }
 
     protected UsersPageDtoRequest createRequest() {
-        return new UsersPageDtoRequest().setPage(0).setSize(10);
+        return new UsersPageDtoRequest();
     }
 
     protected static final class UsersPage extends PageDtoResponse<UserDtoResponse> {
