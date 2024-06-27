@@ -1,6 +1,5 @@
 package link.signalapp.service.admin;
 
-import link.signalapp.dto.request.paging.UserFiltersDto;
 import link.signalapp.dto.request.paging.UsersPageDtoRequest;
 import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.RoleDtoResponse;
@@ -14,12 +13,10 @@ import link.signalapp.model.User;
 import link.signalapp.model.UserToken;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.*;
-import link.signalapp.service.specifications.UserSpecifications;
 import link.signalapp.service.utils.PagingUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +33,7 @@ public class AdminUserService {
             "patronymic", "email", "createTime");
 
     private final UserRepository userRepository;
+    private final FilterUserRepository filterUserRepository;
     private final UserTokenRepository userTokenRepository;
     private final RoleRepository roleRepository;
     private final SignalRepository signalRepository;
@@ -45,8 +43,7 @@ public class AdminUserService {
 
     public PageDtoResponse<UserDtoResponse> getPage(UsersPageDtoRequest request) {
         Pageable pageable = pagingUtils.getPageable(request, applicationProperties.getMaxPageSize());
-        Specification<User> userSpecification = makeUserSpecification(request.getFilters());
-        Page<User> users = userRepository.findAll(userSpecification, pageable);
+        Page<User> users = filterUserRepository.findByFilters(request.getFilters(), pageable);
         PageDtoResponse<UserDtoResponse> pageDtoResponse
                 = new PageDtoResponse<UserDtoResponse>()
                 .setData(users.stream().map(UserMapper.INSTANCE::userToDto).toList())
@@ -98,12 +95,5 @@ public class AdminUserService {
 
     private boolean checkRolesContainsRoleWithId(int roleId, Set<Role> roles) {
         return roles.stream().anyMatch(role -> role.getId() == roleId);
-    }
-
-    private Specification<User> makeUserSpecification(UserFiltersDto filters) {
-        String search = filters.getSearchFormatted();
-        var roleIds = filters.getRoleIds();
-        return Specification.where(search == null ? null : UserSpecifications.nameOrEmailLike(search))
-                .and(roleIds == null ? null : UserSpecifications.existsRoleWithIdIn(roleIds));
     }
 }

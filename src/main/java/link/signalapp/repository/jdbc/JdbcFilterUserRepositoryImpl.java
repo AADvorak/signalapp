@@ -1,5 +1,6 @@
 package link.signalapp.repository.jdbc;
 
+import link.signalapp.dto.request.paging.UserFiltersDto;
 import link.signalapp.model.Role;
 import link.signalapp.model.User;
 import link.signalapp.repository.FilterUserRepository;
@@ -7,14 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
-@Repository
+//@Repository - currently specifications repository is used
 public class JdbcFilterUserRepositoryImpl implements FilterUserRepository {
 
     private static final String USERS_QUERY = """
@@ -59,19 +58,19 @@ public class JdbcFilterUserRepositoryImpl implements FilterUserRepository {
                     .setName(rs.getString("name"));
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final JdbcFilteringQueryExecutor<User> queryExecutor;
+    private final JdbcPageQueryExecutor<User> queryExecutor;
 
     public JdbcFilterUserRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        queryExecutor = new JdbcFilteringQueryExecutor<>(USERS_QUERY, Map.of(
+        queryExecutor = new JdbcPageQueryExecutor<>(USERS_QUERY, Map.of(
                 "search", USERS_QUERY_SEARCH_CONDITION,
                 "roleIds", USERS_QUERY_ROLE_IDS_CONDITION
         ), USER_ROW_MAPPER, jdbcTemplate);
     }
 
     @Override
-    public Page<User> findByFilter(String search, List<Integer> roleIds, Pageable pageable) {
-        Map<String, Object> params = makeParams(search, roleIds);
+    public Page<User> findByFilters(UserFiltersDto filters, Pageable pageable) {
+        Map<String, Object> params = makeParams(filters);
         Page<User> userPage = queryExecutor.execute(params, pageable);
         userPage.stream().forEach(this::fetchRoles);
         return userPage;
@@ -82,10 +81,10 @@ public class JdbcFilterUserRepositoryImpl implements FilterUserRepository {
         user.setRoles(new HashSet<>(jdbcTemplate.query(ROLES_QUERY, params, ROLE_ROW_MAPPER)));
     }
 
-    private Map<String, Object> makeParams(String search, List<Integer> roleIds) {
+    private Map<String, Object> makeParams(UserFiltersDto filters) {
         Map<String, Object> params = new HashMap<>();
-        params.put("search", search);
-        params.put("roleIds", roleIds);
+        params.put("search", filters.getSearchFormatted());
+        params.put("roleIds", filters.getRoleIds());
         return params;
     }
 }

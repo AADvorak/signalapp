@@ -1,19 +1,17 @@
 package link.signalapp.repository.jdbc;
 
+import link.signalapp.dto.request.paging.SignalFiltersDto;
 import link.signalapp.model.Signal;
 import link.signalapp.repository.FilterSignalRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-@Repository
+//@Repository - currently specifications repository is used
 public class JdbcFilterSignalRepositoryImpl implements FilterSignalRepository {
 
     private static final String QUERY_BASE = """
@@ -46,10 +44,10 @@ public class JdbcFilterSignalRepositoryImpl implements FilterSignalRepository {
                     .setSampleRate(rs.getBigDecimal("sample_rate"))
                     .setXMin(rs.getBigDecimal("x_min"));
 
-    private final JdbcFilteringQueryExecutor<Signal> queryExecutor;
+    private final JdbcPageQueryExecutor<Signal> queryExecutor;
 
     public JdbcFilterSignalRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate) {
-        queryExecutor = new JdbcFilteringQueryExecutor<>(QUERY_BASE, Map.of(
+        queryExecutor = new JdbcPageQueryExecutor<>(QUERY_BASE, Map.of(
                 "search", QUERY_SEARCH_CONDITION,
                 "sampleRates", QUERY_SAMPLE_RATES_CONDITION,
                 "folderIds", QUERY_FOLDER_IDS_CONDITION
@@ -57,23 +55,17 @@ public class JdbcFilterSignalRepositoryImpl implements FilterSignalRepository {
     }
 
     @Override
-    public Page<Signal> findByUserIdAndFilter(
-            int userId,
-            String search,
-            List<BigDecimal> sampleRates,
-            List<Integer> folderIds,
-            Pageable pageable
-    ) {
-        Map<String, Object> params = makeParams(userId, search, sampleRates, folderIds);
+    public Page<Signal> findByUserIdAndFilters(int userId, SignalFiltersDto filters, Pageable pageable) {
+        Map<String, Object> params = makeParams(userId, filters);
         return queryExecutor.execute(params, pageable);
     }
 
-    Map<String, Object> makeParams(int userId, String search, List<BigDecimal> sampleRates, List<Integer> folderIds) {
+    Map<String, Object> makeParams(int userId, SignalFiltersDto filters) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        params.put("search", search);
-        params.put("sampleRates", sampleRates);
-        params.put("folderIds", folderIds);
+        params.put("search", filters.getSearchFormatted());
+        params.put("sampleRates", filters.getSampleRates());
+        params.put("folderIds", filters.getFolderIds());
         return params;
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class JdbcFilteringQueryExecutor<T> {
+public class JdbcPageQueryExecutor<T> {
 
     private final String baseQuery;
     private final Map<String, String> conditions;
@@ -62,7 +62,7 @@ public class JdbcFilteringQueryExecutor<T> {
         int size = pageable.getPageSize();
         String limit = " fetch first " + size + " rows only";
         if (page > 0) {
-            return limit + " offset " + page;
+            return limit + " offset " + page * size;
         }
         return limit;
     }
