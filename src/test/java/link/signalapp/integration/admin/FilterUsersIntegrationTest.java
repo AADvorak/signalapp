@@ -41,56 +41,56 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
     @Test
     public void filterAll() {
         UserFilterDto userFilterDto = createUserFilterDto();
-        filterAndCheckCounts(userFilterDto, 12, 2, 10);
+        filterAndCheckCounts(userFilterDto, 12, 2);
     }
 
     @Test
     public void filterSearchVariant1() {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setSearch("abc");
-        filterAndCheckCounts(userFilterDto, 5, 1, 5);
+        filterAndCheckCounts(userFilterDto, 5, 1);
     }
 
     @Test
     public void filterSearchVariant2() {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setSearch("fgh");
-        filterAndCheckCounts(userFilterDto, 10, 1, 10);
+        filterAndCheckCounts(userFilterDto, 10, 1);
     }
 
     @Test
     public void filterSearchVariant3() {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setSearch("klmnopq");
-        filterAndCheckCounts(userFilterDto, 1, 1, 1);
+        filterAndCheckCounts(userFilterDto, 1, 1);
     }
 
     @Test
     public void filterSearchVariant4() {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setSearch("filter0");
-        filterAndCheckCounts(userFilterDto, 1, 1, 1);
+        filterAndCheckCounts(userFilterDto, 1, 1);
     }
 
     @Test
     public void filterRoleIdsVariant1() {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setRoleIds(List.of(getAdminRole().getId()));
-        filterAndCheckCounts(userFilterDto, 2, 1, 2);
+        filterAndCheckCounts(userFilterDto, 2, 1);
     }
 
     @Test
     public void filterRoleIdsVariant2() {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setRoleIds(List.of(getRoleByName(Role.EXTENDED_STORAGE).getId()));
-        filterAndCheckCounts(userFilterDto, 1, 1, 1);
+        filterAndCheckCounts(userFilterDto, 1, 1);
     }
 
     @Test
     public void filterRoleIdsVariant3() {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setRoleIds(List.of(getAdminRole().getId(), getRoleByName(Role.EXTENDED_STORAGE).getId()));
-        filterAndCheckCounts(userFilterDto, 2, 1, 2);
+        filterAndCheckCounts(userFilterDto, 2, 1);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setSearch("abc")
                 .setRoleIds(List.of(getAdminRole().getId()));
-        filterAndCheckCounts(userFilterDto, 0, 0, 0);
+        filterAndCheckCounts(userFilterDto, 0, 0);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setSearch(email1)
                 .setRoleIds(List.of(getAdminRole().getId()));
-        filterAndCheckCounts(userFilterDto, 1, 1, 1);
+        filterAndCheckCounts(userFilterDto, 1, 1);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
         UserFilterDto userFilterDto = createUserFilterDto()
                 .setSearch("first")
                 .setRoleIds(List.of(getAdminRole().getId()));
-        filterAndCheckCounts(userFilterDto, 2, 1, 2);
+        filterAndCheckCounts(userFilterDto, 2, 1);
     }
 
     @Test
@@ -209,13 +209,18 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
     }
 
     private void filterAndCheckCounts(UserFilterDto userFilterDto,
-                                      long expectedElements, long expectedPages, long expectedDataSize) {
-        UsersPage usersPage = getPageAndCheck(userFilterDto);
-        assertAll(
-                () -> assertEquals(expectedElements, usersPage.getElements()),
-                () -> assertEquals(expectedPages, usersPage.getPages()),
-                () -> assertEquals(expectedDataSize, usersPage.getData().size())
-        );
+                                      long expectedElements, long expectedPages) {
+        while (userFilterDto.getPage() < expectedPages) {
+            UsersPage usersPage = getPageAndCheck(userFilterDto);
+            long offsetDataSize = expectedElements - (long) userFilterDto.getPage() * userFilterDto.getSize();
+            long expectedPageDataSize = offsetDataSize > userFilterDto.getSize() ? userFilterDto.getSize() : offsetDataSize;
+            assertAll(
+                    () -> assertEquals(expectedElements, usersPage.getElements()),
+                    () -> assertEquals(expectedPages, usersPage.getPages()),
+                    () -> assertEquals(expectedPageDataSize, usersPage.getData().size())
+            );
+            userFilterDto.setPage(userFilterDto.getPage() + 1);
+        }
     }
 
     private void filterAndCheckSort(UserFilterDto userFilterDto, Comparator<UserDtoResponse> expectedSortComparator) {

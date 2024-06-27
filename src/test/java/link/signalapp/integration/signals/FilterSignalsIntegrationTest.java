@@ -57,112 +57,112 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     @Test
     public void filterAll() {
         SignalFilterDto signalFilterDto = createSignalFilterDto();
-        filterAndCheckCounts(signalFilterDto, 40, 4, 10);
+        filterAndCheckCounts(signalFilterDto, 40, 4);
     }
 
     @Test
     public void filterSearchVariant1() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSearch("abc");
-        filterAndCheckCounts(signalFilterDto, 20, 2, 10);
+        filterAndCheckCounts(signalFilterDto, 20, 2);
     }
 
     @Test
     public void filterSearchVariant2() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSearch("abcdef");
-        filterAndCheckCounts(signalFilterDto, 8, 1, 8);
+        filterAndCheckCounts(signalFilterDto, 8, 1);
     }
 
     @Test
     public void filterSearchVariant3() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSearch("fgh");
-        filterAndCheckCounts(signalFilterDto, 40, 4, 10);
+        filterAndCheckCounts(signalFilterDto, 40, 4);
     }
 
     @Test
     public void filterSearchVariant4() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSearch("klm");
-        filterAndCheckCounts(signalFilterDto, 20, 2, 10);
+        filterAndCheckCounts(signalFilterDto, 20, 2);
     }
 
     @Test
     public void filterSearchVariant5() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSearch("lmn");
-        filterAndCheckCounts(signalFilterDto, 0, 0, 0);
+        filterAndCheckCounts(signalFilterDto, 0, 0);
     }
 
     @Test
     public void filterSampleRatesVariant1() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSampleRates(toBigDecimalList(Stream.of(3000)));
-        filterAndCheckCounts(signalFilterDto, 8, 1, 8);
+        filterAndCheckCounts(signalFilterDto, 8, 1);
     }
 
     @Test
     public void filterSampleRatesVariant2() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)));
-        filterAndCheckCounts(signalFilterDto, 16, 2, 10);
+        filterAndCheckCounts(signalFilterDto, 16, 2);
     }
 
     @Test
     public void filterSampleRatesVariant3() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 4000)));
-        filterAndCheckCounts(signalFilterDto, 8, 1, 8);
+        filterAndCheckCounts(signalFilterDto, 8, 1);
     }
 
     @Test
     public void filterSampleRatesVariant4() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSampleRates(toBigDecimalList(Stream.of(9000, 4000)));
-        filterAndCheckCounts(signalFilterDto, 0, 0, 0);
+        filterAndCheckCounts(signalFilterDto, 0, 0);
     }
 
     @Test
     public void filterFoldersVariant1() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setFolderIds(toFolderIdList(List.of(0)));
-        filterAndCheckCounts(signalFilterDto, 20, 2, 10);
+        filterAndCheckCounts(signalFilterDto, 20, 2);
     }
 
     @Test
     public void filterFoldersVariant2() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setFolderIds(toFolderIdList(List.of(1)));
-        filterAndCheckCounts(signalFilterDto, 10, 1, 10);
+        filterAndCheckCounts(signalFilterDto, 10, 1);
     }
 
     @Test
     public void filterFoldersVariant3() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setFolderIds(toFolderIdList(List.of(2)));
-        filterAndCheckCounts(signalFilterDto, 10, 1, 10);
+        filterAndCheckCounts(signalFilterDto, 10, 1);
     }
 
     @Test
     public void filterFoldersVariant4() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setFolderIds(toFolderIdList(List.of(0, 1)));
-        filterAndCheckCounts(signalFilterDto, 30, 3, 10);
+        filterAndCheckCounts(signalFilterDto, 30, 3);
     }
 
     @Test
     public void filterFoldersVariant5() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setFolderIds(toFolderIdList(List.of(0, 2)));
-        filterAndCheckCounts(signalFilterDto, 30, 3, 10);
+        filterAndCheckCounts(signalFilterDto, 30, 3);
     }
 
     @Test
     public void filterFoldersVariant6() {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setFolderIds(toFolderIdList(List.of(1, 2)));
-        filterAndCheckCounts(signalFilterDto, 10, 1, 10);
+        filterAndCheckCounts(signalFilterDto, 10, 1);
     }
 
     @Test
@@ -170,7 +170,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSearch("abc")
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)));
-        filterAndCheckCounts(signalFilterDto, 8, 1, 8);
+        filterAndCheckCounts(signalFilterDto, 8, 1);
     }
 
     @Test
@@ -178,7 +178,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSearch("abc")
                 .setSampleRates(toBigDecimalList(Stream.of(44000)));
-        filterAndCheckCounts(signalFilterDto, 4, 1, 4);
+        filterAndCheckCounts(signalFilterDto, 4, 1);
     }
 
     @Test
@@ -186,7 +186,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSearch("abcdef")
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)));
-        filterAndCheckCounts(signalFilterDto, 0, 0, 0);
+        filterAndCheckCounts(signalFilterDto, 0, 0);
     }
 
     @Test
@@ -194,7 +194,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)))
                 .setFolderIds(toFolderIdList(List.of(2)));
-        filterAndCheckCounts(signalFilterDto, 4, 1, 4);
+        filterAndCheckCounts(signalFilterDto, 4, 1);
     }
 
     @Test
@@ -202,7 +202,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
         SignalFilterDto signalFilterDto = createSignalFilterDto()
                 .setSearch("abc")
                 .setFolderIds(toFolderIdList(List.of(2)));
-        filterAndCheckCounts(signalFilterDto, 5, 1, 5);
+        filterAndCheckCounts(signalFilterDto, 5, 1);
     }
 
     @Test
@@ -211,7 +211,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
                 .setSearch("abc")
                 .setSampleRates(toBigDecimalList(Stream.of(3000)))
                 .setFolderIds(toFolderIdList(List.of(2)));
-        filterAndCheckCounts(signalFilterDto, 1, 1, 1);
+        filterAndCheckCounts(signalFilterDto, 1, 1);
     }
 
     @Test
@@ -297,13 +297,18 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     private void filterAndCheckCounts(SignalFilterDto signalFilterDto,
-                                      long expectedElements, long expectedPages, long expectedDataSize) {
-        SignalsPage signalsPage = getSignalsPageAndCheck(signalFilterDto);
-        assertAll(
-                () -> assertEquals(expectedElements, signalsPage.getElements()),
-                () -> assertEquals(expectedPages, signalsPage.getPages()),
-                () -> assertEquals(expectedDataSize, signalsPage.getData().size())
-        );
+                                      long expectedElements, long expectedPages) {
+        while (signalFilterDto.getPage() < expectedPages) {
+            SignalsPage signalsPage = getSignalsPageAndCheck(signalFilterDto);
+            long offsetDataSize = expectedElements - (long) signalFilterDto.getPage() * signalFilterDto.getSize();
+            long expectedPageDataSize = offsetDataSize > signalFilterDto.getSize() ? signalFilterDto.getSize() : offsetDataSize;
+            assertAll(
+                    () -> assertEquals(expectedElements, signalsPage.getElements()),
+                    () -> assertEquals(expectedPages, signalsPage.getPages()),
+                    () -> assertEquals(expectedPageDataSize, signalsPage.getData().size())
+            );
+            signalFilterDto.setPage(signalFilterDto.getPage() + 1);
+        }
     }
 
     private void filterAndCheckSort(SignalFilterDto signalFilterDto, Comparator<SignalDtoResponse> expectedSortComparator) {
