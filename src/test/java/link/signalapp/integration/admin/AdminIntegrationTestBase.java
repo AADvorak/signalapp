@@ -1,7 +1,7 @@
 package link.signalapp.integration.admin;
 
-import link.signalapp.dto.request.UserFilterDto;
-import link.signalapp.dto.response.ResponseWithTotalCounts;
+import link.signalapp.dto.request.UsersPageDtoRequest;
+import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.integration.IntegrationTestBase;
 import link.signalapp.model.Role;
@@ -18,10 +18,10 @@ public class AdminIntegrationTestBase extends IntegrationTestBase {
         return getRoleByName(Role.ADMIN);
     }
 
-    protected UserFilterDto createUserFilterDto() {
-        return new UserFilterDto().setPage(0).setSize(10);
+    protected UsersPageDtoRequest createRequest() {
+        return new UsersPageDtoRequest().setPage(0).setSize(10);
     }
 
-    protected static final class UsersPage extends ResponseWithTotalCounts<UserDtoResponse> {
+    protected static final class UsersPage extends PageDtoResponse<UserDtoResponse> {
     }
 }

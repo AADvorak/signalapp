@@ -2,9 +2,9 @@ package link.signalapp.service;
 
 import link.signalapp.audio.AudioSampleReader;
 import link.signalapp.dto.request.SignalDtoRequest;
-import link.signalapp.dto.request.SignalFilterDto;
+import link.signalapp.dto.request.SignalsPageDtoRequest;
 import link.signalapp.dto.response.IdDtoResponse;
-import link.signalapp.dto.response.ResponseWithTotalCounts;
+import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.SignalDtoResponse;
 import link.signalapp.error.code.SignalAppErrorCode;
 import link.signalapp.error.exception.SignalAppConflictException;
@@ -19,7 +19,7 @@ import link.signalapp.model.Signal;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.SignalRepository;
 import link.signalapp.service.specifications.SignalSpecifications;
-import link.signalapp.service.utils.FilterUtils;
+import link.signalapp.service.utils.PagingUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,15 +44,15 @@ public class SignalService extends ServiceBase {
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
     private final ApplicationProperties applicationProperties;
-    private final FilterUtils filterUtils = new FilterUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
+    private final PagingUtils pagingUtils = new PagingUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
 
-    public ResponseWithTotalCounts<SignalDtoResponse> filter(SignalFilterDto filter) {
+    public PageDtoResponse<SignalDtoResponse> getPage(SignalsPageDtoRequest request) {
         int userId = getUserFromContext().getId();
-        Pageable pageable = filterUtils.getPageable(filter, applicationProperties.getMaxPageSize());
-        Specification<Signal> specification = makeSignalSpecification(userId, filterUtils.getSearch(filter),
-                filter.getSampleRates(), filter.getFolderIds());
+        Pageable pageable = pagingUtils.getPageable(request, applicationProperties.getMaxPageSize());
+        Specification<Signal> specification = makeSignalSpecification(userId, pagingUtils.getSearch(request),
+                request.getSampleRates(), request.getFolderIds());
         Page<Signal> signalPage = signalRepository.findAll(specification, pageable);
-        return new ResponseWithTotalCounts<SignalDtoResponse>()
+        return new PageDtoResponse<SignalDtoResponse>()
                 .setData(signalPage.stream().map(SignalMapper.INSTANCE::signalToDto).toList())
                 .setPages(signalPage.getTotalPages())
                 .setElements(signalPage.getTotalElements());

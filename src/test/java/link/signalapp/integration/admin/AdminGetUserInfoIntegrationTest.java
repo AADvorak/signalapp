@@ -43,7 +43,7 @@ public class AdminGetUserInfoIntegrationTest extends AdminIntegrationTestBase {
     @Test
     public void getFirstUserInfo() {
         ResponseEntity<UsersPage> response = template.exchange(fullUrl(FILTER_USERS_URL), HttpMethod.POST,
-                new HttpEntity<>(createUserFilterDto().setSearch(email1), login(email1)), UsersPage.class);
+                new HttpEntity<>(createRequest().setSearch(email1), login(email1)), UsersPage.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody()).getData().get(0);
         User user = userRepository.findByEmail(email1);
         UserToken userToken = userTokenRepository.findLastByUserId(user.getId());
@@ -65,7 +65,7 @@ public class AdminGetUserInfoIntegrationTest extends AdminIntegrationTestBase {
     @Test
     public void getSecondUserInfo() {
         ResponseEntity<UsersPage> response = template.exchange(fullUrl(FILTER_USERS_URL), HttpMethod.POST,
-                new HttpEntity<>(createUserFilterDto().setSearch(email2), login(email1)), UsersPage.class);
+                new HttpEntity<>(createRequest().setSearch(email2), login(email1)), UsersPage.class);
         UserDtoResponse userDtoResponse = Objects.requireNonNull(response.getBody()).getData().get(0);
         User user = userRepository.findByEmail(email2);
         UserToken userToken = userTokenRepository.findLastByUserId(user.getId());

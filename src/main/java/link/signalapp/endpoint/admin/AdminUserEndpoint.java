@@ -1,7 +1,7 @@
 package link.signalapp.endpoint.admin;
 
-import link.signalapp.dto.request.UserFilterDto;
-import link.signalapp.dto.response.ResponseWithTotalCounts;
+import link.signalapp.dto.request.UsersPageDtoRequest;
+import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.RoleDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.service.admin.AdminUserService;
@@ -18,8 +18,8 @@ public class AdminUserEndpoint {
     private final AdminUserService adminUserService;
 
     @PostMapping("/filter")
-    public ResponseWithTotalCounts<UserDtoResponse> filterUsers(@RequestBody UserFilterDto userFilterDto) {
-        return adminUserService.filter(userFilterDto);
+    public PageDtoResponse<UserDtoResponse> getPage(@RequestBody UsersPageDtoRequest request) {
+        return adminUserService.getPage(request);
     }
 
     @PutMapping("/{userId}/roles/{roleId}")

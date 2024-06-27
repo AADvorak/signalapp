@@ -5,9 +5,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import link.signalapp.dto.request.SignalDtoRequest;
-import link.signalapp.dto.request.SignalFilterDto;
+import link.signalapp.dto.request.SignalsPageDtoRequest;
 import link.signalapp.dto.response.IdDtoResponse;
-import link.signalapp.dto.response.ResponseWithTotalCounts;
+import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.SignalDtoResponse;
 import link.signalapp.service.SignalService;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +28,14 @@ public class SignalEndpoint extends EndpointBase {
     private final SignalService signalService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseWithTotalCounts<SignalDtoResponse> get(
+    public PageDtoResponse<SignalDtoResponse> get(
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "0") int size,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String sortDir
     ) {
-        return signalService.filter(new SignalFilterDto()
+        return signalService.getPage(new SignalsPageDtoRequest()
                 .setSearch(search)
                 .setPage(page)
                 .setSize(size)
@@ -45,8 +45,8 @@ public class SignalEndpoint extends EndpointBase {
 
     @PostMapping(path = "/filter", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseWithTotalCounts<SignalDtoResponse> filter(@RequestBody @Valid SignalFilterDto filter) {
-        return signalService.filter(filter);
+    public PageDtoResponse<SignalDtoResponse> getPage(@RequestBody @Valid SignalsPageDtoRequest request) {
+        return signalService.getPage(request);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

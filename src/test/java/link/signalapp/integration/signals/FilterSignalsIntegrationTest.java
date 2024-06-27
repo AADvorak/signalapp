@@ -1,7 +1,7 @@
 package link.signalapp.integration.signals;
 
-import link.signalapp.dto.request.SignalFilterDto;
-import link.signalapp.dto.response.ResponseWithTotalCounts;
+import link.signalapp.dto.request.SignalsPageDtoRequest;
+import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.SignalDtoResponse;
 import link.signalapp.integration.IntegrationTestBase;
 import link.signalapp.model.Folder;
@@ -56,230 +56,230 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void filterAll() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto();
-        filterAndCheckCounts(signalFilterDto, 40, 4);
+        SignalsPageDtoRequest request = createRequest();
+        filterAndCheckCounts(request, 40, 4);
     }
 
     @Test
     public void filterSearchVariant1() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("abc");
-        filterAndCheckCounts(signalFilterDto, 20, 2);
+        filterAndCheckCounts(request, 20, 2);
     }
 
     @Test
     public void filterSearchVariant2() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("abcdef");
-        filterAndCheckCounts(signalFilterDto, 8, 1);
+        filterAndCheckCounts(request, 8, 1);
     }
 
     @Test
     public void filterSearchVariant3() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("fgh");
-        filterAndCheckCounts(signalFilterDto, 40, 4);
+        filterAndCheckCounts(request, 40, 4);
     }
 
     @Test
     public void filterSearchVariant4() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("klm");
-        filterAndCheckCounts(signalFilterDto, 20, 2);
+        filterAndCheckCounts(request, 20, 2);
     }
 
     @Test
     public void filterSearchVariant5() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("lmn");
-        filterAndCheckCounts(signalFilterDto, 0, 0);
+        filterAndCheckCounts(request, 0, 0);
     }
 
     @Test
     public void filterSampleRatesVariant1() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSampleRates(toBigDecimalList(Stream.of(3000)));
-        filterAndCheckCounts(signalFilterDto, 8, 1);
+        filterAndCheckCounts(request, 8, 1);
     }
 
     @Test
     public void filterSampleRatesVariant2() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)));
-        filterAndCheckCounts(signalFilterDto, 16, 2);
+        filterAndCheckCounts(request, 16, 2);
     }
 
     @Test
     public void filterSampleRatesVariant3() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 4000)));
-        filterAndCheckCounts(signalFilterDto, 8, 1);
+        filterAndCheckCounts(request, 8, 1);
     }
 
     @Test
     public void filterSampleRatesVariant4() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSampleRates(toBigDecimalList(Stream.of(9000, 4000)));
-        filterAndCheckCounts(signalFilterDto, 0, 0);
+        filterAndCheckCounts(request, 0, 0);
     }
 
     @Test
     public void filterFoldersVariant1() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setFolderIds(toFolderIdList(List.of(0)));
-        filterAndCheckCounts(signalFilterDto, 20, 2);
+        filterAndCheckCounts(request, 20, 2);
     }
 
     @Test
     public void filterFoldersVariant2() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setFolderIds(toFolderIdList(List.of(1)));
-        filterAndCheckCounts(signalFilterDto, 10, 1);
+        filterAndCheckCounts(request, 10, 1);
     }
 
     @Test
     public void filterFoldersVariant3() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setFolderIds(toFolderIdList(List.of(2)));
-        filterAndCheckCounts(signalFilterDto, 10, 1);
+        filterAndCheckCounts(request, 10, 1);
     }
 
     @Test
     public void filterFoldersVariant4() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setFolderIds(toFolderIdList(List.of(0, 1)));
-        filterAndCheckCounts(signalFilterDto, 30, 3);
+        filterAndCheckCounts(request, 30, 3);
     }
 
     @Test
     public void filterFoldersVariant5() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setFolderIds(toFolderIdList(List.of(0, 2)));
-        filterAndCheckCounts(signalFilterDto, 30, 3);
+        filterAndCheckCounts(request, 30, 3);
     }
 
     @Test
     public void filterFoldersVariant6() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setFolderIds(toFolderIdList(List.of(1, 2)));
-        filterAndCheckCounts(signalFilterDto, 10, 1);
+        filterAndCheckCounts(request, 10, 1);
     }
 
     @Test
     public void filterSearchAndSampleRatesVariant1() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("abc")
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)));
-        filterAndCheckCounts(signalFilterDto, 8, 1);
+        filterAndCheckCounts(request, 8, 1);
     }
 
     @Test
     public void filterSearchAndSampleRatesVariant2() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("abc")
                 .setSampleRates(toBigDecimalList(Stream.of(44000)));
-        filterAndCheckCounts(signalFilterDto, 4, 1);
+        filterAndCheckCounts(request, 4, 1);
     }
 
     @Test
     public void filterSearchAndSampleRatesVariant3() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("abcdef")
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)));
-        filterAndCheckCounts(signalFilterDto, 0, 0);
+        filterAndCheckCounts(request, 0, 0);
     }
 
     @Test
     public void filterSampleRatesAndFolders() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSampleRates(toBigDecimalList(Stream.of(3000, 8000)))
                 .setFolderIds(toFolderIdList(List.of(2)));
-        filterAndCheckCounts(signalFilterDto, 4, 1);
+        filterAndCheckCounts(request, 4, 1);
     }
 
     @Test
     public void filterSearchAndFolders() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("abc")
                 .setFolderIds(toFolderIdList(List.of(2)));
-        filterAndCheckCounts(signalFilterDto, 5, 1);
+        filterAndCheckCounts(request, 5, 1);
     }
 
     @Test
     public void filterSearchAndSampleRatesAndFolders() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto()
+        SignalsPageDtoRequest request = createRequest()
                 .setSearch("abc")
                 .setSampleRates(toBigDecimalList(Stream.of(3000)))
                 .setFolderIds(toFolderIdList(List.of(2)));
-        filterAndCheckCounts(signalFilterDto, 1, 1);
+        filterAndCheckCounts(request, 1, 1);
     }
 
     @Test
     public void sortDefault() {
-        filterAndCheckSort(createSignalFilterDto(), Comparator.comparing(SignalDtoResponse::getId).reversed());
+        filterAndCheckSort(createRequest(), Comparator.comparing(SignalDtoResponse::getId).reversed());
     }
 
     @Test
     public void sortByNameAsc() {
-        filterAndCheckSort(createSignalFilterDto().setSortBy("name").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("name").setSortDir("asc"),
                 Comparator.comparing(SignalDtoResponse::getName));
     }
 
     @Test
     public void sortByNameDesc() {
-        filterAndCheckSort(createSignalFilterDto().setSortBy("name").setSortDir("desc"),
+        filterAndCheckSort(createRequest().setSortBy("name").setSortDir("desc"),
                 Comparator.comparing(SignalDtoResponse::getName).reversed());
     }
 
     @Test
     public void sortByDescriptionAsc() {
-        filterAndCheckSort(createSignalFilterDto().setSortBy("description").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("description").setSortDir("asc"),
                 Comparator.comparing(SignalDtoResponse::getDescription));
     }
 
     @Test
     public void sortByDescriptionDesc() {
-        filterAndCheckSort(createSignalFilterDto().setSortBy("description").setSortDir("desc"),
+        filterAndCheckSort(createRequest().setSortBy("description").setSortDir("desc"),
                 Comparator.comparing(SignalDtoResponse::getDescription).reversed());
     }
 
     @Test
     public void sortBySampleRateAsc() {
-        filterAndCheckSort(createSignalFilterDto().setSortBy("sampleRate").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("sampleRate").setSortDir("asc"),
                 Comparator.comparing(SignalDtoResponse::getSampleRate));
     }
 
     @Test
     public void sortBySampleRateDesc() {
-        filterAndCheckSort(createSignalFilterDto().setSortBy("sampleRate").setSortDir("desc"),
+        filterAndCheckSort(createRequest().setSortBy("sampleRate").setSortDir("desc"),
                 Comparator.comparing(SignalDtoResponse::getSampleRate).reversed());
     }
 
     @Test
     public void sortByWrongField() {
-        filterAndCheckSort(createSignalFilterDto().setSortBy("wrongField").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("wrongField").setSortDir("asc"),
                 Comparator.comparing(SignalDtoResponse::getId));
     }
 
     @Test
     public void sortByWrongDirection() {
-        filterAndCheckSort(createSignalFilterDto().setSortBy("name").setSortDir("wrongDirection"),
+        filterAndCheckSort(createRequest().setSortBy("name").setSortDir("wrongDirection"),
                 Comparator.comparing(SignalDtoResponse::getName).reversed());
     }
 
     @Test
     public void filterWrongPage() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto().setPage(-1);
+        SignalsPageDtoRequest request = createRequest().setPage(-1);
         checkBadRequestFieldError(() -> template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
-                new HttpEntity<>(signalFilterDto, login(email1)), SignalsPage.class),
+                new HttpEntity<>(request, login(email1)), SignalsPage.class),
                 "PositiveOrZero", "page");
     }
 
     @Test
     public void filterWrongSize() {
-        SignalFilterDto signalFilterDto = createSignalFilterDto().setSize(30);
+        SignalsPageDtoRequest request = createRequest().setSize(30);
         checkBadRequestFieldError(() -> template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
-                        new HttpEntity<>(signalFilterDto, login(email1)), SignalsPage.class),
+                        new HttpEntity<>(request, login(email1)), SignalsPage.class),
                 "Max", "size");
     }
 
@@ -296,23 +296,23 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
                 Arrays.stream(sampleRates).sorted().map(BigDecimal::intValue).toList());
     }
 
-    private void filterAndCheckCounts(SignalFilterDto signalFilterDto,
+    private void filterAndCheckCounts(SignalsPageDtoRequest request,
                                       long expectedElements, long expectedPages) {
-        while (signalFilterDto.getPage() < expectedPages) {
-            SignalsPage signalsPage = getSignalsPageAndCheck(signalFilterDto);
-            long offsetDataSize = expectedElements - (long) signalFilterDto.getPage() * signalFilterDto.getSize();
-            long expectedPageDataSize = offsetDataSize > signalFilterDto.getSize() ? signalFilterDto.getSize() : offsetDataSize;
+        while (request.getPage() < expectedPages) {
+            SignalsPage signalsPage = getSignalsPageAndCheck(request);
+            long offsetDataSize = expectedElements - (long) request.getPage() * request.getSize();
+            long expectedPageDataSize = offsetDataSize > request.getSize() ? request.getSize() : offsetDataSize;
             assertAll(
                     () -> assertEquals(expectedElements, signalsPage.getElements()),
                     () -> assertEquals(expectedPages, signalsPage.getPages()),
                     () -> assertEquals(expectedPageDataSize, signalsPage.getData().size())
             );
-            signalFilterDto.setPage(signalFilterDto.getPage() + 1);
+            request.setPage(request.getPage() + 1);
         }
     }
 
-    private void filterAndCheckSort(SignalFilterDto signalFilterDto, Comparator<SignalDtoResponse> expectedSortComparator) {
-        SignalsPage signalsPage = getSignalsPageAndCheck(signalFilterDto);
+    private void filterAndCheckSort(SignalsPageDtoRequest request, Comparator<SignalDtoResponse> expectedSortComparator) {
+        SignalsPage signalsPage = getSignalsPageAndCheck(request);
         List<Integer> actualIds = signalsPage.getData().stream()
                 .map(SignalDtoResponse::getId).toList();
         List<Integer> expectedIds = signalsPage.getData().stream()
@@ -321,9 +321,9 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
         assertEquals(expectedIds, actualIds);
     }
 
-    private SignalsPage getSignalsPageAndCheck(SignalFilterDto signalFilterDto) {
+    private SignalsPage getSignalsPageAndCheck(SignalsPageDtoRequest request) {
         ResponseEntity<SignalsPage> response = template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
-                new HttpEntity<>(signalFilterDto, login(email1)), SignalsPage.class);
+                new HttpEntity<>(request, login(email1)), SignalsPage.class);
         SignalsPage signalsPage = response.getBody();
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
@@ -366,8 +366,8 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
         };
     }
 
-    private SignalFilterDto createSignalFilterDto() {
-        return new SignalFilterDto().setPage(0).setSize(10);
+    private SignalsPageDtoRequest createRequest() {
+        return new SignalsPageDtoRequest().setPage(0).setSize(10);
     }
 
     private List<BigDecimal> toBigDecimalList(Stream<Integer> stream) {
@@ -380,6 +380,6 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
                 .toList();
     }
 
-    private static final class SignalsPage extends ResponseWithTotalCounts<SignalDtoResponse> {
+    private static final class SignalsPage extends PageDtoResponse<SignalDtoResponse> {
     }
 }

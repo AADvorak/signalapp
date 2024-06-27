@@ -1,7 +1,7 @@
 package link.signalapp.service.admin;
 
-import link.signalapp.dto.request.UserFilterDto;
-import link.signalapp.dto.response.ResponseWithTotalCounts;
+import link.signalapp.dto.request.UsersPageDtoRequest;
+import link.signalapp.dto.response.PageDtoResponse;
 import link.signalapp.dto.response.RoleDtoResponse;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.error.exception.SignalAppNotFoundException;
@@ -14,7 +14,7 @@ import link.signalapp.model.UserToken;
 import link.signalapp.properties.ApplicationProperties;
 import link.signalapp.repository.*;
 import link.signalapp.service.specifications.UserSpecifications;
-import link.signalapp.service.utils.FilterUtils;
+import link.signalapp.service.utils.PagingUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,21 +40,21 @@ public class AdminUserService {
     private final SignalRepository signalRepository;
     private final FileManager fileManager;
     private final ApplicationProperties applicationProperties;
-    private final FilterUtils filterUtils = new FilterUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
+    private final PagingUtils pagingUtils = new PagingUtils(AVAILABLE_SORT_FIELDS, DEFAULT_SORT_FIELD);
 
-    public ResponseWithTotalCounts<UserDtoResponse> filter(UserFilterDto filter) {
-        Pageable pageable = filterUtils.getPageable(filter, applicationProperties.getMaxPageSize());
-        Specification<User> userSpecification = makeUserSpecification(filterUtils.getSearch(filter),
-                filter.getRoleIds());
+    public PageDtoResponse<UserDtoResponse> getPage(UsersPageDtoRequest request) {
+        Pageable pageable = pagingUtils.getPageable(request, applicationProperties.getMaxPageSize());
+        Specification<User> userSpecification = makeUserSpecification(pagingUtils.getSearch(request),
+                request.getRoleIds());
         Page<User> users = userRepository.findAll(userSpecification, pageable);
-        ResponseWithTotalCounts<UserDtoResponse> responseWithTotalCounts
-                = new ResponseWithTotalCounts<UserDtoResponse>()
+        PageDtoResponse<UserDtoResponse> pageDtoResponse
+                = new PageDtoResponse<UserDtoResponse>()
                 .setData(users.stream().map(UserMapper.INSTANCE::userToDto).toList())
                 .setPages(users.getTotalPages())
                 .setElements(users.getTotalElements());
-        responseWithTotalCounts.getData().forEach(this::setLastActionTime);
-        responseWithTotalCounts.getData().forEach(this::setStoredSignalsNumber);
-        return responseWithTotalCounts;
+        pageDtoResponse.getData().forEach(this::setLastActionTime);
+        pageDtoResponse.getData().forEach(this::setStoredSignalsNumber);
+        return pageDtoResponse;
     }
 
     public List<RoleDtoResponse> setRole(int userId, int roleId) {

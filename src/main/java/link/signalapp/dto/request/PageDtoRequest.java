@@ -1,6 +1,6 @@
 package link.signalapp.dto.request;
 
-public interface FilterDto {
+public interface PageDtoRequest {
 
     String getSearch();
 

@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Accessors(chain = true)
-public class ResponseWithTotalCounts<T> {
+public class PageDtoResponse<T> {
 
     private List<T> data;
 

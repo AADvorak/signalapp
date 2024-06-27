@@ -1,6 +1,6 @@
 package link.signalapp.integration.admin;
 
-import link.signalapp.dto.request.UserFilterDto;
+import link.signalapp.dto.request.UsersPageDtoRequest;
 import link.signalapp.dto.response.UserDtoResponse;
 import link.signalapp.model.Role;
 import link.signalapp.model.User;
@@ -40,158 +40,158 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
 
     @Test
     public void filterAll() {
-        UserFilterDto userFilterDto = createUserFilterDto();
-        filterAndCheckCounts(userFilterDto, 12, 2);
+        UsersPageDtoRequest request = createRequest();
+        filterAndCheckCounts(request, 12, 2);
     }
 
     @Test
     public void filterSearchVariant1() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setSearch("abc");
-        filterAndCheckCounts(userFilterDto, 5, 1);
+        filterAndCheckCounts(request, 5, 1);
     }
 
     @Test
     public void filterSearchVariant2() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setSearch("fgh");
-        filterAndCheckCounts(userFilterDto, 10, 1);
+        filterAndCheckCounts(request, 10, 1);
     }
 
     @Test
     public void filterSearchVariant3() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setSearch("klmnopq");
-        filterAndCheckCounts(userFilterDto, 1, 1);
+        filterAndCheckCounts(request, 1, 1);
     }
 
     @Test
     public void filterSearchVariant4() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setSearch("filter0");
-        filterAndCheckCounts(userFilterDto, 1, 1);
+        filterAndCheckCounts(request, 1, 1);
     }
 
     @Test
     public void filterRoleIdsVariant1() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setRoleIds(List.of(getAdminRole().getId()));
-        filterAndCheckCounts(userFilterDto, 2, 1);
+        filterAndCheckCounts(request, 2, 1);
     }
 
     @Test
     public void filterRoleIdsVariant2() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setRoleIds(List.of(getRoleByName(Role.EXTENDED_STORAGE).getId()));
-        filterAndCheckCounts(userFilterDto, 1, 1);
+        filterAndCheckCounts(request, 1, 1);
     }
 
     @Test
     public void filterRoleIdsVariant3() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setRoleIds(List.of(getAdminRole().getId(), getRoleByName(Role.EXTENDED_STORAGE).getId()));
-        filterAndCheckCounts(userFilterDto, 2, 1);
+        filterAndCheckCounts(request, 2, 1);
     }
 
     @Test
     public void filterSearchAndRoleIdsVariant1() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setSearch("abc")
                 .setRoleIds(List.of(getAdminRole().getId()));
-        filterAndCheckCounts(userFilterDto, 0, 0);
+        filterAndCheckCounts(request, 0, 0);
     }
 
     @Test
     public void filterSearchAndRoleIdsVariant2() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setSearch(email1)
                 .setRoleIds(List.of(getAdminRole().getId()));
-        filterAndCheckCounts(userFilterDto, 1, 1);
+        filterAndCheckCounts(request, 1, 1);
     }
 
     @Test
     public void filterSearchAndRoleIdsVariant3() {
-        UserFilterDto userFilterDto = createUserFilterDto()
+        UsersPageDtoRequest request = createRequest()
                 .setSearch("first")
                 .setRoleIds(List.of(getAdminRole().getId()));
-        filterAndCheckCounts(userFilterDto, 2, 1);
+        filterAndCheckCounts(request, 2, 1);
     }
 
     @Test
     public void sortDefault() {
-        filterAndCheckSort(createUserFilterDto(),
+        filterAndCheckSort(createRequest(),
                 Comparator.comparing(UserDtoResponse::getCreateTime).reversed());
     }
 
     @Test
     public void sortByCreateTimeAsc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("createTime").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("createTime").setSortDir("asc"),
                 Comparator.comparing(UserDtoResponse::getCreateTime));
     }
 
     @Test
     public void sortByCreateTimeDesc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("createTime").setSortDir("desc"),
+        filterAndCheckSort(createRequest().setSortBy("createTime").setSortDir("desc"),
                 Comparator.comparing(UserDtoResponse::getCreateTime).reversed());
     }
 
     @Test
     public void sortByFirstNameAsc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("firstName").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("firstName").setSortDir("asc"),
                 Comparator.comparing(UserDtoResponse::getFirstName));
     }
 
     @Test
     public void sortByFirstNameDesc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("firstName").setSortDir("desc"),
+        filterAndCheckSort(createRequest().setSortBy("firstName").setSortDir("desc"),
                 Comparator.comparing(UserDtoResponse::getFirstName).reversed());
     }
 
     @Test
     public void sortByLastNameAsc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("lastName").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("lastName").setSortDir("asc"),
                 Comparator.comparing(UserDtoResponse::getLastName));
     }
 
     @Test
     public void sortByLastNameDesc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("lastName").setSortDir("desc"),
+        filterAndCheckSort(createRequest().setSortBy("lastName").setSortDir("desc"),
                 Comparator.comparing(UserDtoResponse::getLastName).reversed());
     }
 
     @Test
     public void sortByPatronymicAsc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("patronymic").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("patronymic").setSortDir("asc"),
                 Comparator.comparing(UserDtoResponse::getPatronymic));
     }
 
     @Test
     public void sortByPatronymicDesc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("patronymic").setSortDir("desc"),
+        filterAndCheckSort(createRequest().setSortBy("patronymic").setSortDir("desc"),
                 Comparator.comparing(UserDtoResponse::getPatronymic).reversed());
     }
 
     @Test
     public void sortByEmailAsc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("email").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("email").setSortDir("asc"),
                 Comparator.comparing(UserDtoResponse::getEmail));
     }
 
     @Test
     public void sortByEmailDesc() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("email").setSortDir("desc"),
+        filterAndCheckSort(createRequest().setSortBy("email").setSortDir("desc"),
                 Comparator.comparing(UserDtoResponse::getEmail).reversed());
     }
 
     @Test
     public void sortByWrongField() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("wrongField").setSortDir("asc"),
+        filterAndCheckSort(createRequest().setSortBy("wrongField").setSortDir("asc"),
                 Comparator.comparing(UserDtoResponse::getCreateTime));
     }
 
     @Test
     public void sortByWrongDirection() {
-        filterAndCheckSort(createUserFilterDto().setSortBy("firstName").setSortDir("wrongDirection"),
+        filterAndCheckSort(createRequest().setSortBy("firstName").setSortDir("wrongDirection"),
                 Comparator.comparing(UserDtoResponse::getFirstName).reversed());
     }
 
@@ -208,23 +208,23 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
         }
     }
 
-    private void filterAndCheckCounts(UserFilterDto userFilterDto,
+    private void filterAndCheckCounts(UsersPageDtoRequest request,
                                       long expectedElements, long expectedPages) {
-        while (userFilterDto.getPage() < expectedPages) {
-            UsersPage usersPage = getPageAndCheck(userFilterDto);
-            long offsetDataSize = expectedElements - (long) userFilterDto.getPage() * userFilterDto.getSize();
-            long expectedPageDataSize = offsetDataSize > userFilterDto.getSize() ? userFilterDto.getSize() : offsetDataSize;
+        while (request.getPage() < expectedPages) {
+            UsersPage usersPage = getPageAndCheck(request);
+            long offsetDataSize = expectedElements - (long) request.getPage() * request.getSize();
+            long expectedPageDataSize = offsetDataSize > request.getSize() ? request.getSize() : offsetDataSize;
             assertAll(
                     () -> assertEquals(expectedElements, usersPage.getElements()),
                     () -> assertEquals(expectedPages, usersPage.getPages()),
                     () -> assertEquals(expectedPageDataSize, usersPage.getData().size())
             );
-            userFilterDto.setPage(userFilterDto.getPage() + 1);
+            request.setPage(request.getPage() + 1);
         }
     }
 
-    private void filterAndCheckSort(UserFilterDto userFilterDto, Comparator<UserDtoResponse> expectedSortComparator) {
-        UsersPage usersPage = getPageAndCheck(userFilterDto);
+    private void filterAndCheckSort(UsersPageDtoRequest request, Comparator<UserDtoResponse> expectedSortComparator) {
+        UsersPage usersPage = getPageAndCheck(request);
         List<Integer> actualIds = usersPage.getData().stream()
                 .map(UserDtoResponse::getId).toList();
         List<Integer> expectedIds = usersPage.getData().stream()
@@ -233,9 +233,9 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
         assertEquals(expectedIds, actualIds);
     }
 
-    private UsersPage getPageAndCheck(UserFilterDto userFilterDto) {
+    private UsersPage getPageAndCheck(UsersPageDtoRequest request) {
         ResponseEntity<UsersPage> response = template.exchange(fullUrl(FILTER_USERS_URL), HttpMethod.POST,
-                new HttpEntity<>(userFilterDto, login(email1)), UsersPage.class);
+                new HttpEntity<>(request, login(email1)), UsersPage.class);
         UsersPage usersPage = response.getBody();
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
