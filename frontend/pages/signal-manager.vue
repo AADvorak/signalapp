@@ -338,7 +338,7 @@ export default {
   },
   methods: {
     async loadDataPage() {
-      await this.loadDataPageBase('signals', '/api/signals/filter')
+      await this.loadDataPageBase('signals', '/api/signals/page')
     },
     async loadSignalData(signal) {
       if (signal.data) {

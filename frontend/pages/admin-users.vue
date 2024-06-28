@@ -208,7 +208,7 @@ export default {
       }
     },
     async loadDataPage() {
-      await this.loadDataPageBase('users', '/api/admin/users/filter', Roles.ADMIN)
+      await this.loadDataPageBase('users', '/api/admin/users/page', Roles.ADMIN)
     },
     setUrlParams() {
       if (!this.mounted) {

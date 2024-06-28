@@ -17,7 +17,7 @@ public class AdminUserEndpoint {
 
     private final AdminUserService adminUserService;
 
-    @PostMapping("/filter")
+    @PostMapping("/page")
     public PageDtoResponse<UserDtoResponse> getPage(@RequestBody UsersPageDtoRequest request) {
         return adminUserService.getPage(request);
     }

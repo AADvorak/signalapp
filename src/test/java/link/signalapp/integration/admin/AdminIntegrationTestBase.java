@@ -8,7 +8,7 @@ import link.signalapp.model.Role;
 
 public class AdminIntegrationTestBase extends IntegrationTestBase {
 
-    protected static final String FILTER_USERS_URL = "/api/admin/users/filter";
+    protected static final String USERS_PAGE_URL = "/api/admin/users/page";
 
     protected void giveAdminRoleToUser(String email) {
         giveRoleToUser(email, getAdminRole());

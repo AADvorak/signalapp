@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FilterSignalsIntegrationTest extends IntegrationTestBase {
 
-    private static final String FILTER_SIGNALS_URL = "/api/signals/filter";
+    private static final String SIGNALS_PAGE_URL = "/api/signals/page";
 
     private static final List<String> NAMES = List.of("abc", "abcd", "abcde", "abcdef", "abcdefg",
             "bcdefgh", "cdefgh", "defgh", "efgh", "fgh");
@@ -270,7 +270,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     @Test
     public void filterWrongPage() {
         SignalsPageDtoRequest request = createRequest().setPage(-1);
-        checkBadRequestFieldError(() -> template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
+        checkBadRequestFieldError(() -> template.exchange(fullUrl(SIGNALS_PAGE_URL), HttpMethod.POST,
                 new HttpEntity<>(request, login(email1)), SignalsPage.class),
                 "PositiveOrZero", "page");
     }
@@ -278,7 +278,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     @Test
     public void filterWrongSize() {
         SignalsPageDtoRequest request = createRequest().setSize(30);
-        checkBadRequestFieldError(() -> template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
+        checkBadRequestFieldError(() -> template.exchange(fullUrl(SIGNALS_PAGE_URL), HttpMethod.POST,
                         new HttpEntity<>(request, login(email1)), SignalsPage.class),
                 "Max", "size");
     }
@@ -322,7 +322,7 @@ public class FilterSignalsIntegrationTest extends IntegrationTestBase {
     }
 
     private SignalsPage getSignalsPageAndCheck(SignalsPageDtoRequest request) {
-        ResponseEntity<SignalsPage> response = template.exchange(fullUrl(FILTER_SIGNALS_URL), HttpMethod.POST,
+        ResponseEntity<SignalsPage> response = template.exchange(fullUrl(SIGNALS_PAGE_URL), HttpMethod.POST,
                 new HttpEntity<>(request, login(email1)), SignalsPage.class);
         SignalsPage signalsPage = response.getBody();
         assertAll(

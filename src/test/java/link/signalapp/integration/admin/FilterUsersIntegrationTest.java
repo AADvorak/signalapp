@@ -234,7 +234,7 @@ public class FilterUsersIntegrationTest extends AdminIntegrationTestBase {
     }
 
     private UsersPage getPageAndCheck(UsersPageDtoRequest request) {
-        ResponseEntity<UsersPage> response = template.exchange(fullUrl(FILTER_USERS_URL), HttpMethod.POST,
+        ResponseEntity<UsersPage> response = template.exchange(fullUrl(USERS_PAGE_URL), HttpMethod.POST,
                 new HttpEntity<>(request, login(email1)), UsersPage.class);
         UsersPage usersPage = response.getBody();
         assertAll(

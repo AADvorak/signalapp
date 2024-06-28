@@ -22,7 +22,7 @@ public class AdminAccessIntegrationTest extends AdminIntegrationTestBase {
 
     @Test
     public void adminAccess() {
-        ResponseEntity<UsersPage> response = template.exchange(fullUrl(FILTER_USERS_URL), HttpMethod.POST,
+        ResponseEntity<UsersPage> response = template.exchange(fullUrl(USERS_PAGE_URL), HttpMethod.POST,
                 new HttpEntity<>(createRequest(), login(email1)), UsersPage.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -30,7 +30,7 @@ public class AdminAccessIntegrationTest extends AdminIntegrationTestBase {
     @Test
     public void noAdminNoAccess() {
         // todo must be 403 or 404
-        checkUnauthorizedError(() -> template.exchange(fullUrl(FILTER_USERS_URL), HttpMethod.POST,
+        checkUnauthorizedError(() -> template.exchange(fullUrl(USERS_PAGE_URL), HttpMethod.POST,
                 new HttpEntity<>(createRequest(), login(email2)), UsersPage.class));
     }
 }

@@ -27,7 +27,7 @@ public class SignalEndpoint extends EndpointBase {
 
     private final SignalService signalService;
 
-    @PostMapping(path = "/filter", produces = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(path = "/page", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public PageDtoResponse<SignalDtoResponse> getPage(@RequestBody @Valid SignalsPageDtoRequest request) {
         return signalService.getPage(request);
