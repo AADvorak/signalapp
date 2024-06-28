@@ -222,7 +222,7 @@ export default {
       }
     },
     onUserRolesMenuClosedRolesChanged() {
-      this.dataPageLastLoadFilter = ''
+      this.dataPageLastRequest = ''
       this.loadDataPage()
     },
     onNewUserRoles(event) {
@@ -242,7 +242,7 @@ export default {
     async deleteUser(user) {
       let response = await this.getApiProvider().del(`/api/admin/users/${user.id}`)
       if (response.ok) {
-        this.dataPageLastLoadFilter = ''
+        this.dataPageLastRequest = ''
         await this.loadDataPage()
       }
     },

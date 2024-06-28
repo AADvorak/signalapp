@@ -34,25 +34,29 @@ export default {
       dir: ''
     },
     additionalPaginationParamsConfig: [],
-    dataPageLastLoadFilter: ''
+    dataPageLastRequest: ''
   }),
   computed: {
-    dataFilter() {
-      const filter = {}
-      for (const paginationParamConfig of this.paginationParamsConfig) {
+    pageRequest() {
+      const request = {}
+      request.page = this.page - 1
+      request.size = this.formValues.pageSize
+      if (this.sort.by && this.sort.dir) {
+        request.sort = this.sort
+      }
+      const filters = {}
+      const search = this.formValues.search
+      if (search) {
+        filters.search = search
+      }
+      for (const paginationParamConfig of this.additionalPaginationParamsConfig) {
         const value = this.getPaginationParamValue(paginationParamConfig)
         if (value) {
-          filter[paginationParamConfig.name] = value
+          filters[paginationParamConfig.name] = value
         }
       }
-      if (this.sort.by) {
-        filter.sortBy = this.sort.by
-      }
-      if (this.sort.dir) {
-        filter.sortDir = this.sort.dir
-      }
-      filter.page = filter.page - 1
-      return filter
+      request.filters = filters
+      return request
     },
     paginationParamsConfig() {
       return [...defaultPaginationParamsConfig, ...this.additionalPaginationParamsConfig]
@@ -84,7 +88,7 @@ export default {
         this.saveFormValues()
       })
     },
-    dataFilter(newValue, oldValue) {
+    pageRequest(newValue, oldValue) {
       const action = () => {
         this.setUrlParams()
         this.loadDataPage()
@@ -92,28 +96,28 @@ export default {
       if (this.onlyPageChanged(newValue, oldValue)) {
         action()
       } else {
-        this.actionWithTimeout(action, 'dataFilter')
+        this.actionWithTimeout(action, 'pageRequest')
       }
     }
   },
   methods: {
     async loadDataPageBase(dataName, dataUrl, checkRole) {
-      const filter = this.dataFilter
-      const filterJson = JSON.stringify(filter)
+      const request = this.pageRequest
+      const requestJson = JSON.stringify(request)
       if (!this.mounted || this.loadingOverlay
-          || this.dataPageLastLoadFilter === filterJson
+          || this.dataPageLastRequest === requestJson
           || !this.validatePageSize()
           || checkRole && !userStore().checkUserRole(checkRole)) {
         return
       }
       await this.loadWithOverlay(async () => {
-        const response = await this.getApiProvider().postJson(dataUrl, filter)
+        const response = await this.getApiProvider().postJson(dataUrl, request)
         if (response.ok) {
           this[dataName] = response.data.data
           this.elements = response.data.elements
           this.pages = response.data.pages
           this[dataName + 'Empty'] = this.elements === 0
-          this.dataPageLastLoadFilter = filterJson
+          this.dataPageLastRequest = requestJson
         } else {
           this.showErrorsFromResponse(response)
         }

@@ -407,7 +407,7 @@ export default {
     async deleteSignal(signal) {
       let response = await this.deleteSignalRequest(signal)
       if (response.ok) {
-        this.dataPageLastLoadFilter = ''
+        this.dataPageLastRequest = ''
         await this.loadDataPage()
       }
     },
@@ -423,7 +423,7 @@ export default {
       let promiseArr = []
       this.selectedSignals.forEach(signal => promiseArr.push(this.deleteSignalRequest(signal)))
       await Promise.all(promiseArr)
-      this.dataPageLastLoadFilter = ''
+      this.dataPageLastRequest = ''
       await this.loadDataPage()
     },
     deleteSignalRequest(signal) {
@@ -438,7 +438,7 @@ export default {
     },
     onSignalFoldersMenuClosedFoldersChanged() {
       if (this.formValues.folderIds.length) {
-        this.dataPageLastLoadFilter = ''
+        this.dataPageLastRequest = ''
         this.loadDataPage()
       }
     },
