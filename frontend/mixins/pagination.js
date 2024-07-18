@@ -223,7 +223,7 @@ export default {
         }
       }
     },
-    onTableSort(sort) {
+    onDataViewerSort(sort) {
       this.sort = sort
       this.page = 1
     }

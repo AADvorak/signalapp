@@ -84,20 +84,20 @@
           <h3 v-else style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
         </fixed-width-wrapper>
         <div v-else>
-          <table-or-list
+          <data-viewer
               data-name="signals"
               caption="name"
               :select="true"
               :items="signals"
-              :columns="tableOrListConfig.columns"
-              :buttons="tableOrListConfig.buttons"
+              :columns="dataViewerConfig.columns"
+              :buttons="dataViewerConfig.buttons"
               :reserved-height="reservedHeight"
               :sort-cols="['name', 'description', 'sampleRate']"
               :sort-prop="this.sort"
               :bus="bus"
-              @click="onTableButtonClick"
-              @select="onTableSelect"
-              @sort="onTableSort"/>
+              @click="onDataViewerButtonClick"
+              @select="onDataViewerSelect"
+              @sort="onDataViewerSort"/>
         </div>
         <fixed-width-wrapper>
           <v-pagination
@@ -188,7 +188,7 @@ import FixedWidthWrapper from "~/components/common/fixed-width-wrapper.vue";
 import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
 import NumberInput from "~/components/common/number-input.vue";
 import TextInput from "~/components/common/text-input.vue";
-import TableOrList from "~/components/common/table-or-list.vue";
+import DataViewer from "~/components/common/data-viewer.vue";
 import SelectProcessor from "~/components/processor-selection/select-processor.vue";
 import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue";
 import DoubleProcessorDialog from "~/components/processor-selection/double-processor-dialog.vue";
@@ -196,13 +196,13 @@ import SingleProcessorDialog from "~/components/processor-selection/single-proce
 import pagination, {PaginationParamLocations} from "~/mixins/pagination";
 import {userStore} from "~/stores/user-store";
 import {appSettingsStore} from "~/stores/app-settings-store";
-import {TableOrListEvents} from "~/dictionary/table-or-list-events";
+import {DataViewerEvents} from "~/dictionary/data-viewer-events";
 
 export default {
   name: "signal-manager",
   components: {
     SingleProcessorDialog, DoubleProcessorDialog, ToolbarWithCloseBtn,
-    SelectProcessor, TableOrList, TextInput, NumberInput, BtnWithTooltip,
+    SelectProcessor, DataViewer, TextInput, NumberInput, BtnWithTooltip,
     FixedWidthWrapper, CardWithLayout
   },
   extends: PageBase,
@@ -264,7 +264,7 @@ export default {
     }
   }),
   computed: {
-    tableOrListConfig() {
+    dataViewerConfig() {
       const buttons = [
         {
           name: 'open',
@@ -329,12 +329,12 @@ export default {
     this.loadSampleRates()
     this.loadFolders()
     this.actionWithTimeout(this.loadDataPage)
-    this.bus.on(TableOrListEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED,
+    this.bus.on(DataViewerEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED,
         this.onSignalFoldersMenuClosedFoldersChanged)
   },
   beforeUnmount() {
     this.mounted = false
-    this.bus.off(TableOrListEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED)
+    this.bus.off(DataViewerEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED)
   },
   methods: {
     async loadDataPage() {
@@ -442,7 +442,7 @@ export default {
         this.loadDataPage()
       }
     },
-    onTableButtonClick({button, item}) {
+    onDataViewerButtonClick({button, item}) {
       if (button === 'open') {
         this.openSignal(item)
       } else if (button === 'play') {
@@ -451,7 +451,7 @@ export default {
         this.askConfirmDeleteSignal(item)
       }
     },
-    onTableSelect(selectedIds) {
+    onDataViewerSelect(selectedIds) {
       this.selectedIds = selectedIds
     },
     reduceFractionDigitsByValue(value) {

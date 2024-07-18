@@ -6,12 +6,12 @@
           <h3 style="text-align: center">{{ _tc('messages.noFolders') }}</h3>
         </fixed-width-wrapper>
         <div v-else>
-          <table-or-list
+          <data-viewer
               data-name="folders"
               caption="name"
               :items="folders"
-              :columns="tableOrListConfig.columns"
-              :buttons="tableOrListConfig.buttons"
+              :columns="dataViewerConfig.columns"
+              :buttons="dataViewerConfig.buttons"
               :reserved-height="160"
               @click="onTableButtonClick"/>
         </div>
@@ -46,16 +46,16 @@ import PageBase from "~/components/base/page-base.vue";
 import FolderRequests from "~/api/folder-requests";
 import CardWithLayout from "~/components/common/card-with-layout.vue";
 import FixedWidthWrapper from "~/components/common/fixed-width-wrapper.vue";
-import TableOrList from "~/components/common/table-or-list.vue";
+import DataViewer from "~/components/common/data-viewer.vue";
 import FolderEditor from "~/components/folders/folder-editor.vue";
 import {userStore} from "~/stores/user-store";
 
 export default {
   name: "folder-manager",
-  components: {FolderEditor, TableOrList, FixedWidthWrapper, CardWithLayout},
+  components: {FolderEditor, DataViewer, FixedWidthWrapper, CardWithLayout},
   extends: PageBase,
   data: () => ({
-    tableOrListConfig: {
+    dataViewerConfig: {
       columns: ['description'],
       buttons: [
         {

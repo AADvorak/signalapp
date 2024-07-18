@@ -115,7 +115,7 @@ const SORT_DIRS = {
 }
 
 export default {
-  name: "table-or-list",
+  name: "data-viewer",
   components: {UserRolesMenu, SignalFoldersMenu, BtnWithTooltip},
   extends: ComponentBase,
   props: {

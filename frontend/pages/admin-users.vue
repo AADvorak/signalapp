@@ -56,18 +56,18 @@
         <fixed-width-wrapper v-if="usersEmpty && !loadingOverlay">
           <h3 style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
         </fixed-width-wrapper>
-        <table-or-list v-else
+        <data-viewer v-else
             data-name="users"
             caption="email"
             :items="users"
-            :columns="tableOrListConfig.columns"
-            :buttons="tableOrListConfig.buttons"
+            :columns="dataViewerConfig.columns"
+            :buttons="dataViewerConfig.buttons"
             :reserved-height="reservedHeight"
             :sort-cols="['firstName', 'lastName', 'patronymic', 'createTime', 'email']"
             :sort-prop="sort"
             :bus="bus"
-            @click="onTableButtonClick"
-            @sort="onTableSort"/>
+            @click="onDataViewerButtonClick"
+            @sort="onDataViewerSort"/>
         <fixed-width-wrapper>
           <v-pagination
               v-model="page"
@@ -85,7 +85,7 @@ import TextInput from "~/components/common/text-input.vue";
 import FixedWidthWrapper from "~/components/common/fixed-width-wrapper.vue";
 import NumberInput from "~/components/common/number-input.vue";
 import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
-import TableOrList from "~/components/common/table-or-list.vue";
+import DataViewer from "~/components/common/data-viewer.vue";
 import {mdiDelete, mdiFileEdit, mdiFilterOff} from "@mdi/js";
 import formNumberValues from "~/mixins/form-number-values";
 import formValidation from "~/mixins/form-validation";
@@ -100,13 +100,13 @@ import {Roles} from "~/dictionary/roles";
 import requiredRoleMsg from "~/mixins/required-role-msg";
 import {appSettingsStore} from "~/stores/app-settings-store";
 import mitt from "mitt";
-import {TableOrListEvents} from "~/dictionary/table-or-list-events";
+import {DataViewerEvents} from "~/dictionary/data-viewer-events";
 
 const isNotCurrentUser = user => user.id !== userStore().userInfo?.id
 
 export default {
   name: 'admin-users',
-  components: {TableOrList, BtnWithTooltip, NumberInput, FixedWidthWrapper, TextInput, CardWithLayout},
+  components: {DataViewer, BtnWithTooltip, NumberInput, FixedWidthWrapper, TextInput, CardWithLayout},
   extends: PageBase,
   mixins: [
     formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving,
@@ -135,7 +135,7 @@ export default {
       search: {value: ''},
       roleIds: {value: []}
     },
-    tableOrListConfig: {
+    dataViewerConfig: {
       columns: [
         {name: 'emailConfirmed', localeKeyGetter: value => value ? 'common.messages.yes' : 'common.messages.no'},
         'firstName', 'lastName', 'patronymic',
@@ -189,13 +189,13 @@ export default {
       this.requiredRoleMsg(Roles.ADMIN)
       this.loadDataPage()
     })
-    this.bus.on(TableOrListEvents.NEW_USER_ROLES, this.onNewUserRoles)
-    this.bus.on(TableOrListEvents.USER_ROLES_MENU_CLOSED_ROLES_CHANGED, this.onUserRolesMenuClosedRolesChanged)
+    this.bus.on(DataViewerEvents.NEW_USER_ROLES, this.onNewUserRoles)
+    this.bus.on(DataViewerEvents.USER_ROLES_MENU_CLOSED_ROLES_CHANGED, this.onUserRolesMenuClosedRolesChanged)
   },
   beforeUnmount() {
     this.mounted = false
-    this.bus.off(TableOrListEvents.NEW_USER_ROLES)
-    this.bus.off(TableOrListEvents.USER_ROLES_MENU_CLOSED_ROLES_CHANGED)
+    this.bus.off(DataViewerEvents.NEW_USER_ROLES)
+    this.bus.off(DataViewerEvents.USER_ROLES_MENU_CLOSED_ROLES_CHANGED)
   },
   methods: {
     async loadRoles() {
@@ -216,7 +216,7 @@ export default {
       }
       useRouter().push(`/admin-users${this.makeUrlParams()}`)
     },
-    onTableButtonClick({button, item}) {
+    onDataViewerButtonClick({button, item}) {
       if (button === 'delete') {
         this.askConfirmDeleteUser(item)
       }
