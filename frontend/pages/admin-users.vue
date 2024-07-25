@@ -3,9 +3,6 @@
     <template #default>
       <v-card-text>
         <fixed-width-wrapper>
-          <p>
-            {{ _tc('pagination.total', {pages, elements}) }}
-          </p>
           <v-expansion-panels v-model="uiParams.openedPanels" class="mb-1">
             <v-expansion-panel value="loadParams">
               <v-expansion-panel-title>
@@ -28,12 +25,6 @@
                         field="search"
                         :field-obj="form.search"
                         @update="v => form.search.value = v"/>
-                    <number-input
-                        class="param-input"
-                        field="pageSize"
-                        :label="_tc('pagination.pageSize')"
-                        :field-obj="form.pageSize"
-                        @update="v => form.pageSize.value = v"/>
                     <v-select
                         class="param-input"
                         v-model="form.roleIds.value"
@@ -53,26 +44,28 @@
             </v-expansion-panel>
           </v-expansion-panels>
         </fixed-width-wrapper>
-        <fixed-width-wrapper v-if="usersEmpty && !loadingOverlay">
-          <h3 style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
-        </fixed-width-wrapper>
-        <data-viewer v-else
+        <data-viewer
+            ref="dataViewer"
             data-name="users"
+            data-url="/api/admin/users/page"
             caption="email"
-            :items="users"
+            pagination
+            :check-role="requiredRole"
+            :filtering-params-config="filteringParamsConfig"
+            :filters="filters"
             :columns="dataViewerConfig.columns"
             :buttons="dataViewerConfig.buttons"
             :reserved-height="reservedHeight"
             :sort-cols="['firstName', 'lastName', 'patronymic', 'createTime', 'email']"
-            :sort-prop="sort"
             :bus="bus"
             @click="onDataViewerButtonClick"
-            @sort="onDataViewerSort"/>
-        <fixed-width-wrapper>
-          <v-pagination
-              v-model="page"
-              :length="pages"/>
-        </fixed-width-wrapper>
+            @update:url-params="setUrlParams"
+            @update:loading-overlay="value => loadingOverlay = value"
+            @update:filters="onDataViewerUpdateFilters">
+          <template #dataEmpty>
+            <h3 style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
+          </template>
+        </data-viewer>
       </v-card-text>
     </template>
   </card-with-layout>
@@ -92,13 +85,12 @@ import formValidation from "~/mixins/form-validation";
 import formValuesSaving from "~/mixins/form-values-saving";
 import actionWithTimeout from "~/mixins/action-with-timeout";
 import uiParamsSaving from "~/mixins/ui-params-saving";
-import pagination, {PaginationParamLocations} from "~/mixins/pagination";
+import filtering from "~/mixins/filtering";
 import {roleStore} from "~/stores/role-store";
 import {userStore} from "~/stores/user-store";
 import {DateTimeUtils} from "~/utils/date-time-utils";
 import {Roles} from "~/dictionary/roles";
 import requiredRoleMsg from "~/mixins/required-role-msg";
-import {appSettingsStore} from "~/stores/app-settings-store";
 import mitt from "mitt";
 import {DataViewerEvents} from "~/dictionary/data-viewer-events";
 
@@ -110,13 +102,12 @@ export default {
   extends: PageBase,
   mixins: [
     formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving,
-    pagination, requiredRoleMsg
+    filtering, requiredRoleMsg
   ],
   data: () => ({
     additionalPaginationParamsConfig: [
       {
         name: 'roleIds',
-        location: PaginationParamLocations.FORM,
         readFunc: parseInt,
         isArray: true,
         emptyValue: []
@@ -124,14 +115,6 @@ export default {
     ],
     mounted: false,
     form: {
-      pageSize: {
-        value: 10,
-        params: {
-          min: 5,
-          max: appSettingsStore().settings?.maxPageSize,
-          step: 1
-        }
-      },
       search: {value: ''},
       roleIds: {value: []}
     },
@@ -160,8 +143,6 @@ export default {
         }
       ],
     },
-    users: [],
-    usersEmpty: false,
     uiParams: {
       openedPanels: []
     },
@@ -169,6 +150,7 @@ export default {
       mdiFilterOff
     },
     bus: new mitt(),
+    requiredRole: Roles.ADMIN
   }),
   computed: {
     reservedHeight() {
@@ -182,11 +164,9 @@ export default {
     this.mounted = true
     this.restoreFormValues()
     this.restoreUiParams()
-    this.readUrlParams()
-    this.setUrlParams()
     this.loadRoles()
     this.actionWithTimeout(() => {
-      this.requiredRoleMsg(Roles.ADMIN)
+      this.requiredRoleMsg(this.requiredRole)
       this.loadDataPage()
     })
     this.bus.on(DataViewerEvents.NEW_USER_ROLES, this.onNewUserRoles)
@@ -199,7 +179,7 @@ export default {
   },
   methods: {
     async loadRoles() {
-      if (!userStore().checkUserRole(Roles.ADMIN)) {
+      if (!userStore().checkUserRole(this.requiredRole)) {
         return
       }
       const response = await this.getApiProvider().get('/api/admin/roles')
@@ -208,13 +188,13 @@ export default {
       }
     },
     async loadDataPage() {
-      await this.loadDataPageBase('users', '/api/admin/users/page', Roles.ADMIN)
+      await this.$refs.dataViewer?.loadDataPage()
     },
-    setUrlParams() {
+    setUrlParams(urlParams) {
       if (!this.mounted) {
         return
       }
-      useRouter().push(`/admin-users${this.makeUrlParams()}`)
+      useRouter().push(`/admin-users${urlParams}`)
     },
     onDataViewerButtonClick({button, item}) {
       if (button === 'delete') {
@@ -226,10 +206,11 @@ export default {
       this.loadDataPage()
     },
     onNewUserRoles(event) {
-      const user = this.users.filter(user => user.id === event.userId)[0]
-      if (user) {
-        user.roles = event.roles
-      }
+      // todo
+      // const user = this.users.filter(user => user.id === event.userId)[0]
+      // if (user) {
+      //   user.roles = event.roles
+      // }
     },
     askConfirmDeleteUser(user) {
       this.askConfirm({

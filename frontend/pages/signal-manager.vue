@@ -3,9 +3,6 @@
     <template #default>
       <v-card-text>
         <fixed-width-wrapper>
-          <p>
-            {{ _tc('pagination.total', {pages, elements}) }}
-          </p>
           <v-expansion-panels v-model="uiParams.openedPanels" class="mb-1">
             <v-expansion-panel value="loadParams">
               <v-expansion-panel-title>
@@ -23,12 +20,6 @@
               <v-expansion-panel-text>
                 <v-form>
                   <div class="d-flex justify-center flex-wrap">
-                    <number-input
-                        class="param-input"
-                        field="pageSize"
-                        :label="_tc('pagination.pageSize')"
-                        :field-obj="form.pageSize"
-                        @update="v => form.pageSize.value = v"/>
                     <text-input
                         class="param-input"
                         field="search"
@@ -77,32 +68,33 @@
             </v-expansion-panel>
           </v-expansion-panels>
         </fixed-width-wrapper>
-        <fixed-width-wrapper v-if="signalsEmpty && !loadingOverlay">
-          <h3 v-if="filterIsEmpty" style="text-align: center;">{{ _t('youHaveNoStoredSignals') }}.
-            <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
-            <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
-          <h3 v-else style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
-        </fixed-width-wrapper>
-        <div v-else>
-          <data-viewer
-              data-name="signals"
-              caption="name"
-              :select="true"
-              :items="signals"
-              :columns="dataViewerConfig.columns"
-              :buttons="dataViewerConfig.buttons"
-              :reserved-height="reservedHeight"
-              :sort-cols="['name', 'description', 'sampleRate']"
-              :sort-prop="this.sort"
-              :bus="bus"
-              @click="onDataViewerButtonClick"
-              @select="onDataViewerSelect"
-              @sort="onDataViewerSort"/>
-        </div>
+        <data-viewer
+            ref="dataViewer"
+            data-name="signals"
+            data-url="/api/signals/page"
+            caption="name"
+            select
+            pagination
+            :filtering-params-config="filteringParamsConfig"
+            :filters="filters"
+            :columns="dataViewerConfig.columns"
+            :buttons="dataViewerConfig.buttons"
+            :reserved-height="reservedHeight"
+            :sort-cols="['name', 'description', 'sampleRate']"
+            :bus="bus"
+            @click="onDataViewerButtonClick"
+            @select="onDataViewerSelect"
+            @update:url-params="setUrlParams"
+            @update:loading-overlay="value => loadingOverlay = value"
+            @update:filters="onDataViewerUpdateFilters">
+          <template #dataEmpty>
+            <h3 v-if="filterIsEmpty" style="text-align: center;">{{ _t('youHaveNoStoredSignals') }}.
+              <a href="/signal-generator">{{ _t('generate') }}</a> {{ _t('or') }}
+              <a href="/signal-recorder">{{ _t('record') }}</a> {{ _t('newSignalsToStartWorking') }}.</h3>
+            <h3 v-else style="text-align: center;">{{ _tc('messages.nothingIsFound') }}</h3>
+          </template>
+        </data-viewer>
         <fixed-width-wrapper>
-          <v-pagination
-              v-model="page"
-              :length="pages"/>
           <div class="d-flex justify-center flex-wrap">
             <p class="mt-5">
               {{ _t('actionsWithSelectedSignals') }}
@@ -193,9 +185,8 @@ import SelectProcessor from "~/components/processor-selection/select-processor.v
 import ToolbarWithCloseBtn from "~/components/common/toolbar-with-close-btn.vue";
 import DoubleProcessorDialog from "~/components/processor-selection/double-processor-dialog.vue";
 import SingleProcessorDialog from "~/components/processor-selection/single-processor-dialog.vue";
-import pagination, {PaginationParamLocations} from "~/mixins/pagination";
+import filtering from "~/mixins/filtering";
 import {userStore} from "~/stores/user-store";
-import {appSettingsStore} from "~/stores/app-settings-store";
 import {DataViewerEvents} from "~/dictionary/data-viewer-events";
 
 export default {
@@ -207,20 +198,18 @@ export default {
   },
   extends: PageBase,
   mixins: [
-    formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving, pagination
+    formNumberValues, formValidation, formValuesSaving, actionWithTimeout, uiParamsSaving, filtering
   ],
   data: () => ({
-    additionalPaginationParamsConfig: [
+    additionalFilteringParamsConfig: [
       {
         name: 'folderIds',
-        location: PaginationParamLocations.FORM,
         readFunc: parseInt,
         isArray: true,
         emptyValue: []
       },
       {
         name: 'sampleRates',
-        location: PaginationParamLocations.FORM,
         readFunc: parseFloat,
         isArray: true,
         emptyValue: []
@@ -232,7 +221,7 @@ export default {
     sampleRates: [],
     signals: [],
     selectedIds: [],
-    signalsEmpty: false,
+    selectedSignals: [],
     playedSignal: null,
     mdi: {
       mdiDelete,
@@ -245,14 +234,6 @@ export default {
       mdiFilterOff
     },
     form: {
-      pageSize: {
-        value: 10,
-        params: {
-          min: 5,
-          max: appSettingsStore().settings?.maxPageSize,
-          step: 1
-        }
-      },
       search: {value: ''},
       sampleRates: {value: []},
       folderIds: {value: []}
@@ -301,9 +282,6 @@ export default {
     reservedHeight() {
       return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 486 : 330
     },
-    selectedSignals() {
-      return this.signals.filter(signal => this.selectedIds.includes(signal.id))
-    },
     viewSignalsAvailable() {
       const selectedSignalsNumber = this.selectedSignals.length
       return selectedSignalsNumber > 0 && selectedSignalsNumber <= 5
@@ -324,8 +302,6 @@ export default {
     SignalRequests.setApiProvider(this.getApiProvider())
     this.restoreFormValues()
     this.restoreUiParams()
-    this.readUrlParams()
-    this.setUrlParams()
     this.loadSampleRates()
     this.loadFolders()
     this.actionWithTimeout(this.loadDataPage)
@@ -338,7 +314,7 @@ export default {
   },
   methods: {
     async loadDataPage() {
-      await this.loadDataPageBase('signals', '/api/signals/page')
+      await this.$refs.dataViewer?.loadDataPage()
     },
     async loadSignalData(signal) {
       if (signal.data) {
@@ -367,11 +343,11 @@ export default {
       this.formValue('folderIds', this.formValues.folderIds.filter(folderId =>
           loadedFolderIds.includes(folderId)))
     },
-    setUrlParams() {
+    setUrlParams(urlParams) {
       if (!this.mounted) {
         return
       }
-      useRouter().push(`/signal-manager${this.makeUrlParams()}`)
+      useRouter().push(`/signal-manager${urlParams}`)
     },
     openSignal(signal) {
       signalStore().clearHistoryForSignal(signal.id)
@@ -451,8 +427,8 @@ export default {
         this.askConfirmDeleteSignal(item)
       }
     },
-    onDataViewerSelect(selectedIds) {
-      this.selectedIds = selectedIds
+    onDataViewerSelect(selectedSignals) {
+      this.selectedSignals = selectedSignals
     },
     reduceFractionDigitsByValue(value) {
       return NumberUtils.reduceFractionDigitsByValue(value)

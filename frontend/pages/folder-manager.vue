@@ -2,19 +2,20 @@
   <card-with-layout full-width :message="message" :loading-overlay="loadingOverlay">
     <template #default>
       <v-card-text>
-        <fixed-width-wrapper v-if="!folders.length && !loadingOverlay">
-          <h3 style="text-align: center">{{ _tc('messages.noFolders') }}</h3>
-        </fixed-width-wrapper>
-        <div v-else>
-          <data-viewer
-              data-name="folders"
-              caption="name"
-              :items="folders"
-              :columns="dataViewerConfig.columns"
-              :buttons="dataViewerConfig.buttons"
-              :reserved-height="160"
-              @click="onTableButtonClick"/>
-        </div>
+        <data-viewer
+            ref="dataViewer"
+            data-name="folders"
+            caption="name"
+            :columns="dataViewerConfig.columns"
+            :buttons="dataViewerConfig.buttons"
+            :reserved-height="160"
+            @click="onDataViewerButtonClick">
+          <template #dataEmpty>
+            <div v-if="!loadingOverlay">
+              <h3 style="text-align: center">{{ _tc('messages.noFolders') }}</h3>
+            </div>
+          </template>
+        </data-viewer>
         <fixed-width-wrapper>
           <div class="mt-5 d-flex justify-center flex-wrap">
             <v-btn @click="createFolder">
@@ -91,8 +92,11 @@ export default {
       await this.loadWithOverlay(async () => {
         await FolderRequests.loadFolders(force, false)
       })
+      this.$refs.dataViewer?.setData({
+        items: this.folders
+      })
     },
-    onTableButtonClick({button, item}) {
+    onDataViewerButtonClick({button, item}) {
       if (button === 'delete') {
         this.askConfirmDeleteFolder(item)
       } else if (button === 'edit') {
