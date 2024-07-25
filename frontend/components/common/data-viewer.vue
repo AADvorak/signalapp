@@ -10,7 +10,7 @@
             <v-card-item>
               <v-card-title>
                 <div style="height: 48px" class="d-flex justify-start">
-                  <span v-if="select"><v-checkbox v-model="selectedIds" :value="item.id" @click.stop/></span>
+                  <span v-if="multiSelect"><v-checkbox v-model="selectedIds" :value="item.id" @click.stop/></span>
                   <div style="margin: 13px 0;">{{ restrictCaptionLength(item) }}</div>
                 </div>
               </v-card-title>
@@ -46,7 +46,7 @@
       <v-table :height="elementHeight" class="element-full-width" v-else fixed-header>
         <thead>
         <tr>
-          <th v-if="select" class="text-left no-padding">
+          <th v-if="multiSelect" class="text-left no-padding">
             <div style="height: 58px">
               <v-checkbox v-model="selectAllItems"/>
             </div>
@@ -72,7 +72,7 @@
         </thead>
         <tbody>
         <tr v-for="item in items">
-          <td v-if="select" class="no-padding">
+          <td v-if="multiSelect" class="no-padding">
             <div style="height: 58px">
               <v-checkbox v-model="selectedIds" :value="item.id" @click.stop/>
             </div>
@@ -166,7 +166,7 @@ export default {
       type: String,
       default: ''
     },
-    select: {
+    multiSelect: {
       type: Boolean,
       default: false
     },
@@ -211,7 +211,7 @@ export default {
       default: null
     }
   },
-  emits: ['click', 'select', 'update:url-params', 'update:loading-overlay', 'update:filters'],
+  emits: ['click', 'update:selected-items', 'update:url-params', 'update:loading-overlay', 'update:filters'],
   data: () => ({
     selectAllItems: false,
     selectedIds: [],
@@ -287,7 +287,7 @@ export default {
     },
     selectedIds(newValue) {
       this.selectAllItems = this.allItemsSelected
-      this.$emit('select', this.items.filter(item => newValue.includes(item.id)))
+      this.$emit('update:selected-items', this.items.filter(item => newValue.includes(item.id)))
     },
     selectAllItems(newValue) {
       if (newValue) {
@@ -382,20 +382,20 @@ export default {
         this.$emit('update:filters', filters)
       }
       const sortBy = ref(route.query.sortBy)
-      if (sortBy.value && this.paginationParams.sort) {
+      if (sortBy.value && this.paginationParams.sort && this.validateSortBy(sortBy.value)) {
         this.paginationParams.sort.by = sortBy.value
       }
       const sortDir = ref(route.query.sortDir)
-      if (sortDir.value && this.paginationParams.sort) {
+      if (sortDir.value && this.paginationParams.sort && this.validateSortDir(sortDir.value)) {
         this.paginationParams.sort.dir = sortDir.value
       }
       const page = ref(route.query.page)
-      if (page.value) {
-        this.paginationParams.page = page.value
+      if (page.value && !isNaN(page.value)) {
+        this.paginationParams.page = parseInt(page.value)
       }
       const size = ref(route.query.size)
-      if (size.value) {
-        this.paginationParams.size = size.value
+      if (size.value && !isNaN(size.value)) {
+        this.paginationParams.size = parseInt(size.value)
       }
     },
     readNumberArrFromUrlParam(str, parseFunc) {
@@ -560,8 +560,8 @@ export default {
       const {page, size, sort} = this.paginationParams
       return page && size
           && this.validatePageSize(size)
-          && (!sort.dir || [SORT_DIRS.DESC, SORT_DIRS.ASC].includes(sort.dir))
-          && (!sort.by || this.sortCols.includes(sort.by))
+          && this.validateSortBy(sort.by)
+          && this.validateSortDir(sort.dir)
     },
     validatePageSize(size) {
       this.pageSizeValidation = []
@@ -578,6 +578,12 @@ export default {
         this.pageSizeValidation.push(validationMsg)
       }
       return !validationMsg
+    },
+    validateSortDir(sortDir) {
+      return !sortDir || [SORT_DIRS.DESC, SORT_DIRS.ASC].includes(sortDir)
+    },
+    validateSortBy(sortBy) {
+      return !sortBy || this.sortCols.includes(sortBy)
     },
     // todo
     onResize() {

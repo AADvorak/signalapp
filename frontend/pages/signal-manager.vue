@@ -73,7 +73,7 @@
             data-name="signals"
             data-url="/api/signals/page"
             caption="name"
-            select
+            multi-select
             pagination
             :filtering-params-config="filteringParamsConfig"
             :filters="filters"
@@ -83,7 +83,7 @@
             :sort-cols="['name', 'description', 'sampleRate']"
             :bus="bus"
             @click="onDataViewerButtonClick"
-            @select="onDataViewerSelect"
+            @update:selected-items="value => selectedSignals = value"
             @update:url-params="setUrlParams"
             @update:loading-overlay="value => loadingOverlay = value"
             @update:filters="onDataViewerUpdateFilters">
@@ -426,9 +426,6 @@ export default {
       } else if (button === 'delete') {
         this.askConfirmDeleteSignal(item)
       }
-    },
-    onDataViewerSelect(selectedSignals) {
-      this.selectedSignals = selectedSignals
     },
     reduceFractionDigitsByValue(value) {
       return NumberUtils.reduceFractionDigitsByValue(value)
