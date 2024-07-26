@@ -5,8 +5,30 @@
   <div v-else>
     <v-layout fluid>
       <div v-if="isMobile" class="element-full-width">
+        <fixed-width-wrapper v-if="pagination">
+          <v-form>
+            <div class="d-flex justify-center flex-wrap">
+              <v-select
+                  :model-value="paginationParams.sort.by"
+                  item-title="header"
+                  item-value="key"
+                  density="compact"
+                  :label="_tc('fields.sortBy')"
+                  :items="sortColsWithHeaders"
+                  clearable
+                  @update:model-value="setSorting"/>
+              <v-btn v-if="sortDirIcons[paginationParams.sort.by]"
+                     variant="plain"
+                     @click="switchSortDir">
+                <v-icon style="width: 22px; height: 22px;">
+                  {{ sortDirIcons[paginationParams.sort.by] }}
+                </v-icon>
+              </v-btn>
+            </div>
+          </v-form>
+        </fixed-width-wrapper>
         <div v-for="item in items">
-          <v-card >
+          <v-card>
             <v-card-item>
               <v-card-title>
                 <div style="height: 48px" class="d-flex justify-start">
@@ -52,19 +74,19 @@
             </div>
           </th>
           <th class="text-left" @click="setSorting(caption)">
-         <span v-if="sortDirIcons[caption]">
-           <v-icon>
-            {{ sortDirIcons[caption] }}
-           </v-icon>
-         </span>
+            <span v-if="sortDirIcons[caption]">
+              <v-icon>
+                {{ sortDirIcons[caption] }}
+              </v-icon>
+            </span>
             {{ columnHeader(caption) }}
           </th>
           <th v-for="column in columns" @click="setSorting(column)">
-         <span v-if="sortDirIcons[columnName(column)]">
-           <v-icon>
-            {{ sortDirIcons[columnName(column)] }}
-           </v-icon>
-         </span>
+            <span v-if="sortDirIcons[columnName(column)]">
+              <v-icon>
+               {{ sortDirIcons[columnName(column)] }}
+              </v-icon>
+            </span>
             {{ columnHeader(column) }}
           </th>
           <th v-for="_ in buttons" class="text-left"></th>
@@ -262,7 +284,10 @@ export default {
     },
     elementHeight() {
       return this.windowHeight - this.reservedHeight
-    }
+    },
+    sortColsWithHeaders() {
+      return this.sortCols.map(sortCol => ({key: sortCol, header: this.columnHeader(sortCol)}))
+    },
   },
   watch: {
     filters() {
@@ -352,7 +377,9 @@ export default {
     },
     onlyPageChanged(newValue, oldValue) {
       let filtersValueChanged = false
-      if (newValue.filters) {
+      if (newValue.filters && !oldValue.filters || !newValue.filters && oldValue.filters) {
+        filtersValueChanged = true
+      } else if (newValue.filters && oldValue.filters) {
         for (const field of this.filterFieldNames) {
           if (newValue.filters[field]?.toString() !== oldValue.filters[field]?.toString()) {
             filtersValueChanged = true
@@ -512,6 +539,10 @@ export default {
       return this.sortCols.includes(columnName)
     },
     setSorting(column) {
+      if (!column) {
+        this.clearSorting()
+        return
+      }
       const columnName = this.columnName(column)
       if (!this.isSortable(columnName)) {
         return
@@ -523,9 +554,19 @@ export default {
         if (this.paginationParams.sort.dir === SORT_DIRS.ASC) {
           this.paginationParams.sort.dir = SORT_DIRS.DESC
         } else {
-          this.paginationParams.sort.dir = ''
-          this.paginationParams.sort.by = ''
+          this.clearSorting()
         }
+      }
+    },
+    clearSorting() {
+      this.paginationParams.sort.dir = ''
+      this.paginationParams.sort.by = ''
+    },
+    switchSortDir() {
+      if (this.paginationParams.sort.dir === SORT_DIRS.ASC) {
+        this.paginationParams.sort.dir = SORT_DIRS.DESC
+      } else {
+        this.paginationParams.sort.dir = SORT_DIRS.ASC
       }
     },
     recalculateSortDirIcons() {
@@ -597,6 +638,7 @@ export default {
 .no-padding {
   padding: 0 20px 0 0 !important;
 }
+
 .element-full-width {
   width: 100%;
 }

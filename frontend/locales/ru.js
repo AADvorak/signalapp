@@ -73,7 +73,8 @@ const ru = {
       createTime: 'Время создания',
       lastActionTime: 'Время последнего действия',
       roles: 'Роли',
-      storedSignalsNumber: 'Количество сохраненных сигналов'
+      storedSignalsNumber: 'Количество сохраненных сигналов',
+      sortBy: 'Сортировать по',
     },
     pagination: {
       total: 'Всего: {pages} страниц, {elements} записей',

@@ -73,7 +73,8 @@ const en = {
       createTime: 'Create time',
       lastActionTime: 'Last action time',
       roles: 'Roles',
-      storedSignalsNumber: 'Number of stored signals'
+      storedSignalsNumber: 'Number of stored signals',
+      sortBy: 'Sort by',
     },
     pagination: {
       total: 'Total: {pages} pages, {elements} entries',
