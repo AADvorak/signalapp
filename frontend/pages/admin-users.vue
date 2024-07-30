@@ -206,11 +206,11 @@ export default {
       this.loadDataPage()
     },
     onNewUserRoles(event) {
-      // todo
-      // const user = this.users.filter(user => user.id === event.userId)[0]
-      // if (user) {
-      //   user.roles = event.roles
-      // }
+      const users = this.$refs.dataViewer?.getData()?.items || []
+      const user = users.filter(user => user.id === event.userId)[0]
+      if (user) {
+        user.roles = event.roles
+      }
     },
     askConfirmDeleteUser(user) {
       this.askConfirm({

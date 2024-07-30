@@ -375,6 +375,13 @@ export default {
       }
       this.dataEmpty = this.elements === 0 && this.items.length === 0
     },
+    getData() {
+      return {
+        items: this.items,
+        elements: this.elements,
+        pages: this.pages
+      }
+    },
     onlyPageChanged(newValue, oldValue) {
       let filtersValueChanged = false
       if (newValue.filters && !oldValue.filters || !newValue.filters && oldValue.filters) {
