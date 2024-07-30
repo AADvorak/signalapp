@@ -16,7 +16,7 @@
                   :label="_tc('fields.sortBy')"
                   :items="sortColsWithHeaders"
                   clearable
-                  @update:model-value="setSorting"/>
+                  @update:model-value="setSortBy"/>
               <v-btn v-if="sortDirIcons[paginationParams.sort.by]"
                      variant="plain"
                      @click="switchSortDir">
@@ -546,10 +546,6 @@ export default {
       return this.sortCols.includes(columnName)
     },
     setSorting(column) {
-      if (!column) {
-        this.clearSorting()
-        return
-      }
       const columnName = this.columnName(column)
       if (!this.isSortable(columnName)) {
         return
@@ -563,6 +559,16 @@ export default {
         } else {
           this.clearSorting()
         }
+      }
+    },
+    setSortBy(columnName) {
+      if (!columnName) {
+        this.clearSorting()
+        return
+      }
+      this.paginationParams.sort.by = columnName
+      if (!this.paginationParams.sort.dir) {
+        this.paginationParams.sort.dir = SORT_DIRS.ASC
       }
     },
     clearSorting() {
