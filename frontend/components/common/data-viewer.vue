@@ -134,12 +134,13 @@
               :error="!!pageSizeValidation.length"
               :error-messages="pageSizeValidation"
               type="number"
-              style="max-width: 300px"
+              style="max-width: 400px"
               density="compact"
               required/>
           <v-pagination
               v-model="paginationParams.page"
               :length="pages"
+              style="min-width: 400px"
               density="compact"/>
         </div>
       </v-form>
