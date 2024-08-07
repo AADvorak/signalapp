@@ -165,7 +165,7 @@ export default {
     this.restoreFormValues()
     this.restoreUiParams()
     this.loadRoles()
-    this.requiredRoleMsg(this.requiredRole)
+    setTimeout(() => this.requiredRoleMsg(this.requiredRole))
     this.bus.on(DataViewerEvents.NEW_USER_ROLES, this.onNewUserRoles)
     this.bus.on(DataViewerEvents.USER_ROLES_MENU_CLOSED_ROLES_CHANGED, this.onUserRolesMenuClosedRolesChanged)
   },
