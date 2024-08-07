@@ -340,6 +340,7 @@ export default {
       this.restorePaginationParams()
       this.readUrlParams()
       this.setUrlParams()
+      setTimeout(this.loadDataPage)
     }
   },
   methods: {

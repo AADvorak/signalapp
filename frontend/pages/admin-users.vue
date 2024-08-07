@@ -105,7 +105,7 @@ export default {
     filtering, requiredRoleMsg
   ],
   data: () => ({
-    additionalPaginationParamsConfig: [
+    additionalFilteringParamsConfig: [
       {
         name: 'roleIds',
         readFunc: parseInt,
@@ -154,7 +154,7 @@ export default {
   }),
   computed: {
     reservedHeight() {
-      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 410 : 254
+      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 332 : 254
     },
     roles() {
       return roleStore().roles.map(role => ({...role, localeName: this.$t(`userRoles.${role.name}`)}))
@@ -165,10 +165,7 @@ export default {
     this.restoreFormValues()
     this.restoreUiParams()
     this.loadRoles()
-    this.actionWithTimeout(() => {
-      this.requiredRoleMsg(this.requiredRole)
-      this.loadDataPage()
-    })
+    this.requiredRoleMsg(this.requiredRole)
     this.bus.on(DataViewerEvents.NEW_USER_ROLES, this.onNewUserRoles)
     this.bus.on(DataViewerEvents.USER_ROLES_MENU_CLOSED_ROLES_CHANGED, this.onUserRolesMenuClosedRolesChanged)
   },

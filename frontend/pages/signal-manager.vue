@@ -304,7 +304,6 @@ export default {
     this.restoreUiParams()
     this.loadSampleRates()
     this.loadFolders()
-    this.actionWithTimeout(this.loadDataPage)
     this.bus.on(DataViewerEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED,
         this.onSignalFoldersMenuClosedFoldersChanged)
   },
