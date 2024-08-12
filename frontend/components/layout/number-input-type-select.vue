@@ -10,6 +10,7 @@
 <script>
 import ComponentBase from "~/components/base/component-base.vue";
 import {dataStore} from "~/stores/data-store";
+import {NumberInputTypes} from "~/dictionary/number-input-types";
 
 export default {
   name: 'number-input-type-select',
@@ -19,7 +20,8 @@ export default {
   }),
   computed: {
     numberInputTypes() {
-      return dataStore().numberInputTypes.map(code => ({code, name: this._t('numberInputTypes.' + code)}))
+      return Object.values(NumberInputTypes)
+          .map(code => ({code, name: this._t('numberInputTypes.' + code)}))
     }
   },
   watch: {

@@ -1,4 +1,5 @@
 import {defineStore} from 'pinia'
+import {NumberInputTypes} from "~/dictionary/number-input-types";
 
 export const dataStore = defineStore('dataStore', {
   state: () => {
@@ -10,8 +11,7 @@ export const dataStore = defineStore('dataStore', {
       emailForPasswordRestore: null,
       defaultLocale: 'en',
       locale: localStorage.getItem('locale'),
-      numberInputType: localStorage.getItem('numberInputType') || 'text',
-      numberInputTypes: ['text', 'slider']
+      numberInputType: localStorage.getItem('numberInputType') || NumberInputTypes.TEXT
     }
   },
   actions: {
