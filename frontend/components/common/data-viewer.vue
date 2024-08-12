@@ -153,7 +153,6 @@
 
 <script>
 import {mdiSortAscending, mdiSortDescending} from "@mdi/js";
-import DeviceUtils from "~/utils/device-utils";
 import StringUtils from "~/utils/string-utils";
 import BtnWithTooltip from "~/components/common/btn-with-tooltip.vue";
 import SignalFoldersMenu from "~/components/folders/signal-folders-menu.vue";
@@ -165,6 +164,8 @@ import {userStore} from "~/stores/user-store";
 import actionWithTimeout from "~/mixins/action-with-timeout";
 import PageBase from "~/components/base/page-base.vue";
 import formNumberValues from "~/mixins/form-number-values";
+import {mobileVersionStore} from "~/stores/mobile-version-store";
+import DeviceUtils from "~/utils/device-utils";
 
 const SORT_DIRS = {
   DESC: 'desc',
@@ -272,7 +273,7 @@ export default {
       return [...this.filteringParamsConfig.map(item => item.name)]
     },
     isMobile() {
-      return DeviceUtils.isMobile()
+      return mobileVersionStore().isMobile
     },
     allItemsSelected() {
       return this.items.length && this.selectedIds.length === this.items.length
@@ -360,6 +361,7 @@ export default {
           this.pages = response.data.pages
           this.dataEmpty = this.elements === 0
           this.dataPageLastRequest = requestJson
+          this.isMobile && setTimeout(DeviceUtils.scrollUp)
         } else {
           this.showErrorsFromResponse(response)
         }

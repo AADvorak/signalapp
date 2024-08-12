@@ -115,6 +115,14 @@ const en = {
       slider: 'Slider'
     }
   },
+  'mobile-version-select': {
+    mobileVersion: 'Mobile version',
+    mobileVersionStates: {
+      auto: 'Auto',
+      on: 'On',
+      off: 'Off'
+    },
+  },
   'change-password': {
     name: 'Change password',
     passwordChangeSuccess: 'Password changed successfully',

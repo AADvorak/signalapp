@@ -29,11 +29,13 @@ export default {
       }
     },
     focusFirstFormField() {
-      const inputRefs = this.$refs.inputRefs
-      if (inputRefs) {
-        const firstInputRef = inputRefs[0]
-        firstInputRef?.focus && firstInputRef.focus()
-      }
+      setTimeout(() => {
+        const inputRefs = this.$refs.inputRefs
+        if (inputRefs) {
+          const firstInputRef = inputRefs[0]
+          firstInputRef?.focus && firstInputRef.focus()
+        }
+      })
     }
   }
 }

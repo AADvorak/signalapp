@@ -111,6 +111,7 @@ import FixedWidthWrapper from "~/components/common/fixed-width-wrapper.vue";
 import SelectProcessorDialog from "~/components/processor-selection/select-processor-dialog.vue";
 import SingleProcessorDialog from "~/components/processor-selection/single-processor-dialog.vue";
 import {ProcessingEvents} from "~/dictionary/processing-events";
+import DeviceUtils from "~/utils/device-utils";
 
 export default {
   name: "signal",
@@ -154,11 +155,11 @@ export default {
   },
   watch: {
     '$route.query.history'() {
-      window.scrollTo(0,0)
+      DeviceUtils.scrollUp()
       this.getSignalFromHistoryOrLoad()
     },
     signal() {
-      this.signal.name && this.$refs.nameInput.focus()
+      this.signal.name && setTimeout(() => this.$refs.nameInput?.focus())
     }
   },
   mounted() {

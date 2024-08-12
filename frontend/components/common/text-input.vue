@@ -53,7 +53,7 @@ export default {
       this.$emit('show')
     },
     focus() {
-      this.$refs.input.focus()
+      this.$refs.input?.focus()
     }
   }
 }

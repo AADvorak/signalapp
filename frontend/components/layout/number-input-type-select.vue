@@ -19,11 +19,7 @@ export default {
   }),
   computed: {
     numberInputTypes() {
-      let items = []
-      for (const code of dataStore().numberInputTypes) {
-        items.push({code, name: this._t('numberInputTypes.' + code)})
-      }
-      return items
+      return dataStore().numberInputTypes.map(code => ({code, name: this._t('numberInputTypes.' + code)}))
     }
   },
   watch: {

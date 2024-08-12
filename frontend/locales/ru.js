@@ -115,6 +115,14 @@ const ru = {
       slider: 'Слайдер'
     }
   },
+  'mobile-version-select': {
+    mobileVersion: 'Мобильная версия',
+    mobileVersionStates: {
+      auto: 'Авто',
+      on: 'Вкл',
+      off: 'Выкл'
+    },
+  },
   'change-password': {
     name: 'Изменение пароля',
     passwordChangeSuccess: 'Пароль успешно изменен',

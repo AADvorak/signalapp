@@ -70,6 +70,7 @@
               <v-card-text>
                 <v-switch hide-details v-model="darkMode" :label="_t('darkMode', {darkModeState})"/>
                 <v-form>
+                  <mobile-version-select/>
                   <locale-select/>
                   <number-input-type-select/>
                   <selects-settings/>
@@ -92,16 +93,18 @@ import {dataStore} from "~/stores/data-store";
 import {moduleStore} from "~/stores/module-store";
 import ApiProvider from "../api/api-provider";
 import {mdiAccount, mdiHome, mdiMicrophone, mdiSineWave, mdiServer, mdiCog, mdiAccountMultiple} from "@mdi/js";
-import DeviceUtils from "../utils/device-utils";
 import ComponentBase from "../components/base/component-base.vue";
 import LocaleSelect from "~/components/layout/locale-select.vue";
 import SelectsSettings from "~/components/layout/selects-settings.vue";
 import NumberInputTypeSelect from "~/components/layout/number-input-type-select.vue";
 import {userStore} from "~/stores/user-store";
+import MobileVersionSelect from "~/components/layout/mobile-version-select.vue";
+import {mobileVersionStore} from "~/stores/mobile-version-store";
+import DeviceUtils from "~/utils/device-utils";
 
 export default {
   name: 'default',
-  components: {NumberInputTypeSelect, SelectsSettings, LocaleSelect},
+  components: {MobileVersionSelect, NumberInputTypeSelect, SelectsSettings, LocaleSelect},
   extends: ComponentBase,
   data() {
     return {
@@ -114,13 +117,15 @@ export default {
       },
       darkMode: dataStore().darkMode,
       header: '',
-      showMainMenu: false,
-      isMobile: DeviceUtils.isMobile()
+      showMainMenu: false
     }
   },
   computed: {
     theme() {
       return this.darkMode ? 'dark' : 'light'
+    },
+    isMobile() {
+      return mobileVersionStore().isMobile
     },
     darkModeState() {
       return this._t(this.darkMode ? 'on' : 'off')
@@ -189,7 +194,7 @@ export default {
     },
     showOrHideMenu() {
       this.showMainMenu = !this.showMainMenu
-      window.scrollTo(0,0)
+      DeviceUtils.scrollUp()
     },
     getModuleIcon(module) {
       return this.moduleIcons[module.icon] || mdiCog

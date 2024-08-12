@@ -36,9 +36,6 @@ export default {
     selectItems: [],
     loadingOverlay: false
   }),
-  mounted() {
-    window.scrollTo(0,0)
-  },
   methods: {
     getApiProvider() {
       return ApiProvider.setRouter(useRouter()).setRoute(useRoute())

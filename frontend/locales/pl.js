@@ -115,6 +115,14 @@ const pl = {
       slider: 'Suwak'
     }
   },
+  'mobile-version-select': {
+    mobileVersion: 'Wersja mobilna',
+    mobileVersionStates: {
+      auto: 'Auto',
+      on: 'Wł',
+      off: 'Wył'
+    },
+  },
   'change-password': {
     name: 'Zmiana hasła',
     passwordChangeSuccess: 'Hasło zostało zmienione pomyślnie',

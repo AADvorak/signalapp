@@ -170,7 +170,6 @@ import formNumberValues from "../mixins/form-number-values";
 import formValidation from "../mixins/form-validation";
 import actionWithTimeout from "../mixins/action-with-timeout";
 import formValuesSaving from "../mixins/form-values-saving";
-import DeviceUtils from "../utils/device-utils";
 import FolderRequests from "~/api/folder-requests";
 import NumberUtils from "~/utils/number-utils";
 import uiParamsSaving from "~/mixins/ui-params-saving";
@@ -239,7 +238,6 @@ export default {
       folderIds: {value: []}
     },
     bus: new mitt(),
-    isMobile: DeviceUtils.isMobile(),
     uiParams: {
       openedPanels: []
     }
