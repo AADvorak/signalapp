@@ -138,7 +138,7 @@
               density="compact"
               required/>
           <v-pagination
-              v-model="paginationParams.page"
+              v-model="page"
               :length="pages"
               style="min-width: 400px"
               density="compact"/>
@@ -243,8 +243,8 @@ export default {
     pages: 0,
     items: [],
     dataEmpty: false,
+    page: 1,
     paginationParams: {
-      page: 1,
       size: 10,
       sort: {
         by: '',
@@ -259,7 +259,7 @@ export default {
   computed: {
     pageRequest() {
       const request = {}
-      request.page = this.paginationParams.page - 1
+      request.page = this.page - 1
       request.size = this.paginationParams.size
       if (this.paginationParams.sort?.by && this.paginationParams.sort?.dir) {
         request.sort = this.paginationParams.sort
@@ -281,6 +281,9 @@ export default {
     paginationParamsKey() {
       return this.dataName + 'PaginationParams'
     },
+    pageKey() {
+      return this.dataName + 'Page'
+    },
     allItemIds() {
       return this.items.map(item => item.id)
     },
@@ -293,21 +296,8 @@ export default {
   },
   watch: {
     filters() {
-      this.paginationParams.page = 1
-    },
-    pageRequest(newValue, oldValue) {
-      if (!this.pagination) {
-        return
-      }
-      const action = () => {
-        this.setUrlParams()
-        this.loadDataPage()
-      }
-      if (this.onlyPageChanged(newValue, oldValue)) {
-        action()
-      } else {
-        this.actionWithTimeout(action, 'pageRequest')
-      }
+      this.page = 1
+      this.actionWithTimeout(this.setUrlParamsAndLoadDataPage, 'filters')
     },
     loadingOverlay(newValue) {
       this.$emit('update:loading-overlay', newValue)
@@ -328,9 +318,15 @@ export default {
         if (this.validatePaginationParams()) {
           this.recalculateSortDirIcons()
           this.savePaginationParams()
+          this.page = 1
+          this.actionWithTimeout(this.setUrlParamsAndLoadDataPage, 'paginationParams')
         }
       },
       deep: true
+    },
+    page() {
+      this.savePage()
+      this.setUrlParamsAndLoadDataPage()
     },
     items() {
       this.selectedIds = this.selectedIds.filter(id => this.allItemIds.includes(id))
@@ -339,12 +335,16 @@ export default {
   mounted() {
     if (this.pagination) {
       this.restorePaginationParams()
+      this.restorePage()
       this.readUrlParams()
-      this.setUrlParams()
-      setTimeout(this.loadDataPage)
+      setTimeout(this.setUrlParamsAndLoadDataPage)
     }
   },
   methods: {
+    setUrlParamsAndLoadDataPage() {
+      this.setUrlParams()
+      this.loadDataPage()
+    },
     async loadDataPage() {
       const request = this.pageRequest
       const requestJson = JSON.stringify(request)
@@ -386,23 +386,6 @@ export default {
         pages: this.pages
       }
     },
-    onlyPageChanged(newValue, oldValue) {
-      let filtersValueChanged = false
-      if (newValue.filters && !oldValue.filters || !newValue.filters && oldValue.filters) {
-        filtersValueChanged = true
-      } else if (newValue.filters && oldValue.filters) {
-        for (const field of this.filterFieldNames) {
-          if (newValue.filters[field]?.toString() !== oldValue.filters[field]?.toString()) {
-            filtersValueChanged = true
-          }
-        }
-      }
-      const anotherPaginationParamChanged = newValue.size !== oldValue.size
-          || newValue.sort?.by !== oldValue.sort?.by
-          || newValue.sort?.dir !== oldValue.sort?.dir
-      return newValue.page.toString() !== oldValue.page.toString()
-          && !filtersValueChanged && !anotherPaginationParamChanged
-    },
     readUrlParams() {
       const route = useRoute()
       const filters = {}
@@ -429,7 +412,7 @@ export default {
       }
       const page = ref(route.query.page)
       if (page.value && !isNaN(page.value)) {
-        this.paginationParams.page = parseInt(page.value)
+        this.page = parseInt(page.value)
       }
       const size = ref(route.query.size)
       if (size.value && !isNaN(size.value)) {
@@ -443,7 +426,7 @@ export default {
       this.$emit('update:url-params', this.makeUrlParams())
     },
     makeUrlParams() {
-      let params = `?page=${this.paginationParams.page}&size=${this.paginationParams.size}`
+      let params = `?page=${this.page}&size=${this.paginationParams.size}`
       for (const paginationParamConfig of this.filteringParamsConfig) {
         const value = this.filters[paginationParamConfig.name]
         if (value) {
@@ -609,14 +592,26 @@ export default {
       const paramsJson = localStorage.getItem(this.paginationParamsKey)
       if (paramsJson) {
         const params = JSON.parse(paramsJson)
-        if (params.page && params.size && params.sort) {
+        if (params.size && params.sort) {
           this.paginationParams = params
         }
       }
     },
+    savePage() {
+      localStorage.setItem(this.pageKey, JSON.stringify({page: this.page}))
+    },
+    restorePage() {
+      const paramsJson = localStorage.getItem(this.pageKey)
+      if (paramsJson) {
+        const params = JSON.parse(paramsJson)
+        if (params.page) {
+          this.page = params.page
+        }
+      }
+    },
     validatePaginationParams() {
-      const {page, size, sort} = this.paginationParams
-      return page && size
+      const {size, sort} = this.paginationParams
+      return size
           && this.validatePageSize(size)
           && this.validateSortBy(sort.by)
           && this.validateSortDir(sort.dir)
