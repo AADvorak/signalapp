@@ -1,107 +1,118 @@
 <template>
-  <fixed-width-wrapper v-if="dataEmpty && !loadingOverlay">
-    <slot name="dataEmpty"/>
-  </fixed-width-wrapper>
-  <div v-else>
-    <v-layout fluid>
-      <div v-if="isMobile" class="element-full-width">
-        <fixed-width-wrapper v-if="pagination">
-          <v-form>
-            <div class="d-flex justify-center flex-wrap">
-              <v-select
-                  :model-value="paginationParams.sort.by"
-                  item-title="header"
-                  item-value="key"
-                  density="compact"
-                  :label="_tc('fields.sortBy')"
-                  :items="sortColsWithHeaders"
-                  clearable
-                  @update:model-value="setSortBy"/>
-              <v-btn v-if="sortDirIcons[paginationParams.sort.by]"
-                     variant="plain"
-                     @click="switchSortDir">
-                <v-icon style="width: 22px; height: 22px;">
-                  {{ sortDirIcons[paginationParams.sort.by] }}
+  <v-layout fluid>
+    <div v-if="isMobile" class="element-full-width">
+      <fixed-width-wrapper v-if="pagination">
+        <v-form>
+          <div class="d-flex justify-center flex-wrap">
+            <v-select
+                :model-value="paginationParams.sort.by"
+                item-title="header"
+                item-value="key"
+                density="compact"
+                :label="_tc('fields.sortBy')"
+                :items="sortColsWithHeaders"
+                clearable
+                @update:model-value="setSortBy"/>
+            <v-btn v-if="sortDirIcons[paginationParams.sort.by]"
+                   variant="plain"
+                   @click="switchSortDir">
+              <v-icon style="width: 22px; height: 22px;">
+                {{ sortDirIcons[paginationParams.sort.by] }}
+              </v-icon>
+            </v-btn>
+          </div>
+        </v-form>
+      </fixed-width-wrapper>
+      <fixed-width-wrapper v-if="dataEmpty && !loadingOverlay">
+        <slot name="dataEmpty"/>
+      </fixed-width-wrapper>
+      <div v-else v-for="item in items">
+        <v-card>
+          <v-card-item>
+            <v-card-title>
+              <div style="height: 48px" class="d-flex justify-start">
+                <span v-if="multiSelect"><v-checkbox v-model="selectedIds" :value="item.id" @click.stop/></span>
+                <div style="margin: 13px 0;">{{ restrictCaptionLength(item) }}</div>
+              </div>
+            </v-card-title>
+          </v-card-item>
+          <v-card-text v-if="cardDescriptionExists(item)">
+            <template v-for="column in columns">
+              <div v-if="columnValue(column, item)">
+                {{ columnHeader(column) }}: {{ columnValue(column, item) }}
+              </div>
+            </template>
+          </v-card-text>
+          <v-card-actions v-if="buttons.length" class="justify-center">
+            <template v-for="button in buttons">
+              <v-btn v-if="checkCondition(button, item)" @click="buttonClick(button.name, item)">
+                <v-icon :color="button.color">
+                  {{ makeIcon(button, item) }}
                 </v-icon>
+                <signal-folders-menu
+                    v-if="button.component === 'signal-folders-menu'"
+                    :signal-id="item.id"
+                    :bus="bus"/>
+                <user-roles-menu
+                    v-if="button.component === 'user-roles-menu'"
+                    :user="item"
+                    :bus="bus"/>
               </v-btn>
-            </div>
-          </v-form>
-        </fixed-width-wrapper>
-        <div v-for="item in items">
-          <v-card>
-            <v-card-item>
-              <v-card-title>
-                <div style="height: 48px" class="d-flex justify-start">
-                  <span v-if="multiSelect"><v-checkbox v-model="selectedIds" :value="item.id" @click.stop/></span>
-                  <div style="margin: 13px 0;">{{ restrictCaptionLength(item) }}</div>
-                </div>
-              </v-card-title>
-            </v-card-item>
-            <v-card-text v-if="cardDescriptionExists(item)">
-              <template v-for="column in columns">
-                <div v-if="columnValue(column, item)">
-                  {{ columnHeader(column) }}: {{ columnValue(column, item) }}
-                </div>
-              </template>
-            </v-card-text>
-            <v-card-actions v-if="buttons.length" class="justify-center">
-              <template v-for="button in buttons">
-                <v-btn v-if="checkCondition(button, item)" @click="buttonClick(button.name, item)">
-                  <v-icon :color="button.color">
-                    {{ makeIcon(button, item) }}
-                  </v-icon>
-                  <signal-folders-menu
-                      v-if="button.component === 'signal-folders-menu'"
-                      :signal-id="item.id"
-                      :bus="bus"/>
-                  <user-roles-menu
-                      v-if="button.component === 'user-roles-menu'"
-                      :user="item"
-                      :bus="bus"/>
-                </v-btn>
-              </template>
-            </v-card-actions>
-          </v-card>
-          <v-divider/>
-        </div>
+            </template>
+          </v-card-actions>
+        </v-card>
+        <v-divider/>
       </div>
-      <v-table :height="elementHeight" class="element-full-width" v-else fixed-header>
-        <thead>
-        <tr>
-          <th v-if="multiSelect" class="text-left no-padding">
-            <div style="height: 58px">
-              <v-checkbox v-model="selectAllItems"/>
-            </div>
-          </th>
-          <th class="text-left" @click="setSorting(caption)">
-            <span v-if="sortDirIcons[caption]">
-              <v-icon>
-                {{ sortDirIcons[caption] }}
-              </v-icon>
-            </span>
-            {{ columnHeader(caption) }}
-          </th>
-          <th v-for="column in columns" @click="setSorting(column)">
-            <span v-if="sortDirIcons[columnName(column)]">
-              <v-icon>
-               {{ sortDirIcons[columnName(column)] }}
-              </v-icon>
-            </span>
-            {{ columnHeader(column) }}
-          </th>
-          <th v-for="_ in buttons" class="text-left"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in items">
-          <td v-if="multiSelect" class="no-padding">
-            <div style="height: 58px">
-              <v-checkbox v-model="selectedIds" :value="item.id" @click.stop/>
-            </div>
-          </td>
-          <td>{{ item[caption] }}</td>
-          <td v-for="column in columns">{{ columnValue(column, item) }}</td>
-          <td v-for="button in buttons">
+      <fixed-width-wrapper v-if="pagination" class="mt-5">
+        <v-form>
+          <div class="d-flex justify-center flex-wrap">
+            <v-select
+                v-model="paginationParams.size"
+                item-title="title"
+                item-value="value"
+                :items="sizeOptions"
+                :label="_tc('pagination.pageSize')"
+                style="max-width: 150px"
+                density="compact"/>
+            <v-pagination
+                v-model="page"
+                :length="pages"
+                style="min-width: 400px"
+                density="compact"/>
+          </div>
+        </v-form>
+        <p style="text-align: center;">
+          {{ _tc('pagination.total', {pages, elements}) }}
+        </p>
+      </fixed-width-wrapper>
+    </div>
+    <v-data-table-server
+        ref="dataTable"
+        v-else
+        v-model="selectedIds"
+        v-model:items-per-page="paginationParams.size"
+        :headers="dataTableHeaders"
+        :items="items"
+        :items-length="elements"
+        :height="elementHeight"
+        item-value="id"
+        :items-per-page-text="_tc('pagination.pageSize')"
+        :items-per-page-options="sizeOptions"
+        :show-select="multiSelect"
+        :sort-asc-icon="mdi.mdiSortAscending"
+        :sort-desc-icon="mdi.mdiSortDescending"
+        :sort-by="dataTableSortBy"
+        :hide-default-footer="!pagination"
+        density="compact"
+        fixed-header
+        @update:options="onDataTableOptionsUpdate"
+    >
+      <template v-slot:no-data>
+        <slot v-if="dataEmpty" name="dataEmpty"/>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <div class="d-flex justify-center">
+          <template v-for="button in buttons">
             <btn-with-tooltip
                 v-if="checkCondition(button, item)"
                 :tooltip="makeTooltip(button, item)"
@@ -119,36 +130,11 @@
                   :user="item"
                   :bus="bus"/>
             </btn-with-tooltip>
-          </td>
-        </tr>
-        </tbody>
-      </v-table>
-    </v-layout>
-    <fixed-width-wrapper v-if="pagination">
-      <v-form>
-        <div class="d-flex justify-center flex-wrap">
-          <v-text-field
-              v-model="paginationParams.size"
-              :label="_tc('pagination.pageSize')"
-              :step="1"
-              :error="!!pageSizeValidation.length"
-              :error-messages="pageSizeValidation"
-              type="number"
-              style="max-width: 400px"
-              density="compact"
-              required/>
-          <v-pagination
-              v-model="page"
-              :length="pages"
-              style="min-width: 400px"
-              density="compact"/>
+          </template>
         </div>
-      </v-form>
-      <p style="text-align: center;">
-        {{ _tc('pagination.total', {pages, elements}) }}
-      </p>
-    </fixed-width-wrapper>
-  </div>
+      </template>
+    </v-data-table-server>
+  </v-layout>
 </template>
 
 <script>
@@ -237,7 +223,6 @@ export default {
   },
   emits: ['click', 'update:selected-items', 'update:url-params', 'update:loading-overlay', 'update:filters'],
   data: () => ({
-    selectAllItems: false,
     selectedIds: [],
     elements: 0,
     pages: 0,
@@ -254,7 +239,10 @@ export default {
     sortDirIcons: {},
     windowHeight: window.innerHeight,
     dataPageLastRequest: '',
-    pageSizeValidation: []
+    mdi: {
+      mdiSortAscending,
+      mdiSortDescending
+    }
   }),
   computed: {
     pageRequest() {
@@ -269,14 +257,51 @@ export default {
       }
       return request
     },
-    filterFieldNames() {
-      return [...this.filteringParamsConfig.map(item => item.name)]
-    },
     isMobile() {
       return mobileVersionStore().isMobile
     },
-    allItemsSelected() {
-      return this.items.length && this.selectedIds.length === this.items.length
+    dataTableHeaders() {
+      const headers = [{
+        title: this.columnHeader(this.caption),
+        key: this.caption,
+        align: 'start',
+        sortable: this.isSortable(this.caption)
+      }]
+      for (const column of this.columns) {
+        const columnName = this.columnName(column)
+        headers.push({
+          title: this.columnHeader(column),
+          key: columnName,
+          align: 'start',
+          sortable: this.isSortable(columnName),
+          value: item => this.columnValue(column, item)
+        })
+      }
+      headers.push({key: 'actions', sortable: false})
+      return headers
+    },
+    sizeOptions() {
+      const minValue = 5,
+          step = 5,
+          maxValue = appSettingsStore().settings?.maxPageSize
+      const options = []
+      const push = function (value) {
+        options.push({value, title: String(value)})
+      }
+      for (let value = minValue; value < maxValue; value += step) {
+        push(value)
+      }
+      push(maxValue)
+      return options
+    },
+    dataTableSortBy() {
+      if (!this.paginationParams.sort.by || !this.paginationParams.sort.dir) {
+        return []
+      }
+      return [{
+        key: this.paginationParams.sort.by,
+        order: this.paginationParams.sort.dir
+      }]
     },
     paginationParamsKey() {
       return this.dataName + 'PaginationParams'
@@ -297,21 +322,14 @@ export default {
   watch: {
     filters() {
       this.page = 1
+      this.dataEmpty = false
       this.actionWithTimeout(this.setUrlParamsAndLoadDataPage, 'filters')
     },
     loadingOverlay(newValue) {
       this.$emit('update:loading-overlay', newValue)
     },
     selectedIds(newValue) {
-      this.selectAllItems = this.allItemsSelected
       this.$emit('update:selected-items', this.items.filter(item => newValue.includes(item.id)))
-    },
-    selectAllItems(newValue) {
-      if (newValue) {
-        this.selectedIds = this.allItemIds
-      } else if (this.allItemsSelected) {
-        this.selectedIds = []
-      }
     },
     paginationParams: {
       handler() {
@@ -319,6 +337,7 @@ export default {
           this.recalculateSortDirIcons()
           this.savePaginationParams()
           this.page = 1
+          this.dataEmpty = false
           this.actionWithTimeout(this.setUrlParamsAndLoadDataPage, 'paginationParams')
         }
       },
@@ -410,13 +429,13 @@ export default {
       if (sortDir.value && this.paginationParams.sort && this.validateSortDir(sortDir.value)) {
         this.paginationParams.sort.dir = sortDir.value
       }
-      const page = ref(route.query.page)
-      if (page.value && !isNaN(page.value)) {
-        this.page = parseInt(page.value)
+      const page = parseInt(ref(route.query.page).value)
+      if (page && !isNaN(page)) {
+        this.page = page
       }
-      const size = ref(route.query.size)
-      if (size.value && !isNaN(size.value)) {
-        this.paginationParams.size = parseInt(size.value)
+      const size = parseInt(ref(route.query.size).value)
+      if (size && !isNaN(size) && this.validatePageSize(size)) {
+        this.paginationParams.size = size
       }
     },
     readNumberArrFromUrlParam(str, parseFunc) {
@@ -532,22 +551,6 @@ export default {
     isSortable(columnName) {
       return this.sortCols.includes(columnName)
     },
-    setSorting(column) {
-      const columnName = this.columnName(column)
-      if (!this.isSortable(columnName)) {
-        return
-      }
-      if (this.paginationParams.sort.by !== columnName) {
-        this.paginationParams.sort.by = columnName
-        this.paginationParams.sort.dir = SORT_DIRS.ASC
-      } else {
-        if (this.paginationParams.sort.dir === SORT_DIRS.ASC) {
-          this.paginationParams.sort.dir = SORT_DIRS.DESC
-        } else {
-          this.clearSorting()
-        }
-      }
-    },
     setSortBy(columnName) {
       if (!columnName) {
         this.clearSorting()
@@ -617,26 +620,24 @@ export default {
           && this.validateSortDir(sort.dir)
     },
     validatePageSize(size) {
-      this.pageSizeValidation = []
-      const value = size,
-          minValue = 5,
-          maxValue = appSettingsStore().settings?.maxPageSize
-      let validationMsg = ''
-      if (isNaN(value)) {
-        validationMsg = this._tc('validation.number')
-      } else if (value < minValue || value > maxValue) {
-        validationMsg = this._tc('validation.between', {minValue, maxValue})
-      }
-      if (validationMsg) {
-        this.pageSizeValidation.push(validationMsg)
-      }
-      return !validationMsg
+      return this.sizeOptions.map(option => option.value).includes(size)
     },
     validateSortDir(sortDir) {
       return !sortDir || [SORT_DIRS.DESC, SORT_DIRS.ASC].includes(sortDir)
     },
     validateSortBy(sortBy) {
       return !sortBy || this.sortCols.includes(sortBy)
+    },
+    onDataTableOptionsUpdate(options) {
+      this.page = options.page
+      this.paginationParams.size = options.itemsPerPage
+      const sort = options.sortBy[0]
+      if (sort) {
+        this.paginationParams.sort.by = sort.key
+        this.paginationParams.sort.dir = sort.order
+      } else {
+        this.clearSorting()
+      }
     },
     // todo
     onResize() {

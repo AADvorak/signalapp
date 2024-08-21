@@ -154,7 +154,7 @@ export default {
   }),
   computed: {
     reservedHeight() {
-      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 354 : 254
+      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 342 : 240
     },
     roles() {
       return roleStore().roles.map(role => ({...role, localeName: this.$t(`userRoles.${role.name}`)}))

@@ -278,7 +278,7 @@ export default {
       }
     },
     reservedHeight() {
-      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 486 : 330
+      return this.uiParams.openedPanels && this.uiParams.openedPanels.includes('loadParams') ? 472 : 316
     },
     viewSignalsAvailable() {
       const selectedSignalsNumber = this.selectedSignals.length
