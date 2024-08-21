@@ -44,21 +44,23 @@
             </template>
           </v-card-text>
           <v-card-actions v-if="buttons.length" class="justify-center">
-            <template v-for="button in buttons">
-              <v-btn v-if="checkCondition(button, item)" @click="buttonClick(button.name, item)">
-                <v-icon :color="button.color">
-                  {{ makeIcon(button, item) }}
-                </v-icon>
-                <signal-folders-menu
-                    v-if="button.component === 'signal-folders-menu'"
-                    :signal-id="item.id"
-                    :bus="bus"/>
-                <user-roles-menu
-                    v-if="button.component === 'user-roles-menu'"
-                    :user="item"
-                    :bus="bus"/>
-              </v-btn>
-            </template>
+            <v-btn
+                v-for="button in buttons"
+                :disabled="!checkCondition(button, item)"
+                @click="buttonClick(button.name, item)"
+            >
+              <v-icon :color="button.color">
+                {{ makeIcon(button, item) }}
+              </v-icon>
+              <signal-folders-menu
+                  v-if="button.component === 'signal-folders-menu'"
+                  :signal-id="item.id"
+                  :bus="bus"/>
+              <user-roles-menu
+                  v-if="button.component === 'user-roles-menu'"
+                  :user="item"
+                  :bus="bus"/>
+            </v-btn>
           </v-card-actions>
         </v-card>
         <v-divider/>
@@ -112,25 +114,24 @@
       </template>
       <template v-slot:item.actions="{ item }">
         <div class="d-flex justify-center">
-          <template v-for="button in buttons">
-            <btn-with-tooltip
-                v-if="checkCondition(button, item)"
-                :tooltip="makeTooltip(button, item)"
-                @click="buttonClick(button.name, item)"
-            >
-              <v-icon :color="button.color">
-                {{ makeIcon(button, item) }}
-              </v-icon>
-              <signal-folders-menu
-                  v-if="button.component === 'signal-folders-menu'"
-                  :signal-id="item.id"
-                  :bus="bus"/>
-              <user-roles-menu
-                  v-if="button.component === 'user-roles-menu'"
-                  :user="item"
-                  :bus="bus"/>
-            </btn-with-tooltip>
-          </template>
+          <btn-with-tooltip
+              v-for="button in buttons"
+              :tooltip="makeTooltip(button, item)"
+              :disabled="!checkCondition(button, item)"
+              @click="buttonClick(button.name, item)"
+          >
+            <v-icon :color="button.color">
+              {{ makeIcon(button, item) }}
+            </v-icon>
+            <signal-folders-menu
+                v-if="button.component === 'signal-folders-menu'"
+                :signal-id="item.id"
+                :bus="bus"/>
+            <user-roles-menu
+                v-if="button.component === 'user-roles-menu'"
+                :user="item"
+                :bus="bus"/>
+          </btn-with-tooltip>
         </div>
       </template>
     </v-data-table-server>
