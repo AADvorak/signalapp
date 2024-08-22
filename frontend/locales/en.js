@@ -78,6 +78,7 @@ const en = {
     },
     pagination: {
       total: 'Total: {pages} pages, {elements} entries',
+      of: 'of',
       pageSize: 'Page size',
       loadParams: 'Load parameters'
     }

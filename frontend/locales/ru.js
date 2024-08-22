@@ -78,6 +78,7 @@ const ru = {
     },
     pagination: {
       total: 'Всего: {pages} страниц, {elements} записей',
+      of: 'из',
       pageSize: 'Размер страницы',
       loadParams: 'Параметры загрузки'
     }

@@ -78,6 +78,7 @@ const pl = {
     },
     pagination: {
       total: 'Razem: {pages} stron, {elements} wpisów',
+      of: 'z',
       pageSize: 'Rozmiar strony',
       loadParams: 'Parametry ładowania'
     }

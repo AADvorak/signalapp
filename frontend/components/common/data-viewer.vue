@@ -99,6 +99,7 @@
         :height="elementHeight"
         item-value="id"
         :items-per-page-text="_tc('pagination.pageSize')"
+        :page-text="'{0}-{1} ' + _tc('pagination.of') + ' {2}'"
         :items-per-page-options="sizeOptions"
         :show-select="multiSelect"
         :sort-asc-icon="mdi.mdiSortAscending"
