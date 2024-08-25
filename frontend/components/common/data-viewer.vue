@@ -1,5 +1,5 @@
 <template>
-  <v-layout fluid>
+  <v-layout v-if="dataPageLastRequest || !pagination" fluid>
     <div v-if="isMobile" class="element-full-width">
       <fixed-width-wrapper v-if="pagination">
         <v-form>
@@ -105,6 +105,7 @@
         :sort-asc-icon="mdi.mdiSortAscending"
         :sort-desc-icon="mdi.mdiSortDescending"
         :sort-by="dataTableSortBy"
+        :page="page"
         :hide-default-footer="!pagination"
         density="compact"
         fixed-header
@@ -323,9 +324,10 @@ export default {
   },
   watch: {
     filters() {
-      this.page = 1
-      this.dataEmpty = false
-      this.actionWithTimeout(this.setUrlParamsAndLoadDataPage, 'filters')
+      if (this.dataPageLastRequest) {
+        this.dataEmpty = false
+        this.actionWithTimeout(this.onPaginationParamsOrFiltersChange, 'filters')
+      }
     },
     loadingOverlay(newValue) {
       this.$emit('update:loading-overlay', newValue)
@@ -335,12 +337,11 @@ export default {
     },
     paginationParams: {
       handler() {
-        if (this.validatePaginationParams()) {
+        if (this.dataPageLastRequest && this.validatePaginationParams()) {
           this.recalculateSortDirIcons()
           this.savePaginationParams()
-          this.page = 1
           this.dataEmpty = false
-          this.actionWithTimeout(this.setUrlParamsAndLoadDataPage, 'paginationParams')
+          this.actionWithTimeout(this.onPaginationParamsOrFiltersChange, 'paginationParams')
         }
       },
       deep: true
@@ -358,7 +359,7 @@ export default {
       this.restorePaginationParams()
       this.restorePage()
       this.readUrlParams()
-      setTimeout(this.setUrlParamsAndLoadDataPage)
+      this.setUrlParamsAndLoadDataPage()
     }
   },
   methods: {
@@ -366,7 +367,10 @@ export default {
       this.setUrlParams()
       this.loadDataPage()
     },
-    async loadDataPage() {
+    async loadDataPage(reload = false) {
+      if (reload) {
+        this.dataPageLastRequest = '{}'
+      }
       const request = this.pageRequest
       const requestJson = JSON.stringify(request)
       if (this.loadingOverlay || this.dataPageLastRequest === requestJson
@@ -632,13 +636,19 @@ export default {
     },
     onDataTableOptionsUpdate(options) {
       this.page = options.page
-      this.paginationParams.size = options.itemsPerPage
       const sort = options.sortBy[0]
       if (sort) {
         this.paginationParams.sort.by = sort.key
         this.paginationParams.sort.dir = sort.order
       } else {
         this.clearSorting()
+      }
+    },
+    onPaginationParamsOrFiltersChange() {
+      if (this.page > 1) {
+        this.page = 1
+      } else {
+        this.setUrlParamsAndLoadDataPage()
       }
     },
     // todo

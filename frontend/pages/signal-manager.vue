@@ -69,6 +69,7 @@
           </v-expansion-panels>
         </fixed-width-wrapper>
         <data-viewer
+            v-if="paramsInitComplete"
             ref="dataViewer"
             data-name="signals"
             data-url="/api/signals/page"
@@ -215,6 +216,7 @@ export default {
       }
     ],
     mounted: false,
+    paramsInitComplete: false,
     viewDialog: false,
     processDialog: false,
     sampleRates: [],
@@ -298,8 +300,7 @@ export default {
   mounted() {
     this.mounted = true
     SignalRequests.setApiProvider(this.getApiProvider())
-    this.restoreFormValues()
-    this.restoreUiParams()
+    this.initParams()
     this.loadSampleRates()
     this.loadFolders()
     this.bus.on(DataViewerEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED,
@@ -307,11 +308,17 @@ export default {
   },
   beforeUnmount() {
     this.mounted = false
+    this.paramsInitComplete = false
     this.bus.off(DataViewerEvents.SIGNAL_FOLDERS_MENU_CLOSED_FOLDERS_CHANGED)
   },
   methods: {
-    async loadDataPage() {
-      await this.$refs.dataViewer?.loadDataPage()
+    initParams() {
+      this.restoreFormValues()
+      this.restoreUiParams()
+      this.paramsInitComplete = true
+    },
+    async reloadDataPage() {
+      await this.$refs.dataViewer?.loadDataPage(true)
     },
     async loadSignalData(signal) {
       if (signal.data) {
@@ -380,8 +387,7 @@ export default {
     async deleteSignal(signal) {
       let response = await this.deleteSignalRequest(signal)
       if (response.ok) {
-        this.dataPageLastRequest = ''
-        await this.loadDataPage()
+        await this.reloadDataPage()
       }
     },
     askConfirmDeleteSelectedSignals() {
@@ -396,8 +402,7 @@ export default {
       let promiseArr = []
       this.selectedSignals.forEach(signal => promiseArr.push(this.deleteSignalRequest(signal)))
       await Promise.all(promiseArr)
-      this.dataPageLastRequest = ''
-      await this.loadDataPage()
+      await this.reloadDataPage()
     },
     deleteSignalRequest(signal) {
       return this.getApiProvider().del('/api/signals/' + signal.id)
@@ -411,8 +416,7 @@ export default {
     },
     onSignalFoldersMenuClosedFoldersChanged() {
       if (this.formValues.folderIds.length) {
-        this.dataPageLastRequest = ''
-        this.loadDataPage()
+        this.reloadDataPage()
       }
     },
     onDataViewerButtonClick({button, item}) {

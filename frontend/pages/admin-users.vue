@@ -184,8 +184,8 @@ export default {
         roleStore().roles = response.data
       }
     },
-    async loadDataPage() {
-      await this.$refs.dataViewer?.loadDataPage()
+    async reloadDataPage() {
+      await this.$refs.dataViewer?.loadDataPage(true)
     },
     setUrlParams(urlParams) {
       if (!this.mounted) {
@@ -199,8 +199,7 @@ export default {
       }
     },
     onUserRolesMenuClosedRolesChanged() {
-      this.dataPageLastRequest = ''
-      this.loadDataPage()
+      this.reloadDataPage()
     },
     onNewUserRoles(event) {
       const users = this.$refs.dataViewer?.getData()?.items || []
@@ -220,8 +219,7 @@ export default {
     async deleteUser(user) {
       let response = await this.getApiProvider().del(`/api/admin/users/${user.id}`)
       if (response.ok) {
-        this.dataPageLastRequest = ''
-        await this.loadDataPage()
+        await this.reloadDataPage()
       }
     },
   }
